@@ -4,6 +4,7 @@ import { BsEnvelope, BsLock } from "react-icons/bs";
 import { validateEmail } from "../components/utils";
 import { useRouter } from "next/navigation";
 
+
 const Login: React.FC = () => {
   const router = useRouter();
 
@@ -137,15 +138,15 @@ const Login: React.FC = () => {
             onClick={() => router.push('/signup')}
             className="h-9 rounded p-2 border border-[#E3E1D9] bg-transparent flex flex-row justify-center items-center text-center"
           >
-            <BsEnvelope />
+            <BsEnvelope className="mr-1"/>
             이메일로 가입하기
           </button>
 
           <button
             className="h-9 rounded p-2 border border-[#E3E1D9] bg-transparent flex flex-row justify-center items-center text-center"
           >
-            <img src="/path/to/btnD.png" className="w-4 h-4 mb-1" alt="Naver Logo" />
-            네이버로 가입/로그인하기
+            <img src="../images/google.png" className="w-4 h-4 mb-1 mr-1" alt="google logo" />
+            구글로 가입/로그인하기
           </button>
         </div>
       </div>
