@@ -1,6 +1,6 @@
 "use client"
 import React, { useState, useEffect } from "react";
-import { validateEmail, validatePW } from "../components/utils";
+import { validateEmail, validatePW } from "../../components/validation";
 import { BsEnvelope, BsFillLockFill } from "react-icons/bs";
 import { useRouter } from "next/navigation";
 

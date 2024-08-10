@@ -3,11 +3,16 @@
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "@types/node": "^22.1.0",
     "@types/react": "^18.3.3",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.41",
     "prettier": "^3.3.3",
     "prettier-plugin-tailwindcss": "^0.6.5",
-    "typescript": "^5.5.4"
+    "tailwindcss": "^3.4.9",
+    "typescript": "^5.5.4",
+    "vite": "^5.4.0"
   },
   "scripts": {
+    "preinstall": "npx only-allow pnpm", 
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -15,15 +20,13 @@
     "format": "prettier --check --ignore-path .gitignore ."
   },
   "dependencies": {
-    "autoprefixer": "^10.4.20",
     "firebase": "^10.12.5",
     "firebase-admin": "^12.3.1",
     "next": "^14.2.5",
-    "postcss": "^8.4.41",
+    "pnpm": "^9.7.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-icons": "^5.2.1",
-    "tailwindcss": "^3.4.8",
     "zustand": "^4.5.4"
   }
 }
