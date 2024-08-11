@@ -7,34 +7,6 @@ import { useRouter } from "next/navigation";
 
 const Login: React.FC = () => {
   const router = useRouter();
-
-  const [IDHover, setIDHover] = useState(false);
-  const [IDClick, setIDClick] = useState(false);
-  const [PWHover, setPWHover] = useState(false);
-  const [PWClick, setPWClick] = useState(false);
-
-  const IDentered = () => setIDHover(true);
-  const IDleaved = () => setIDHover(false);
-  const PWentered = () => setPWHover(true);
-  const PWleaved = () => setPWHover(false);
-
-  const IDClicked = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIDClick(true);
-    setPWClick(false);
-  };
-
-  const PWClicked = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setPWClick(true);
-    setIDClick(false);
-  };
-
-  const Clicked = () => {
-    setIDClick(false);
-    setPWClick(false);
-  };
-
   const [inputEmail, setInputEmail] = useState<string>("");
   const [inputPW, setInputPW] = useState<string>("");
   const [validate, setValidate] = useState<boolean>(true);
@@ -56,18 +28,19 @@ const Login: React.FC = () => {
     // 로그인 로직
   };
 
+
+  const [isIDFocused, setIsIDFocused] = useState<boolean>(false);
+  const [isPWFocused, setIsPWFocused] = useState<boolean>(false);
   
 
   return (
     <div
       className="flex justify-center items-center h-screen bg-[#EEEDEB] font-nanum-barun-gothic"
-      onClick={Clicked}
     >
       <div
         className="flex justify-center items-center h-3/5 w-2/5 min-w-[300px] min-h-[500px] max-w-[600px] bg-white"
-        onClick={Clicked}
       >
-        <div className="w-4/5 flex flex-col" onClick={Clicked}>
+        <div className="w-4/5 flex flex-col">
           <h5 className="font-bold text-lg ">로그인</h5>
           <hr />
           <div className="mb-4 flex flex-col">
@@ -75,13 +48,18 @@ const Login: React.FC = () => {
               아이디
             </label>
             <div
-              onClick={IDClicked}
-              className={`flex items-center border rounded p-2 h-9 transition-colors duration-500
-                ${IDClick ? (validate ? "border-black" : "border-red-500") : "border-[#E3E1D9]"}
-                ${IDHover || IDClick ? "bg-[#EEEDEB]" : "bg-transparent"}
-              `}
-              onMouseEnter={IDentered}
-              onMouseLeave={IDleaved}
+              className={`flex items-center 
+                          border rounded p-2 h-9 
+                          transition-colors duration-500 
+                          bg-transparent 
+                          hover:bg-[#EEEDEB]
+                          ${validate ? "" : "border-red-500"}
+                          ${
+                            isIDFocused
+                              ? "bg-[#EEEDEB] border-2 border-black"
+                              : "border-[#EEEDEB]"
+                          }
+                        `}
             >
               <BsEnvelope />
               <input
@@ -90,7 +68,13 @@ const Login: React.FC = () => {
                 type="email"
                 value={inputEmail}
                 onChange={onChangeEmail}
-                className="w-full p-2 box-border border-none bg-transparent focus:outline-none"
+                onFocus={() => setIsIDFocused(true)}
+                onBlur={() => setIsIDFocused(false)}
+                className="w-full p-2 
+                          box-border 
+                          border-none 
+                          bg-transparent 
+                          focus:outline-none"
               />
             </div>
           </div>
@@ -100,13 +84,18 @@ const Login: React.FC = () => {
               비밀번호
             </label>
             <div
-              onClick={PWClicked}
-              className={`flex items-center border rounded p-2 h-9 transition-colors duration-500
-                ${PWClick ? "border-black" : "border-[#E3E1D9]"}
-                ${PWHover || PWClick ? "bg-[#EEEDEB]" : "bg-transparent"}
+              className={`flex items-center 
+                          border rounded p-2 h-9 
+                          transition-colors duration-500 
+                          border #E3E1D9
+                          bg-transparent
+                          hover:bg-[#EEEDEB]
+                          ${
+                            isPWFocused
+                              ? "bg-[#EEEDEB] border-2 border-[#000000]"
+                              : "border-[#EEEDEB]"
+                          }
               `}
-              onMouseEnter={PWentered}
-              onMouseLeave={PWleaved}
             >
               <BsLock />
               <input
@@ -115,30 +104,43 @@ const Login: React.FC = () => {
                 type="password"
                 value={inputPW}
                 onChange={(event) => setInputPW(event.target.value)}
+                onFocus={() => setIsPWFocused(true)}
+                onBlur={() => setIsPWFocused(false)}
                 className="w-full p-2 box-border border-none bg-transparent focus:outline-none"
+                
               />
             </div>
           </div>
 
+          
+
           <button
             onClick={login}
             disabled={buttonDisabled}
-            className="flex justify-center items-center text-center rounded bg-black border-transparent h-9 transition-all duration-300 p-2 disabled:bg-[#C7C8CC] cursor-not-allowed"
+            className="flex 
+                      justify-center 
+                      items-center 
+                      text-center 
+                      rounded bg-black 
+                      border-transparent h-9 
+                      transition-all duration-300 p-2 
+                      disabled:bg-[#C7C8CC] 
+                      "
           >
             <p className="text-white text-sm mb-0">로그인</p>
           </button>
 
-          <div className="text-xs text-center text-[#C7C8CC] mt-2 cursor-pointer">
+          <div className="text-xs text-center text-[#C7C8CC] mt-2 cursor-pointer mb-2">
             도움이 필요하신가요?
           </div>
 
-          <hr />
+          <hr className="mb-2"/>
 
           <button
             onClick={() => router.push('/signup')}
-            className="h-9 rounded p-2 border border-[#E3E1D9] bg-transparent flex flex-row justify-center items-center text-center"
+            className="h-9 rounded p-2 border border-[#E3E1D9] bg-transparent flex flex-row justify-center items-center text-center mb-2"
           >
-            <BsEnvelope className="mr-1"/>
+            <BsEnvelope className="mr-2 mb-1"/>
             이메일로 가입하기
           </button>
 

@@ -16,7 +16,7 @@ export const validateEmail = (
   }
 };
 
-export const validatePW = (
+export const validatePassword = (
   password: string,
   setInputPW: React.Dispatch<React.SetStateAction<string>>,
   setPWValidate: React.Dispatch<React.SetStateAction<boolean>>

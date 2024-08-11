@@ -1,6 +1,6 @@
 "use client"
 import React, { useState, useEffect } from "react";
-import { validateEmail, validatePW } from "../../components/validation";
+import { validateEmail, validatePassword } from "../../components/validation";
 import { BsEnvelope, BsFillLockFill } from "react-icons/bs";
 import { useRouter } from "next/navigation";
 
@@ -10,27 +10,10 @@ const SignUp: React.FC = () => {
   // ID 부분
   const [inputEmail, setInputEmail] = useState<string>("");
   const [validateID, setValidateID] = useState<boolean>(true);
+  const [isIDFocused, setIsIDFocused] = useState<boolean>(false);
 
   const onChangeEmail = (event: React.ChangeEvent<HTMLInputElement>) => {
     validateEmail(event.target.value, setInputEmail, setValidateID);
-  };
-
-  // ID 부분 hover
-  const [IDHover, setIDHover] = useState<boolean>(false);
-  const [IDClick, setIDClick] = useState<boolean>(false);
-
-  const IDentered = () => {
-    setIDHover(true);
-  };
-
-  const IDleaved = () => {
-    setIDHover(false);
-  };
-
-  const IDClicked = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    e.stopPropagation()
-    setIDClick(true)
-    setPWClick(false)
   };
 
   useEffect(() => {
@@ -46,39 +29,21 @@ const SignUp: React.FC = () => {
     }
   }, [inputEmail, validateID]);
 
-
-
   // PW 부분
   const [inputPW, setInputPW] = useState<string>("");
-  const [IsPWvalidate, setIsPWValidate] = useState<boolean>(true);
+  const [validatePW, setValidatePW] = useState<boolean>(true);
+  const [isPWFocused, setIsPWFocused] = useState<boolean>(false);
 
   const onChangePW = (event: React.ChangeEvent<HTMLInputElement>) => {
-    validatePW(event.target.value, setInputPW, setIsPWValidate);
+    validatePassword(event.target.value, setInputPW, setValidatePW);
   }  
 
-  // PW 부분 hover
-  const [PWHover, setPWHover] = useState<boolean>(false);
-  const [PWClick, setPWClick] = useState<boolean>(false);
-
-  const PWentered = () => {
-    setPWHover(true)
-  };
-
-  const PWLeaved = () => {
-    setPWHover(false)
-  }
-
-  const PWClicked = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    e.stopPropagation()
-    setPWClick(true)
-    setIDClick(false)
-  };
-
+  // 이부분 나중에 ref 사용해서 성능 최적화 해야하지 않을까
   useEffect(() => {
     if (inputPW === "") {
       setPWInfo("");
       setPWInfoVisible(false);
-    } else if(inputPW !== "" && IsPWvalidate) {
+    } else if(inputPW !== "" && validatePW) {
       setPWInfo("")
     } else {
       setButtonDisabled(true);
@@ -87,12 +52,6 @@ const SignUp: React.FC = () => {
     }
   }, [inputPW, validatePW])
 
-
-  // 바깥을 클릭한 경우
-  const Clicked = () => {
-    setIDClick(false)
-    setPWClick(false)
-  };
 
   // button disabled
   const [buttonDisabled, setButtonDisabled] = useState<boolean>(true);
@@ -104,13 +63,13 @@ const SignUp: React.FC = () => {
 
 
 
- 
+  // 얘도 나중에 최적화 가능할 것 같구나
   // 아이디 비밀번호가 모두 옳으면
   useEffect(() => {
-    if (validateID && IsPWvalidate) {
+    if (validateID && validatePW) {
       setButtonDisabled(false);
     }
-  }, [validateID, IsPWvalidate])
+  }, [validateID, validatePW])
 
   const router = useRouter();
 
@@ -118,13 +77,11 @@ const SignUp: React.FC = () => {
   return (
     <div
       className="flex justify-center items-center h-screen bg-[#EEEDEB] font-nanum"
-      onClick={Clicked}
     >
       <div
         className="flex justify-center items-center h-3/5 w-2/5 min-w-[300px] min-h-[500px] max-w-[600px] bg-white"
-        onClick={Clicked}
       >
-        <div className="w-4/5 flex flex-col" onClick={Clicked}>
+        <div className="w-4/5 flex flex-col">
           <h5 className="font-bold">회원가입</h5>
           <hr />
           <div className="mb-4 flex flex-col">
@@ -132,18 +89,23 @@ const SignUp: React.FC = () => {
               이메일
             </label>
             <div
-              className={`flex items-center rounded-md p-2 h-[35px] transition-colors duration-500 ${
-                IDClick && !validateID
-                  ? "border-2 border-red-500"
-                  : IDClick && validateID
-                  ? "border-2 border-black"
-                  : IDClick
-                  ? "border-2 border-black"
-                  : "border border-[#E3E1D9]"
-              } ${IDHover || IDClick ? "bg-[#EEEDEB]" : "bg-transparent"}`}
-              onMouseEnter={IDentered}
-              onMouseLeave={IDleaved}
-              onClick={IDClicked}
+              className={`flex 
+                          items-center 
+                          rounded-md p-2 h-[35px] 
+                          transition-colors 
+                          duration-500 
+                          bg-transparent
+                          hover:bg-[#EEEDEB]
+                          ${
+                            validateID ? "" : "border-red-500"
+                          }
+                          ${
+                            isIDFocused
+                              ? "bg-[#EEEDEB] border-2 border-black"
+                              : "border-[#EEEDEB]"
+                          }
+              `}
+
             >
               <BsEnvelope />
               <input
@@ -151,6 +113,8 @@ const SignUp: React.FC = () => {
                 type="email"
                 value={inputEmail}
                 onChange={onChangeEmail}
+                onFocus={()=>{setIsIDFocused(true)}}
+                onBlur={()=>{setIsIDFocused(false)}}
                 className="w-full p-2 bg-transparent border-none focus:outline-none ml-2"
               />
             </div>
@@ -165,18 +129,17 @@ const SignUp: React.FC = () => {
               비밀번호
             </label>
             <div
-              className={`flex items-center rounded-md p-2 h-[35px] transition-colors duration-500 ${
-                PWClick && !validatePW
-                  ? "border-2 border-red-500"
-                  : PWClick && validatePW
-                  ? "border-2 border-black"
-                  : PWClick
-                  ? "border-2 border-black"
-                  : "border border-[#E3E1D9]"
-              } ${PWHover || PWClick ? "bg-[#EEEDEB]" : "bg-transparent"}`}
-              onMouseEnter={PWentered}
-              onMouseLeave={PWLeaved}
-              onClick={PWClicked}
+              className={`flex items-center rounded-md p-2 h-[35px] transition-colors duration-500 bg-transparent hover:bg-[#EEEDEB]
+                        ${
+                          validatePW ? "" : "border-red-500"
+                        } 
+                        ${
+                          isPWFocused
+                            ? "bg-[#EEEDEB] border-2 border-black"
+                            : "border-[#EEEDEB]"
+                        }
+
+              `}
             >
               <BsFillLockFill />
               <input
@@ -184,6 +147,8 @@ const SignUp: React.FC = () => {
                 type="password"
                 value={inputPW}
                 onChange={onChangePW}
+                onFocus={()=>{setIsPWFocused(true)}}
+                onBlur={()=>{setIsPWFocused(false)}}
                 className="w-full p-2 bg-transparent border-none focus:outline-none ml-2"
               />
             </div>
