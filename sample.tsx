@@ -1,1 +1,0 @@
-<li className={`cursor-pointer ${ pathname === item.path ? "text-blue-500" : "text-[#595959] hover:text-blue-500" } font-medium`} onClick={() => navigateTo(item.path)} > 

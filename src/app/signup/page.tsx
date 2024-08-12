@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { validateEmail, validatePassword } from "../../components/validation";
 import { BsEnvelope, BsFillLockFill } from "react-icons/bs";
 import { useRouter } from "next/navigation";
+import { signUp, checkIDExists, checkNicknameExists } from "../../firebase/firebaseApi";
 
 
 const SignUp: React.FC = () => {
@@ -12,6 +13,7 @@ const SignUp: React.FC = () => {
   const [validateID, setValidateID] = useState<boolean>(true);
   const [isIDFocused, setIsIDFocused] = useState<boolean>(false);
 
+  // 얘도 나중에 ref로 최적화 해줘야 하지 않을까
   const onChangeEmail = (event: React.ChangeEvent<HTMLInputElement>) => {
     validateEmail(event.target.value, setInputEmail, setValidateID);
   };
@@ -28,6 +30,17 @@ const SignUp: React.FC = () => {
       setIDInfoVisible(true);
     }
   }, [inputEmail, validateID]);
+
+const checkID = (id :string) => {
+  const result = checkIDExists(id);
+
+  if(result && validateID) {
+    setIDInfo("사용 가능한 아이디입니다.")
+  } else if(!result && validateID) {
+    setIDInfo("이미 존재하는 아이디입니다")
+  }
+}
+
 
   // PW 부분
   const [inputPW, setInputPW] = useState<string>("");
@@ -74,6 +87,15 @@ const SignUp: React.FC = () => {
   const router = useRouter();
 
 
+  // 닉네임 부분
+  const [inputNickname, setInputNickname] = useState<string>("");
+  const [isNicknameFocused, setIsNicknameFocused] = useState<boolean>(false);
+
+
+
+
+
+
   return (
     <div
       className="flex justify-center items-center h-screen bg-[#EEEDEB] font-nanum"
@@ -88,36 +110,47 @@ const SignUp: React.FC = () => {
             <label htmlFor="email" className="mb-2 font-bold text-sm mt-2">
               이메일
             </label>
-            <div
-              className={`flex 
-                          items-center 
-                          rounded-md p-2 h-[35px] 
-                          transition-colors 
-                          duration-500 
-                          bg-transparent
-                          hover:bg-[#EEEDEB]
-                          ${
-                            validateID ? "" : "border-red-500"
-                          }
-                          ${
-                            isIDFocused
-                              ? "bg-[#EEEDEB] border-2 border-black"
-                              : "border-[#EEEDEB]"
-                          }
-              `}
-
-            >
-              <BsEnvelope />
-              <input
-                id="id"
-                type="email"
-                value={inputEmail}
-                onChange={onChangeEmail}
-                onFocus={()=>{setIsIDFocused(true)}}
-                onBlur={()=>{setIsIDFocused(false)}}
-                className="w-full p-2 bg-transparent border-none focus:outline-none ml-2"
-              />
+            <div className="flex flex-row">
+              <div
+                className={`flex 
+                            items-center 
+                            rounded-md p-2 h-[35px] 
+                            transition-colors 
+                            duration-500 
+                            bg-transparent
+                            hover:bg-[#EEEDEB]
+                            border rounded p-2 h-9 
+                            w-[75%]
+                            mr-5
+                            ${
+                              validateID ? "" : "border-red-500"
+                            }
+                            ${
+                              isIDFocused
+                                ? "bg-[#EEEDEB] border-2 border-black"
+                                : "border-[#EEEDEB]"
+                            }
+                `}
+              
+              >
+                <BsEnvelope />
+                <input
+                  id="id"
+                  type="email"
+                  value={inputEmail}
+                  onChange={onChangeEmail}
+                  onFocus={()=>{setIsIDFocused(true)}}
+                  onBlur={()=>{setIsIDFocused(false)}}
+                  className="w-full p-2 bg-transparent border-none focus:outline-none ml-2"
+                />
+              </div>
+              <button className="flex items-center justify-center rounded-md bg-black h-[35px] p-2 transition-all duration-300 w-[20%] hover:bg-gray-700"
+                  onClick={() => checkID(inputEmail)}
+              >
+                <p className="text-white text-xs items-center justify-center">중복확인</p>
+              </button>
             </div>
+            
             <p
               className={`mt-1 text-red-500 text-xs h-4 ${
                 IDInfoVisible ? "visible" : "invisible"
@@ -129,7 +162,7 @@ const SignUp: React.FC = () => {
               비밀번호
             </label>
             <div
-              className={`flex items-center rounded-md p-2 h-[35px] transition-colors duration-500 bg-transparent hover:bg-[#EEEDEB]
+              className={`flex items-center rounded-md p-2 h-[35px] transition-colors duration-500 bg-transparent hover:bg-[#EEEDEB] border rounded p-2 h-9 
                         ${
                           validatePW ? "" : "border-red-500"
                         } 
@@ -159,15 +192,52 @@ const SignUp: React.FC = () => {
             >
               {PWInfo}
             </p>
+            <label htmlFor="email" className="mb-2 font-bold text-sm">
+              닉네임
+          </label>
+          <div className="flex flex-row">
+            <div
+                className={`flex 
+                            items-center 
+                            rounded-md p-2 h-[35px] 
+                            border rounded p-2 h-9 
+                            transition-colors 
+                            duration-500 
+                            bg-transparent
+                            hover:bg-[#EEEDEB]
+                            mb-2
+                            w-[75%]
+                            mr-5
+                            ${
+                              isNicknameFocused
+                                ? "bg-[#EEEDEB] border-2 border-black"
+                                : "border-[#EEEDEB]"
+                            }
+                `}
+
+              >
+                <input
+                  id="id"
+                  value={inputNickname}
+                  onChange={(e)=>{setInputNickname(e.target.value)}}
+                  onFocus={()=>{setIsNicknameFocused(true)}}
+                  onBlur={()=>{setIsNicknameFocused(false)}}
+                  className="w-full p-2 bg-transparent border-none focus:outline-none ml-2"
+                />
+              </div>
+              <button className="flex items-center justify-center rounded-md bg-black h-[35px] p-2 transition-all duration-300 w-[20%] hover:bg-gray-700">
+                <p className="text-white text-xs items-center justify-center">중복확인</p>
+              </button>
+            </div>
           </div>
           <button
             disabled={buttonDisabled}
-            className={`flex items-center justify-center rounded-md bg-black h-[35px] p-2 transition-all duration-300 ${
+            className={`flex items-center justify-center rounded-md bg-black h-[35px] p-2 transition-all duration-300  ${
               buttonDisabled
                 ? "bg-[#C7C8CC] cursor-not-allowed"
                 : "hover:bg-gray-700"
             }`}
-            onClick={null}
+            onClick={() => signUp(inputEmail, inputPW, inputNickname)}
           >
             <p className="text-white text-xs mr-2">회원가입</p>
             
