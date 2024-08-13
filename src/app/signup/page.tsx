@@ -4,6 +4,7 @@ import { validateEmail, validatePassword } from "../../components/validation";
 import { BsEnvelope, BsFillLockFill } from "react-icons/bs";
 import { useRouter } from "next/navigation";
 import { signUp, checkIDExists, checkNicknameExists } from "../../firebase/firebaseApi";
+import { useAuthStore } from "../../states/store";
 
 
 const SignUp: React.FC = () => {
@@ -31,12 +32,12 @@ const SignUp: React.FC = () => {
     }
   }, [inputEmail, validateID]);
 
-const checkID = (id :string) => {
-  const result = checkIDExists(id);
-
-  if(result && validateID) {
+const checkID = async (id :string) => {
+  const result = await checkIDExists(id);
+  console.log(result)
+  if(!result && validateID) {
     setIDInfo("사용 가능한 아이디입니다.")
-  } else if(!result && validateID) {
+  } else if(result && validateID) {
     setIDInfo("이미 존재하는 아이디입니다")
   }
 }
@@ -76,13 +77,6 @@ const checkID = (id :string) => {
 
 
 
-  // 얘도 나중에 최적화 가능할 것 같구나
-  // 아이디 비밀번호가 모두 옳으면
-  useEffect(() => {
-    if (validateID && validatePW) {
-      setButtonDisabled(false);
-    }
-  }, [validateID, validatePW])
 
   const router = useRouter();
 
@@ -91,7 +85,15 @@ const checkID = (id :string) => {
   const [inputNickname, setInputNickname] = useState<string>("");
   const [isNicknameFocused, setIsNicknameFocused] = useState<boolean>(false);
 
-
+  // 얘도 나중에 최적화 가능할 것 같구나
+  // 아이디 비밀번호가 모두 옳으면
+  useEffect(() => {
+    if (inputEmail !== "" && inputPW !== "" && inputNickname !== "" && validateID && validatePW) {
+      setButtonDisabled(false);
+    } else {
+      setButtonDisabled(true)
+    }
+  }, [validateID, validatePW, inputEmail, inputPW, inputNickname])
 
 
 
@@ -195,7 +197,6 @@ const checkID = (id :string) => {
             <label htmlFor="email" className="mb-2 font-bold text-sm">
               닉네임
           </label>
-          <div className="flex flex-row">
             <div
                 className={`flex 
                             items-center 
@@ -206,8 +207,7 @@ const checkID = (id :string) => {
                             bg-transparent
                             hover:bg-[#EEEDEB]
                             mb-2
-                            w-[75%]
-                            mr-5
+
                             ${
                               isNicknameFocused
                                 ? "bg-[#EEEDEB] border-2 border-black"
@@ -225,10 +225,7 @@ const checkID = (id :string) => {
                   className="w-full p-2 bg-transparent border-none focus:outline-none ml-2"
                 />
               </div>
-              <button className="flex items-center justify-center rounded-md bg-black h-[35px] p-2 transition-all duration-300 w-[20%] hover:bg-gray-700">
-                <p className="text-white text-xs items-center justify-center">중복확인</p>
-              </button>
-            </div>
+
           </div>
           <button
             disabled={buttonDisabled}

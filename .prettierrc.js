@@ -1,5 +1,5 @@
 /** @type {import('prettier').Config} */
-module.exports = {
+const config = {
   arrowParens: 'always',
   bracketSameLine: false,
   bracketSpacing: true,
@@ -24,3 +24,5 @@ module.exports = {
   importOrderSortSpecifiers: true,
   importOrderTypeScriptVersion: '5.0.0',
 };
+
+export default config;

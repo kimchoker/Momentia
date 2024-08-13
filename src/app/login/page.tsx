@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { BsEnvelope, BsLock } from "react-icons/bs";
 import { validateEmail } from "../../components/validation";
 import { useRouter } from "next/navigation";
+import { login } from "../../firebase/firebaseApi";
 
 
 const Login: React.FC = () => {
@@ -24,10 +25,20 @@ const Login: React.FC = () => {
     }
   }, [inputEmail, validate, inputPW]);
 
-  const login = async () => {
-    // 로그인 로직
-  };
+  const handleLogin = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    
+    try {
+      const userCredential = await login(inputEmail, inputPW);
 
+      if (userCredential) {
+        console.log("로그인 성공");
+        router.push('/');
+      }
+    } catch (error) {
+      console.error("로그인 실패:", error.message);
+    }
+  };
 
   const [isIDFocused, setIsIDFocused] = useState<boolean>(false);
   const [isPWFocused, setIsPWFocused] = useState<boolean>(false);
@@ -115,7 +126,7 @@ const Login: React.FC = () => {
           
 
           <button
-            onClick={login}
+            onClick={handleLogin}
             disabled={buttonDisabled}
             className="flex 
                       justify-center 

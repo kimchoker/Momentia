@@ -1,6 +1,6 @@
-import { collection, query, where, getDocs, getFirestore, addDoc, Timestamp  } from "firebase/firestore";
+import { collection, query, where, getDocs, addDoc, Timestamp  } from "firebase/firestore";
 import { db } from "./firebase";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, UserCredential } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, UserCredential } from "firebase/auth";
 import { auth } from "./firebase"
 
 interface UserData {
@@ -28,7 +28,6 @@ const checkNicknameExists = async (nickname: string) => {
   const usersRef = collection(db, "user"); 
   const q = query(usersRef, where("nickname", "==", nickname));
   const querySnapshot = await getDocs(q);
-
   // true면 중복된 닉네임이 존재
   return !querySnapshot.empty; 
 };
@@ -71,4 +70,4 @@ const login = async (email: string, password: string): Promise<UserCredential> =
 };
 
 
-export { checkNicknameExists, signUp, checkIDExists };
+export { checkIDExists, checkNicknameExists, signUp, login };
