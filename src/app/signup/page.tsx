@@ -1,6 +1,6 @@
 "use client"
 import React, { useState, useEffect } from "react";
-import { validateEmail, validatePassword } from "../../components/validation";
+import { validateEmail, validatePassword } from "../../utils/validation";
 import { BsEnvelope, BsFillLockFill } from "react-icons/bs";
 import { useRouter } from "next/navigation";
 import { signUp, checkIDExists, checkNicknameExists } from "../../firebase/firebaseApi";

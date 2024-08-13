@@ -1,7 +1,13 @@
-import Image from "next/image";
+import { uploadImage } from "../firebase/firebaseApi";
 
 export default function Home() {
   return (
-    <>홈이에요</>
+    <div>
+      <form>
+        <input type="file" />
+        <button type="submit">업로드</button>
+      </form>
+      
+    </div>
   );
 }

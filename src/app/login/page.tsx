@@ -1,12 +1,14 @@
 'use client';
 import React, { useState, useEffect } from "react";
 import { BsEnvelope, BsLock } from "react-icons/bs";
-import { validateEmail } from "../../components/validation";
+import { validateEmail } from "../../utils/validation";
 import { useRouter } from "next/navigation";
 import { login } from "../../firebase/firebaseApi";
 
 
+
 const Login: React.FC = () => {
+
   const router = useRouter();
   const [inputEmail, setInputEmail] = useState<string>("");
   const [inputPW, setInputPW] = useState<string>("");

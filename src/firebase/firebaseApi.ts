@@ -1,7 +1,7 @@
 import { collection, query, where, getDocs, addDoc, Timestamp  } from "firebase/firestore";
-import { db } from "./firebase";
+import { db, auth, storage } from "./firebase";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, UserCredential } from "firebase/auth";
-import { auth } from "./firebase"
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 interface UserData {
   bio: string;
@@ -69,5 +69,19 @@ const login = async (email: string, password: string): Promise<UserCredential> =
   }
 };
 
+const uploadImage = async (file: File): Promise<string> => {
+  try {
+    // Firebase Storage의 'images' 폴더에 파일을 업로드
+    const storageRef = ref(storage, `images/${file.name}`);
+    const snapshot = await uploadBytes(storageRef, file);
+    
+    // 업로드된 파일의 다운로드 URL을 가져옴
+    const url = await getDownloadURL(snapshot.ref);
+    return url;
+  } catch (error) {
+    console.error('Upload failed:', error);
+    throw new Error('Image upload failed');
+  }
+};
 
-export { checkIDExists, checkNicknameExists, signUp, login };
+export { checkIDExists, checkNicknameExists, signUp, login, uploadImage };
