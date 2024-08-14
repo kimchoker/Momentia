@@ -1,14 +1,13 @@
-import { collection, query, where, getDocs, addDoc, Timestamp  } from "firebase/firestore";
+import { collection, query, where, getDocs, setDoc, doc, Timestamp  } from "firebase/firestore";
 import { db, auth, storage } from "./firebase";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, UserCredential } from "firebase/auth";
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 interface UserData {
   bio: string;
   createdAt: Timestamp;
   email: string;
   nickname: string;
-  password: string;
   profileImage: string;
   updatedAt: Timestamp;
 }
@@ -45,15 +44,14 @@ async function signUp(email: string, password: string, nickname: string) {
       createdAt: now,
       email: email,
       nickname: nickname,
-      password: password,
       profileImage: "",
       updatedAt: now,
     };
 
     // Firestore에 사용자 데이터 저장 (문서 ID 자동 생성)
-    const docRef = await addDoc(collection(db, "user"), userData);
+    await setDoc(doc(db, "user", user.uid), userData);
 
-    console.log("DB에 회원정보 저장 성공:", docRef.id);
+    console.log("DB에 회원정보 저장 성공:");
   } catch (error) {
     console.error("DB에 회원정보 저장 실패:", error);
   }
@@ -76,10 +74,11 @@ const uploadImage = async (file: File): Promise<string> => {
     const snapshot = await uploadBytes(storageRef, file);
     
     // 업로드된 파일의 다운로드 URL을 가져옴
-    const url = await getDownloadURL(snapshot.ref)
+    const url = await getDownloadURL(snapshot.ref);
     return url;
   } catch (error) {
     console.error('Upload failed:', error);
+    alert("이미지 업로드에 실패했습니다.")
     throw new Error('Image upload failed');
   }
 };

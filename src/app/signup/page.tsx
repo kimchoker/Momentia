@@ -4,7 +4,7 @@ import { validateEmail, validatePassword } from "../../utils/validation";
 import { BsEnvelope, BsFillLockFill } from "react-icons/bs";
 import { useRouter } from "next/navigation";
 import { signUp, checkIDExists, checkNicknameExists } from "../../firebase/firebaseApi";
-import { useAuthStore } from "../../states/store";
+import { authStore } from "../../states/store";
 
 
 const SignUp: React.FC = () => {
@@ -37,8 +37,10 @@ const checkID = async (id :string) => {
   console.log(result)
   if(!result && validateID) {
     setIDInfo("사용 가능한 아이디입니다.")
+    setIDInfoVisible(true)
   } else if(result && validateID) {
     setIDInfo("이미 존재하는 아이디입니다")
+    setIDInfoVisible(true)
   }
 }
 

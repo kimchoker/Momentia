@@ -1,3 +1,5 @@
+import { Timestamp } from "firebase/firestore";
+
 // zustand
 export interface User {
   uid: string;
@@ -16,4 +18,13 @@ export interface AuthState {
 export interface useSidebarToggleStore {
   isOpen: boolean;
   setIsOpen: () => void;
+}
+
+export interface UserData {
+  bio: string;
+  createdAt: Timestamp;
+  email: string;
+  nickname: string;
+  profileImage: string;
+  updatedAt: Timestamp;
 }

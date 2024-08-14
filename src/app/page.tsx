@@ -14,22 +14,28 @@ export default function Home() {
   };
 
   const upload = async() => {
+    event.preventDefault();
     if (selectedImage) {
       try {
         const url = await uploadImage(selectedImage);
         setImageUrl(url)
       } catch(e) {
-        
+        console.error("Error uploading image:", e);
       }
     }
   }
 
   return (
     <div className="flex justify-center items-center h-screen bg-[#EEEDEB] font-nanum-barun-gothic">
-      <form>
+      <form onSubmit={upload}>
         <input type="file" accept="image/*" onChange={handleImageChange}/>
-        <button type="submit" onClick={upload}>업로드</button>
-        <p>{imageUrl}</p>
+        <button type="submit">업로드</button>
+        {imageUrl && (
+        <div>
+          <p>Uploaded Image:</p>
+          <img src={imageUrl} alt="Uploaded" style={{ maxWidth: '100%', maxHeight: '400px' }} />
+        </div>
+      )}
       </form>
       
     </div>

@@ -20,7 +20,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const storage = getStorage(app);
 
-export const auth: Auth = getAuth(app);
+export const auth: Auth = getAuth();
 export const db: Firestore = getFirestore(app);
 export const USER_COLLECTION: CollectionReference = collection(db, "User");
 export { storage };
