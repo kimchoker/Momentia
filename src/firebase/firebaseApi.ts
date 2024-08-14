@@ -1,7 +1,7 @@
 import { collection, query, where, getDocs, addDoc, Timestamp  } from "firebase/firestore";
 import { db, auth, storage } from "./firebase";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, UserCredential } from "firebase/auth";
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 interface UserData {
   bio: string;
@@ -76,7 +76,7 @@ const uploadImage = async (file: File): Promise<string> => {
     const snapshot = await uploadBytes(storageRef, file);
     
     // 업로드된 파일의 다운로드 URL을 가져옴
-    const url = await getDownloadURL(snapshot.ref);
+    const url = await getDownloadURL(snapshot.ref)
     return url;
   } catch (error) {
     console.error('Upload failed:', error);

@@ -12,3 +12,8 @@ export interface AuthState {
   logout: () => void;
   setError: (error: string | null) => void;
 }
+
+export interface useSidebarToggleStore {
+  isOpen: boolean;
+  setIsOpen: () => void;
+}
