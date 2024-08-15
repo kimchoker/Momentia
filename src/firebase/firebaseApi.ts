@@ -3,6 +3,7 @@ import { db, auth, storage } from "./firebase";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, UserCredential } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
+
 interface UserData {
   bio: string;
   createdAt: Timestamp;
@@ -48,7 +49,7 @@ async function signUp(email: string, password: string, nickname: string) {
       updatedAt: now,
     };
 
-    // Firestore에 사용자 데이터 저장 (문서 ID 자동 생성)
+    // Firestore에 사용자 데이터 저장 (문서 ID를 uid로)
     await setDoc(doc(db, "user", user.uid), userData);
 
     console.log("DB에 회원정보 저장 성공:");
@@ -67,6 +68,7 @@ const login = async (email: string, password: string): Promise<UserCredential> =
   }
 };
 
+// 이미지 업로드
 const uploadImage = async (file: File): Promise<string> => {
   try {
     // Firebase Storage의 'images' 폴더에 파일을 업로드

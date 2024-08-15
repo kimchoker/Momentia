@@ -9,7 +9,11 @@ const firebaseAdminConfig = {
 if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.cert(firebaseAdminConfig),
+    
   });
 }
 
-export { admin };
+const adminAuth = admin.auth();
+const adminDB = admin.firestore();
+
+export { admin, adminAuth, adminDB };

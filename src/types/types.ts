@@ -1,4 +1,5 @@
 import { Timestamp } from "firebase/firestore";
+import { ReactNode } from 'react';
 
 // zustand
 export interface User {
@@ -27,4 +28,9 @@ export interface UserData {
   nickname: string;
   profileImage: string;
   updatedAt: Timestamp;
+}
+
+// layout.tsx 설정용
+export interface LayoutProps {
+  children: ReactNode;
 }
