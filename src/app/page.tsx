@@ -1,6 +1,7 @@
 "use client"
 import { uploadImage } from "../firebase/firebaseApi";
 import { useState } from "react";
+import { ScrollArea } from '../components/ui/scroll-area';
 
 export default function Home() {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
@@ -25,7 +26,8 @@ export default function Home() {
   }
 
   return (
-    <div className="flex justify-center items-center h-screen bg-[#EEEDEB] font-nanum-barun-gothic">
+    <div className="flex justify-center items-center h-screen bg-[#ffffff] font-nanum-barun-gothic">
+      <ScrollArea className='w-[40%] h-[100%]'>
       <form onSubmit={upload}>
         <input type="file" accept="image/*" onChange={handleImageChange}/>
         <button type="submit">업로드</button>
@@ -36,6 +38,12 @@ export default function Home() {
         </div>
       )}
       </form>
+
+
+
+
+      </ScrollArea>
+      
       
     </div>
   );
