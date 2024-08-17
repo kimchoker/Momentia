@@ -6,6 +6,10 @@ const MyPage = () => {
   return (
     <div className="flex justify-center items-center h-screen font-nanum-barun-gothic">
       <ScrollArea className="flex flex-col w-[40%] h-screen justify-center items-center bg-[#d6d6d6]">
+        <div>
+          
+        </div>
+
         <div className="w-[100%] h-[300px] border-b border-black">
           {/* 프로필 부분 */}
           <div className="flex flex-row justify-start ml-5 p-3 ">

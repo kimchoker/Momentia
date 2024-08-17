@@ -17,8 +17,13 @@ export default function Home() {
     event.preventDefault();
     if (selectedImage) {
       try {
-        const url = await uploadImage(selectedImage);
+        let url = await uploadImage(selectedImage);
+        console.log(url)
+        if(url) {
+          console.log("됨?")
+        }
         setImageUrl(url)
+        url = null
       } catch(e) {
         console.error("Error uploading image:", e);
       }
@@ -29,7 +34,7 @@ export default function Home() {
     <div className="flex justify-center items-center h-screen bg-[#ffffff] font-nanum-barun-gothic">
       <ScrollArea className='w-[40%] h-[100%]'>
       <form onSubmit={upload}>
-        <input type="file" accept="image/*" onChange={handleImageChange}/>
+        <input type="file" accept="image/*" onChange={handleImageChange} />
         <button type="submit">업로드</button>
         {imageUrl && (
         <div>

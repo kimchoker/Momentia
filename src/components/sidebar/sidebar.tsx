@@ -7,11 +7,16 @@ import { PanelsTopLeft } from "lucide-react";
 import { useSidebarToggle } from "../../states/store";
 import { SidebarToggle } from "./components/admin-panel/sidebar-toggle";
 import { useStore } from "zustand";
+import { usePathname } from "next/navigation";
 
 export function Sidebar() {
+  const currentPath = usePathname();
+
+  const invisibleRoutes = ["/login", "/signup"];
+  const showSidebar = !invisibleRoutes.includes(currentPath)
   const sidebar = useStore(useSidebarToggle, (state) => state);
   
-  if(!sidebar) return null;
+  if(!sidebar || !showSidebar) return null;
 
   return (
     <aside
@@ -21,7 +26,7 @@ export function Sidebar() {
       )}
     >
       <SidebarToggle isOpen={sidebar?.isOpen} setIsOpen={sidebar?.setIsOpen} />
-      <div className="relative h-full flex flex-col px-3 py-4 overflow-y-auto shadow-md dark:shadow-zinc-800">
+      <div className="relative h-full flex flex-col px-3 py-4 overflow-y-auto shadow-md dark:shadow-zinc-800 border-none">
         <Button
           className={cn(
             "transition-transform ease-in-out duration-300 mb-1",
@@ -44,6 +49,7 @@ export function Sidebar() {
             </h1>
           </Link>
         </Button>
+        
         <Menu isOpen={sidebar?.isOpen} />
       </div>
     </aside>
