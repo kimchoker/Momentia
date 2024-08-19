@@ -4,11 +4,10 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import { useSidebarToggleStore } from '../types/types';
 
 const authStore = create<AuthState>((set) => ({
-  user: null,
-  error: null,
-  login: (userData: User) => set({ user: userData }),
-  logout: () => set({ user: null }),
-  setError: (error: string | null) => set({ error }),
+  isLoggedIn: false,
+  token: null,
+  login: (token) => set({ isLoggedIn: true, token }),
+  logout: () => set({ isLoggedIn: false, token: null }),
 }));
 
 
@@ -27,5 +26,9 @@ const useSidebarToggle = create(
   )
 );
 
+const handleLogout = () => {
+  authStore.getState().logout();
+}
 
-export { authStore, useSidebarToggle };
+
+export { authStore, useSidebarToggle, handleLogout };

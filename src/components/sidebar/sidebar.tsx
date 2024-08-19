@@ -1,7 +1,7 @@
 "use client"
 import Link from "next/link";
-import { cn } from "../../utils/utils";
-import { Button } from "./components/ui/button";
+import { cn } from "../../lib/utils";
+import { Button } from "../ui/button";
 import { Menu } from "./components/admin-panel/menu";
 import { PanelsTopLeft } from "lucide-react";
 import { useSidebarToggle } from "../../states/store";
@@ -35,7 +35,7 @@ export function Sidebar() {
           variant="link"
           asChild
         >
-          <Link href="/dashboard" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2">
             <PanelsTopLeft className="w-6 h-6 mr-1" />
             <h1
               className={cn(

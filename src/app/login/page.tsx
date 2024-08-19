@@ -4,7 +4,7 @@ import { BsEnvelope, BsLock } from "react-icons/bs";
 import { validateEmail } from "../../utils/validation";
 import { useRouter } from "next/navigation";
 import { login } from "../../services/clientApi";
-
+import Cookies from "js-cookie";
 
 
 const Login: React.FC = () => {
@@ -31,10 +31,12 @@ const Login: React.FC = () => {
     event.preventDefault();
     
     try {
-      const userCredential = await login(inputEmail, inputPW);
+      const token :string = await login(inputEmail, inputPW);
 
-      if (userCredential) {
+      if (token) {
         console.log("로그인 성공");
+        console.log(token)
+        Cookies.set('token', token, { expires: 7 })
         router.push('/');
       }
     } catch (error) {

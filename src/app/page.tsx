@@ -1,7 +1,7 @@
 "use client"
 import { uploadImage } from "../services/clientApi";
 import { useState } from "react";
-import { ScrollArea } from '../components/ui/scroll-area';
+import { ScrollArea } from '../components/ui/feed-scroll-area';
 
 export default function Home() {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);

@@ -2,6 +2,7 @@ import { collection, query, where, getDocs, setDoc, doc, Timestamp  } from "fire
 import { db, auth, storage } from "../firebase/firebase";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, UserCredential } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import strict from "assert/strict";
 
 
 interface UserData {
@@ -59,12 +60,16 @@ async function signUp(email: string, password: string, nickname: string) {
 }
 
 // 로그인
-const login = async (email: string, password: string): Promise<UserCredential> => {
+const login = async (email: string, password: string): Promise<string> => {
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    return userCredential;
+    const user = userCredential.user;
+    const token = await user.getIdToken();
+
+    return token;
+
   } catch (error) {
-    throw new Error(error.message);
+    throw new Error('로그인에 실패했습니다.');
   }
 };
 

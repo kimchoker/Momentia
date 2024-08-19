@@ -9,11 +9,10 @@ export interface User {
 }
 
 export interface AuthState {
-  user: User | null;
-  error: string | null;
-  login: (userData: User) => void;
+  isLoggedIn: boolean;
+  token: string | null;
+  login: (token :string) => void;
   logout: () => void;
-  setError: (error: string | null) => void;
 }
 
 export interface useSidebarToggleStore {
