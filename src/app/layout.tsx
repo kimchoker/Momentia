@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Sidebar } from "../components/sidebar/sidebar";
+import Providers from "../states/providers";
 
 
 export const metadata: Metadata = {
@@ -10,14 +11,19 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="en">
-      <body className="nanumbarungothic">{children}
-        <Sidebar/>
-      </body>
-    </html>
+    
+      <html lang="en">
+        <body className="nanumbarungothic">
+          <Providers>
+            {children}
+            <Sidebar/>
+          </Providers>
+        </body>
+      </html>
+    
   );
 }

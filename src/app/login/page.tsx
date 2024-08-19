@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { BsEnvelope, BsLock } from "react-icons/bs";
 import { validateEmail } from "../../utils/validation";
 import { useRouter } from "next/navigation";
-import { login } from "../../firebase/firebaseApi";
+import { login } from "../../services/clientApi";
 
 
 

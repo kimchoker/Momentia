@@ -1,5 +1,5 @@
 import { collection, query, where, getDocs, setDoc, doc, Timestamp  } from "firebase/firestore";
-import { db, auth, storage } from "./firebase";
+import { db, auth, storage } from "../firebase/firebase";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, UserCredential } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 

@@ -1,5 +1,5 @@
 "use client"
-import { uploadImage } from "../firebase/firebaseApi";
+import { uploadImage } from "../services/clientApi";
 import { useState } from "react";
 import { ScrollArea } from '../components/ui/scroll-area';
 
