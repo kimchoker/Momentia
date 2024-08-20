@@ -2,10 +2,10 @@
 import Link from "next/link";
 import { cn } from "../../lib/utils";
 import { Button } from "../ui/button";
-import { Menu } from "./components/admin-panel/menu";
+import { Menu } from "./admin-panel/menu";
 import { PanelsTopLeft } from "lucide-react";
 import { useSidebarToggle } from "../../states/store";
-import { SidebarToggle } from "./components/admin-panel/sidebar-toggle";
+import { SidebarToggle } from "./admin-panel/sidebar-toggle";
 import { useStore } from "zustand";
 import { usePathname } from "next/navigation";
 

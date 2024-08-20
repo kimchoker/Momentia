@@ -2,13 +2,13 @@
 import * as React from "react";
 import { useTheme } from "next-themes";
 import { MoonIcon, SunIcon } from "@radix-ui/react-icons";
-import { Button } from "../../ui/button";
+import { Button } from "../ui/button";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
   TooltipProvider
-} from "../../ui/tooltip";
+} from "../ui/tooltip";
 
 export function ModeToggle() {
   const { setTheme, theme } = useTheme();

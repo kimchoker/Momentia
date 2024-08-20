@@ -1,19 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { Ellipsis, LogOut } from "lucide-react";
-import { usePathname } from "next/navigation";
-import { cn } from "../../../../lib/utils";
-import { getMenuList } from "../../../../lib/menu-list";
-import { Button } from "../../../ui/button";
-import { ScrollArea } from "../../../ui/scroll-area";
+import { Ellipsis, LogOut, LogIn } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { cn } from "../../../lib/utils";
+import { getMenuList } from "../../../lib/menu-list";
+import { Button } from "../../ui/button";
+import { ScrollArea } from "../../ui/scroll-area";
 import { CollapseMenuButton } from "./collapse-menu-button";
 import {
   Tooltip,
   TooltipTrigger,
   TooltipContent,
   TooltipProvider
-} from "../../../ui/tooltip";
+} from "../../ui/tooltip";
+import { authStore } from "../../../states/store";
 
 interface MenuProps {
   isOpen: boolean | undefined;
@@ -22,6 +23,20 @@ interface MenuProps {
 export function Menu({ isOpen }: MenuProps) {
   const pathname = usePathname();
   const menuList = getMenuList(pathname);
+  const router = useRouter();
+
+  const { isLoggedIn, logOut } = authStore((state) => ({
+    isLoggedIn: state.isLoggedIn,
+    logOut: state.logout
+  }))
+
+  const handleUserState = () => {
+    if (isLoggedIn) {
+      logOut();
+    } else {
+      router.push('/login')
+    }
+  };
 
   return (
     <ScrollArea className="[&>div>div[style]]:!block">
@@ -107,12 +122,16 @@ export function Menu({ isOpen }: MenuProps) {
               <Tooltip delayDuration={100}>
                 <TooltipTrigger asChild>
                   <Button
-                    onClick={() => {}}
-                    variant="outline"
+                    onClick={() => {handleUserState}}
+                    
                     className="w-full justify-center h-10 mt-5"
                   >
                     <span className={cn(isOpen === false ? "" : "mr-4")}>
-                      <LogOut size={18} />
+                      {
+                        isLoggedIn ? 
+                        <LogIn size={18}/> : <LogOut size={18} />
+                      }
+                      
                     </span>
                     <p
                       className={cn(
@@ -120,7 +139,10 @@ export function Menu({ isOpen }: MenuProps) {
                         isOpen === false ? "opacity-0 hidden" : "opacity-100"
                       )}
                     >
-                      Sign out
+                      {
+                        isLoggedIn ? 'Sign out' : 'Sign in'
+                      }
+                      
                     </p>
                   </Button>
                 </TooltipTrigger>

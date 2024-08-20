@@ -1,9 +1,9 @@
 "use client";
-import { cn } from "../../../../lib/utils";
-import { useStore } from "../../../../hooks/use-store";
+import { cn } from "../../../lib/utils";
+import { useStore } from "../../../hooks/use-store";
 import { Footer } from "./footer";
 import { Sidebar } from "./sidebar";
-import { useSidebarToggle } from "../../../../states/store";
+import { useSidebarToggle } from "../../../states/store";
 
 export default function AdminPanelLayout({
   children

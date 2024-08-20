@@ -4,6 +4,7 @@ import { BsEnvelope, BsLock } from "react-icons/bs";
 import { validateEmail } from "../../utils/validation";
 import { useRouter } from "next/navigation";
 import { login } from "../../services/clientApi";
+import { authStore } from "../../states/store";
 import Cookies from "js-cookie";
 
 
@@ -27,6 +28,7 @@ const Login: React.FC = () => {
     }
   }, [inputEmail, validate, inputPW]);
 
+  // 로그인 시 처리
   const handleLogin = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     
@@ -37,6 +39,8 @@ const Login: React.FC = () => {
         console.log("로그인 성공");
         console.log(token)
         Cookies.set('token', token, { expires: 7 })
+        authStore.getState().login(token)
+
         router.push('/');
       }
     } catch (error) {

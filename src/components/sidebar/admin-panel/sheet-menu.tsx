@@ -1,14 +1,14 @@
 import Link from "next/link";
 import { MenuIcon, PanelsTopLeft } from "lucide-react";
 
-import { Button } from "../../../ui/button";
-import { Menu } from "../admin-panel/menu";
+import { Button } from "../../ui/button";
+import { Menu } from "./menu";
 import {
   Sheet,
   SheetHeader,
   SheetContent,
   SheetTrigger,
-} from "../../../ui/sheet";
+} from "../../ui/sheet";
 
 export function SheetMenu() {
   return (
