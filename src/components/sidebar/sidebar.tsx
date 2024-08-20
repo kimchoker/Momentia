@@ -9,11 +9,10 @@ import { SidebarToggle } from "./admin-panel/sidebar-toggle";
 import { useStore } from "zustand";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useModalStore } from "../../states/store";
 
 import {
   PostModalDialog,
-  PostModalDialogTrigger,
   PostModalDialogContent,
   PostModalDialogHeader,
   PostModalDialogFooter,
@@ -23,28 +22,16 @@ import {
   PostModalDialogCancel,
 } from "../feed/PostModal"
 
-export function Sidebar() {
+const Sidebar = () => {
   const currentPath = usePathname();
 
   const invisibleRoutes = ["/login", "/signup"];
   const showSidebar = !invisibleRoutes.includes(currentPath)
   const sidebar = useStore(useSidebarToggle, (state) => state);
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const router = useRouter();
+  const { isModalOpen, closeModal } = useModalStore();
 
-  const handleMenuClick = (href :string) => {
-    if (href === "/newpost") {
-      setIsModalOpen(true); // 모달 열기
-      console.log("씨빨")
-    } else {
-      router.push(href); // 페이지 이동
-    }
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false); // 모달 닫기
-  };
+  
 
   if(!sidebar || !showSidebar) return null;
 
@@ -57,20 +44,18 @@ export function Sidebar() {
         sidebar?.isOpen === false ? "w-[90px]" : "w-72"
       )}
     >
-      <PostModalDialog open={true} onOpenChange={setIsModalOpen}>
-              <PostModalDialogContent>
-                <PostModalDialogHeader>
-                  <PostModalDialogTitle>{"새 글 쓰기"}</PostModalDialogTitle>
-                  <PostModalDialogDescription>
-                    
-                  </PostModalDialogDescription>
-                </PostModalDialogHeader>
-                <PostModalDialogFooter>
-                  <PostModalDialogCancel onClick={closeModal}>Cancel</PostModalDialogCancel>
-                  <PostModalDialogAction>Continue</PostModalDialogAction>
-                </PostModalDialogFooter>
-              </PostModalDialogContent>
-        </PostModalDialog>
+      <PostModalDialog open={isModalOpen} onOpenChange={closeModal}>
+        <PostModalDialogContent>
+          <PostModalDialogHeader>
+            <PostModalDialogTitle>{}</PostModalDialogTitle>
+            <PostModalDialogDescription></PostModalDialogDescription>
+          </PostModalDialogHeader>
+          <PostModalDialogFooter>
+            <PostModalDialogCancel onClick={closeModal}>Cancel</PostModalDialogCancel>
+            <PostModalDialogAction>Continue</PostModalDialogAction>
+          </PostModalDialogFooter>
+        </PostModalDialogContent>
+      </PostModalDialog>
       <SidebarToggle isOpen={sidebar?.isOpen} setIsOpen={sidebar?.setIsOpen} />
       <div className="relative h-full flex flex-col px-3 py-4 overflow-y-auto shadow-md dark:shadow-zinc-800 border-none">
         <Button
@@ -96,8 +81,11 @@ export function Sidebar() {
           </Link>
         </Button>
         
-        <Menu isOpen={sidebar?.isOpen} onMenuItemClick={handleMenuClick}/>
+        <Menu isOpen={sidebar?.isOpen}/>
       </div>
     </aside>
   );
 }
+
+
+export { Sidebar }

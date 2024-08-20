@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { AuthState } from "../types/types";
+import { AuthState, ModalState } from "../types/types";
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { useSidebarToggleStore } from '../types/types';
 import Cookies from 'js-cookie';
@@ -25,14 +25,6 @@ const authStore = create<AuthState>((set) => {
       set({ isLoggedIn: false, token: null });
       Cookies.remove('token');  // 쿠키에서 토큰 삭제
     },
-
-    // 쿠키에서 토큰을 불러오는 초기화 액션
-    // initializeFromCookies: () => {
-    //   const token = Cookies.get('token');
-    //   if (token) {
-    //     set({ isLoggedIn: true, token });
-    //   }
-    // }
   };
 });
 
@@ -52,5 +44,11 @@ const useSidebarToggle = create(
   )
 );
 
+const useModalStore = create<ModalState>((set) => ({
+  isModalOpen: false,
+  openModal: () => set({ isModalOpen: true }),
+  closeModal: () => set({ isModalOpen: false }),
+}));
 
-export { authStore, useSidebarToggle };
+
+export { authStore, useSidebarToggle, useModalStore };

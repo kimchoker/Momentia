@@ -34,26 +34,6 @@ export function getMenuList(pathname: string): Group[] {
       groupLabel: "",
       menus: [
         {
-          href: "/",
-          label: "Home",
-          active: pathname.includes("/dashboard"),
-          icon: House,
-          submenus: []
-        }
-      ]
-    },
-    {
-      groupLabel: "",
-      menus: [
-        {
-          href: "/",
-          label: "Create New Posts",
-          active: pathname.includes("/newpost"),
-          icon: SquarePen,
-          submenus: [
-          ]
-        },
-        {
           href: "/dm",
           label: "DM",
           active: pathname.includes("/dm"),

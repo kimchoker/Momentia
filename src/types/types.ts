@@ -33,3 +33,9 @@ export interface UserData {
 export interface LayoutProps {
   children: ReactNode;
 }
+
+export interface ModalState {
+  isModalOpen: boolean;
+  openModal: () => void;
+  closeModal: () => void;
+}

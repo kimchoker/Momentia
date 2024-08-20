@@ -1,31 +1,26 @@
 "use client";
 
 import Link from "next/link";
-import { Ellipsis, LogOut, LogIn } from "lucide-react";
+import { Ellipsis, LogOut, LogIn, SquarePen } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "../../../lib/utils";
 import { getMenuList } from "../../../lib/menu-list";
 import { Button } from "../../ui/button";
-import { ScrollArea } from "../../ui/scroll-area";
 import { CollapseMenuButton } from "./collapse-menu-button";
-import {
-  Tooltip,
-  TooltipTrigger,
-  TooltipContent,
-  TooltipProvider
-} from "../../ui/tooltip";
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "../../ui/tooltip";
 import { authStore } from "../../../states/store";
 import { useState } from "react";
+import { useModalStore } from "../../../states/store";
 
 interface MenuProps {
   isOpen: boolean | undefined;
-  onMenuItemClick: (href :string) => void
 }
 
-export function Menu({ isOpen, onMenuItemClick }: MenuProps) {
+export function Menu({ isOpen }: MenuProps) {
   const pathname = usePathname();
   const menuList = getMenuList(pathname);
   const router = useRouter();
+  const { openModal } = useModalStore();
 
   const { isLoggedIn, logOut } = authStore((state) => ({
     isLoggedIn: state.isLoggedIn,
@@ -40,10 +35,40 @@ export function Menu({ isOpen, onMenuItemClick }: MenuProps) {
     }
   };
 
+  const [isClicked, setIsClicked] = useState(false);
+
+  const handleClick = () => {
+    setIsClicked(isClicked)
+  }
+
   return (
-    <ScrollArea className="[&>div>div[style]]:!block">
-      <nav className="mt-8 h-full w-full">
-        <ul className="flex flex-col min-h-[calc(100vh-48px-36px-16px-32px)] lg:min-h-[calc(100vh-32px-40px-32px)] items-start space-y-1 px-2">
+    
+      <nav className="mt-8 h-screen w-full overflow-hidden">
+        <ul className="flex flex-col min-h-[calc(100vh-48px-36px-16px-32px)] lg:min-h-[calc(100vh-32px-40px-32px)] items-start space-y-1 px-2 overflow-hidden">
+
+        <TooltipProvider disableHoverableContent>
+          <Tooltip delayDuration={100}>
+            <TooltipTrigger asChild>
+              <Button
+                variant={isClicked ? "secondary" : "ghost"}
+                onClick={openModal}
+                className={cn(isOpen ? "w-[248px]" : "w-[50px]", "justify-start h-10 mb-1")}
+              >
+                <span className={cn(isOpen === false ? "" : "mr-4")}>
+                  <SquarePen size={18} />
+                </span>
+                <p className={cn("max-w-[200px] truncate", isOpen === false ? "-translate-x-96 opacity-0" : "translate-x-0 opacity-100")}>
+                  Create New Post
+                </p>
+              </Button>
+            </TooltipTrigger>
+            {isOpen === false && <TooltipContent side="right">Create New Post</TooltipContent>}
+          </Tooltip>
+        </TooltipProvider>
+
+
+
+
           {menuList.map(({ groupLabel, menus }, index) => (
             <li className={cn("w-full", groupLabel ? "pt-5" : "")} key={index}>
               {(isOpen && groupLabel) || isOpen === undefined ? (
@@ -79,7 +104,7 @@ export function Menu({ isOpen, onMenuItemClick }: MenuProps) {
                               asChild
                             >
                               <Link href={href}>
-                                <span onClick={() => onMenuItemClick(href)}
+                                <span
                                   className={cn(isOpen === false ? "" : "mr-4")}
                                 >
                                   <Icon size={18} />
@@ -119,7 +144,7 @@ export function Menu({ isOpen, onMenuItemClick }: MenuProps) {
               )}
             </li>
           ))}
-          <li className="w-full grow flex items-end">
+          <li className="w-full grow flex items-end mb-5">
             {/* <TooltipProvider disableHoverableContent>
               <Tooltip delayDuration={100}>
                 <TooltipTrigger asChild> */}
@@ -128,6 +153,7 @@ export function Menu({ isOpen, onMenuItemClick }: MenuProps) {
                         <Button
                           onClick={handleUserState}
                           className="w-full justify-center h-10 mt-5"
+                          variant="ghost"
                         >
                           <span className={cn(isOpen === false ? "" : "mr-4")}>
                             <LogIn size={18} />
@@ -145,6 +171,7 @@ export function Menu({ isOpen, onMenuItemClick }: MenuProps) {
                         <Button
                           onClick={handleUserState}
                           className="w-full justify-center h-10 mt-5"
+                          variant="ghost"
                         >
                           <span className={cn(isOpen === false ? "" : "mr-4")}>
                             <LogOut size={18} />
@@ -169,6 +196,6 @@ export function Menu({ isOpen, onMenuItemClick }: MenuProps) {
           </li>
         </ul>
       </nav>
-    </ScrollArea>
+    
   );
 }
