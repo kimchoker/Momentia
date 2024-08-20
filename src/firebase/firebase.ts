@@ -25,14 +25,14 @@ export const db: Firestore = getFirestore(app);
 export const USER_COLLECTION: CollectionReference = collection(db, "User");
 export { storage };
 
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    authStore.getState().login({
-      uid: user.uid,
-      email: user.email!,
-      displayName: user.displayName,
-    } as User);
-  } else {
-    authStore.getState().logout();
-  }
-});
+// onAuthStateChanged(auth, (user) => {
+//   if (user) {
+//     authStore.getState().login({
+//       uid: user.uid,
+//       email: user.email!,
+//       displayName: user.displayName,
+//     } as User);
+//   } else {
+//     authStore.getState().logout();
+//   }
+// });
