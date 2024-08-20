@@ -15,12 +15,14 @@ import {
   TooltipProvider
 } from "../../ui/tooltip";
 import { authStore } from "../../../states/store";
+import { useState } from "react";
 
 interface MenuProps {
   isOpen: boolean | undefined;
+  onMenuItemClick: (href :string) => void
 }
 
-export function Menu({ isOpen }: MenuProps) {
+export function Menu({ isOpen, onMenuItemClick }: MenuProps) {
   const pathname = usePathname();
   const menuList = getMenuList(pathname);
   const router = useRouter();
@@ -77,7 +79,7 @@ export function Menu({ isOpen }: MenuProps) {
                               asChild
                             >
                               <Link href={href}>
-                                <span
+                                <span onClick={() => onMenuItemClick(href)}
                                   className={cn(isOpen === false ? "" : "mr-4")}
                                 >
                                   <Icon size={18} />
@@ -118,39 +120,52 @@ export function Menu({ isOpen }: MenuProps) {
             </li>
           ))}
           <li className="w-full grow flex items-end">
-            <TooltipProvider disableHoverableContent>
+            {/* <TooltipProvider disableHoverableContent>
               <Tooltip delayDuration={100}>
-                <TooltipTrigger asChild>
-                  <Button
-                    onClick={() => {handleUserState}}
-                    
-                    className="w-full justify-center h-10 mt-5"
-                  >
-                    <span className={cn(isOpen === false ? "" : "mr-4")}>
-                      {
-                        isLoggedIn ? 
-                        <LogIn size={18}/> : <LogOut size={18} />
-                      }
-                      
-                    </span>
-                    <p
-                      className={cn(
-                        "whitespace-nowrap",
-                        isOpen === false ? "opacity-0 hidden" : "opacity-100"
+                <TooltipTrigger asChild> */}
+                  <div className="w-full grow flex items-end">
+                      {!isLoggedIn ? (
+                        <Button
+                          onClick={handleUserState}
+                          className="w-full justify-center h-10 mt-5"
+                        >
+                          <span className={cn(isOpen === false ? "" : "mr-4")}>
+                            <LogIn size={18} />
+                          </span>
+                          <p
+                            className={cn(
+                              "whitespace-nowrap",
+                              isOpen === false ? "opacity-0 hidden" : "opacity-100"
+                            )}
+                          >
+                            Sign in
+                          </p>
+                        </Button>
+                      ) : (
+                        <Button
+                          onClick={handleUserState}
+                          className="w-full justify-center h-10 mt-5"
+                        >
+                          <span className={cn(isOpen === false ? "" : "mr-4")}>
+                            <LogOut size={18} />
+                          </span>
+                          <p
+                            className={cn(
+                              "whitespace-nowrap",
+                              isOpen === false ? "opacity-0 hidden" : "opacity-100"
+                            )}
+                          >
+                            Sign out
+                          </p>
+                        </Button>
                       )}
-                    >
-                      {
-                        isLoggedIn ? 'Sign out' : 'Sign in'
-                      }
-                      
-                    </p>
-                  </Button>
-                </TooltipTrigger>
+                  </div>
+                {/* </TooltipTrigger>
                 {isOpen === false && (
                   <TooltipContent side="right">Sign out</TooltipContent>
                 )}
               </Tooltip>
-            </TooltipProvider>
+            </TooltipProvider> */}
           </li>
         </ul>
       </nav>

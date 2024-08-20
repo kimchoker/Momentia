@@ -2,6 +2,18 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Sidebar } from "../components/sidebar/sidebar";
 import Providers from "../states/providers";
+import {
+  PostModalDialog,
+  PostModalDialogTrigger,
+  PostModalDialogContent,
+  PostModalDialogHeader,
+  PostModalDialogFooter,
+  PostModalDialogTitle,
+  PostModalDialogDescription,
+  PostModalDialogAction,
+  PostModalDialogCancel,
+} from "../components/feed/PostModal"
+
 
 
 export const metadata: Metadata = {
@@ -19,6 +31,7 @@ export default function RootLayout({
       <html lang="en">
         <body className="nanumbarungothic">
           <Providers>
+            
             {children}
             <Sidebar/>
           </Providers>
@@ -27,3 +40,5 @@ export default function RootLayout({
     
   );
 }
+
+

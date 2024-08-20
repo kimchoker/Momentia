@@ -47,7 +47,7 @@ export function getMenuList(pathname: string): Group[] {
         {
           href: "",
           label: "Posts",
-          active: pathname.includes("/posts"),
+          active: pathname.includes("/newpost"),
           icon: SquarePen,
           submenus: [
             {
@@ -59,6 +59,7 @@ export function getMenuList(pathname: string): Group[] {
               href: "/posts/new",
               label: "New Post",
               active: pathname === "/posts/new"
+              
             }
           ]
         },
