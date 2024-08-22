@@ -1,11 +1,9 @@
 import {
   Users,
   Settings,
-  SquarePen,
   LucideIcon,
   MessageSquare,
   Bell,
-  House
 } from "lucide-react";
 
 

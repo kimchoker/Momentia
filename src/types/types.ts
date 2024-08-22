@@ -8,6 +8,7 @@ export interface User {
   
 }
 
+// 유저 인증상태
 export interface AuthState {
   isLoggedIn: boolean;
   token: string | null;
@@ -15,11 +16,13 @@ export interface AuthState {
   logout: () => void;
 }
 
+// 사이드바 열림 닫힘
 export interface useSidebarToggleStore {
   isOpen: boolean;
   setIsOpen: () => void;
 }
 
+// 유저 데이터
 export interface UserData {
   bio: string;
   createdAt: Timestamp;
@@ -34,8 +37,18 @@ export interface LayoutProps {
   children: ReactNode;
 }
 
+// 글쓰기/수정 모달 상태 관리용
 export interface ModalState {
   isModalOpen: boolean;
   openModal: () => void;
   closeModal: () => void;
+}
+
+// 글쓰기/수정 관련 타입
+export interface PostData {
+  content: string;
+  userId: string;
+  images: { url: string; fileName: string }[];
+  likeCount: number;
+  commentCount: number;
 }

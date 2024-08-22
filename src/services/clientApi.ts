@@ -1,18 +1,9 @@
-import { collection, query, where, getDocs, setDoc, doc, Timestamp  } from "firebase/firestore";
+import { collection, query, where, getDocs, setDoc, doc, Timestamp, addDoc, serverTimestamp  } from "firebase/firestore";
 import { db, auth, storage } from "../firebase/firebase";
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, UserCredential } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import strict from "assert/strict";
+import { PostData, UserData } from '../types/types';
 
-
-interface UserData {
-  bio: string;
-  createdAt: Timestamp;
-  email: string;
-  nickname: string;
-  profileImage: string;
-  updatedAt: Timestamp;
-}
 
 // 아이디 중복확인
 const checkIDExists = async (id: string) => {
@@ -74,15 +65,19 @@ const login = async (email: string, password: string): Promise<string> => {
 };
 
 // 이미지 업로드
-const uploadImage = async (file: File): Promise<string> => {
+const uploadImage = async (file: File): Promise<{url :string, fileName :string}> => {
   try {
-    // Firebase Storage의 'images' 폴더에 파일을 업로드
-    const storageRef = ref(storage, `images/${file.name}`);
+    // 이미지 파일의 수정/삭제를 위한 고유 이름 붙여 업로드
+    const uploadedFileName = `${Date.now()}_${file.name}`;
+    // Firebase Storage의 'images' 폴더를 지정
+    const storageRef = ref(storage, `images/${uploadedFileName}`);
+    // 이미지 파일 업로드
     const snapshot = await uploadBytes(storageRef, file);
-    
     // 업로드된 파일의 다운로드 URL을 가져옴
     const url = await getDownloadURL(snapshot.ref);
-    return url;
+    // 업로드 된 이미지의 url과 파일이름을 return
+    return { url, fileName: uploadedFileName };
+
   } catch (error) {
     console.error('Upload failed:', error);
     alert("이미지 업로드에 실패했습니다.")
@@ -90,4 +85,18 @@ const uploadImage = async (file: File): Promise<string> => {
   }
 };
 
-export { checkIDExists, checkNicknameExists, signUp, login, uploadImage };
+
+// 글 업로드
+const savePost = async (postData: PostData) => {
+  try {
+    await addDoc(collection(db, 'posts'), {
+      ...postData,
+      createdAt: serverTimestamp(),
+    });
+    console.log('글 작성에 성공했습니다!');
+  } catch (e) {
+    console.error('Error adding post: ', e);
+  }
+};
+
+export { checkIDExists, checkNicknameExists, signUp, login, uploadImage, savePost };

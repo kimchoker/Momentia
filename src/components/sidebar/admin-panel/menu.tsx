@@ -9,7 +9,7 @@ import { Button } from "../../ui/button";
 import { CollapseMenuButton } from "./collapse-menu-button";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "../../ui/tooltip";
 import { authStore } from "../../../states/store";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useModalStore } from "../../../states/store";
 
 interface MenuProps {
@@ -22,23 +22,26 @@ export function Menu({ isOpen }: MenuProps) {
   const router = useRouter();
   const { openModal } = useModalStore();
 
-  const { isLoggedIn, logOut } = authStore((state) => ({
-    isLoggedIn: state.isLoggedIn,
-    logOut: state.logout
-  }))
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    // 클라이언트 사이드에서만 상태를 읽도록 설정
+    const { isLoggedIn } = authStore.getState();
+    setIsLoggedIn(isLoggedIn);
+  }, []);
 
   const handleUserState = () => {
     if (isLoggedIn) {
-      logOut();
+      authStore.getState().logout();
     } else {
-      router.push('/login')
+      router.push('/login');
     }
   };
 
   const [isClicked, setIsClicked] = useState(false);
 
   const handleClick = () => {
-    setIsClicked(isClicked)
+    setIsClicked(prevState => !prevState);
   }
 
   return (
@@ -145,54 +148,18 @@ export function Menu({ isOpen }: MenuProps) {
             </li>
           ))}
           <li className="w-full grow flex items-end mb-5">
-            {/* <TooltipProvider disableHoverableContent>
-              <Tooltip delayDuration={100}>
-                <TooltipTrigger asChild> */}
-                  <div className="w-full grow flex items-end">
-                      {!isLoggedIn ? (
-                        <Button
-                          onClick={handleUserState}
-                          className="w-full justify-center h-10 mt-5"
-                          variant="ghost"
-                        >
-                          <span className={cn(isOpen === false ? "" : "mr-4")}>
-                            <LogIn size={18} />
-                          </span>
-                          <p
-                            className={cn(
-                              "whitespace-nowrap",
-                              isOpen === false ? "opacity-0 hidden" : "opacity-100"
-                            )}
-                          >
-                            Sign in
-                          </p>
-                        </Button>
-                      ) : (
-                        <Button
-                          onClick={handleUserState}
-                          className="w-full justify-center h-10 mt-5"
-                          variant="ghost"
-                        >
-                          <span className={cn(isOpen === false ? "" : "mr-4")}>
-                            <LogOut size={18} />
-                          </span>
-                          <p
-                            className={cn(
-                              "whitespace-nowrap",
-                              isOpen === false ? "opacity-0 hidden" : "opacity-100"
-                            )}
-                          >
-                            Sign out
-                          </p>
-                        </Button>
-                      )}
-                  </div>
-                {/* </TooltipTrigger>
-                {isOpen === false && (
-                  <TooltipContent side="right">Sign out</TooltipContent>
-                )}
-              </Tooltip>
-            </TooltipProvider> */}
+            <Button
+              onClick={handleUserState}
+              className="w-full justify-center h-10 mt-5"
+              variant="ghost"
+            >
+              <span className={cn(isOpen ? "mr-4" : "")}>
+                {isLoggedIn ? <LogOut size={18} /> : <LogIn size={18} />}
+              </span>
+              <p className={cn("whitespace-nowrap", isOpen ? "opacity-100" : "opacity-0 hidden")}>
+                {isLoggedIn ? "Sign out" : "Sign in"}
+              </p>
+            </Button>
           </li>
         </ul>
       </nav>

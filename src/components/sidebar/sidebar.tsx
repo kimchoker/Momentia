@@ -3,36 +3,21 @@ import Link from "next/link";
 import { cn } from "../../lib/utils";
 import { Button } from "../ui/button";
 import { Menu } from "./admin-panel/menu";
-import { PanelsTopLeft, Swords } from "lucide-react";
+import { Swords } from "lucide-react";
 import { useSidebarToggle } from "../../states/store";
 import { SidebarToggle } from "./admin-panel/sidebar-toggle";
 import { useStore } from "zustand";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
 import { useModalStore } from "../../states/store";
-
-import {
-  PostModalDialog,
-  PostModalDialogContent,
-  PostModalDialogHeader,
-  PostModalDialogFooter,
-  PostModalDialogTitle,
-  PostModalDialogDescription,
-  PostModalDialogAction,
-  PostModalDialogCancel,
-} from "../feed/PostModal"
+import WritingComponent from "../feed/PostWriting";
+import { PostModalDialog, PostModalDialogContent, PostModalDialogHeader, PostModalDialogFooter, PostModalDialogTitle, PostModalDialogDescription } from "../feed/PostModal"
 
 const Sidebar = () => {
   const currentPath = usePathname();
-
   const invisibleRoutes = ["/login", "/signup"];
   const showSidebar = !invisibleRoutes.includes(currentPath)
   const sidebar = useStore(useSidebarToggle, (state) => state);
-
   const { isModalOpen, closeModal } = useModalStore();
-
-  
-
   if(!sidebar || !showSidebar) return null;
 
 
@@ -47,12 +32,12 @@ const Sidebar = () => {
       <PostModalDialog open={isModalOpen} onOpenChange={closeModal}>
         <PostModalDialogContent>
           <PostModalDialogHeader>
-            <PostModalDialogTitle>{}</PostModalDialogTitle>
-            <PostModalDialogDescription></PostModalDialogDescription>
+            <PostModalDialogTitle></PostModalDialogTitle>
+            <PostModalDialogDescription>
+              <WritingComponent/>
+            </PostModalDialogDescription>
           </PostModalDialogHeader>
           <PostModalDialogFooter>
-            <PostModalDialogCancel onClick={closeModal}>Cancel</PostModalDialogCancel>
-            <PostModalDialogAction>Continue</PostModalDialogAction>
           </PostModalDialogFooter>
         </PostModalDialogContent>
       </PostModalDialog>

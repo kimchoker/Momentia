@@ -17,7 +17,7 @@ const ModalOpen = ({ closeModal }) => {
         <AlertDialogPrimitive.Content className={cn("fixed inset-0 z-50 bg-white p-4 m-auto max-w-md rounded")}>
           <AlertDialogPrimitive.Title>Modal Title</AlertDialogPrimitive.Title>
           <AlertDialogPrimitive.Description>
-            This is the modal description.
+            
           </AlertDialogPrimitive.Description>
           <div className="flex justify-end space-x-2 mt-4">
             <AlertDialogPrimitive.Cancel asChild>

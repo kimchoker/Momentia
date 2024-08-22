@@ -5,7 +5,7 @@ import { useSidebarToggleStore } from '../types/types';
 import Cookies from 'js-cookie';
 
 const authStore = create<AuthState>((set) => {
-  // 페이지 로드 시 쿠키에서 토큰을 불러와 상태 초기화 ㅁㄴㅇㄴㅁ
+  // 페이지 로드 시 쿠키에서 토큰을 불러와 상태 초기화 
   const token = Cookies.get('token');
   const isLoggedIn = !!token;  // 토큰이 있으면 true, 없으면 false
   console.log("새로고침")
