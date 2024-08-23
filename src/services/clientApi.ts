@@ -89,7 +89,7 @@ const uploadImage = async (file: File): Promise<{url :string, fileName :string}>
 // 글 업로드
 const savePost = async (postData: PostData) => {
   try {
-    await addDoc(collection(db, 'posts'), {
+    await addDoc(collection(db, 'Feed'), {
       ...postData,
       createdAt: serverTimestamp(),
     });
@@ -99,4 +99,15 @@ const savePost = async (postData: PostData) => {
   }
 };
 
-export { checkIDExists, checkNicknameExists, signUp, login, uploadImage, savePost };
+// 글 받아오기
+const getFeedPosts = async () => {
+  const feedCollection = collection(db, "feed");
+  const feedSnapshot = await getDocs(feedCollection);
+  const feedList = feedSnapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data()
+  }));
+  return feedList;
+};
+
+export { checkIDExists, checkNicknameExists, signUp, login, uploadImage, savePost, getFeedPosts };

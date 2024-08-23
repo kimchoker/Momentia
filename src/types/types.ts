@@ -12,6 +12,7 @@ export interface User {
 export interface AuthState {
   isLoggedIn: boolean;
   token: string | null;
+  intervalId: NodeJS.Timeout | null;
   login: (token :string) => void;
   logout: () => void;
 }
