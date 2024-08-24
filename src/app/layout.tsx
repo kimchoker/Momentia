@@ -20,7 +20,6 @@ export default function RootLayout({
         </Head>
         <body className="nanumbarungothic">
             <Providers>
-              <Sibar/>
               {children}
             </Providers>
         </body>

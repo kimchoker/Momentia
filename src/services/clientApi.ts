@@ -3,6 +3,7 @@ import { db, auth, storage } from "../firebase/firebase";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { PostData, UserData } from '../types/types';
+import Cookies from "js-cookie";
 
 
 // 아이디 중복확인
@@ -109,5 +110,8 @@ const getFeedPosts = async () => {
   }));
   return feedList;
 };
+
+// 글 작성을 위한 유저 정보 받아오기
+
 
 export { checkIDExists, checkNicknameExists, signUp, login, uploadImage, savePost, getFeedPosts };

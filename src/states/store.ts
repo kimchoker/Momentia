@@ -9,6 +9,7 @@ const authStore = create<AuthState>((set) => {
   // 페이지 로드 시 쿠키에서 토큰을 불러와 상태 초기화 
   const token = Cookies.get('token');
   const isLoggedIn = !!token;
+  console.log("새로고침 확인 - Token:", token, "IsLoggedIn:", isLoggedIn);
 
   // Firebase 인증 객체
 

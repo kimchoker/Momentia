@@ -35,34 +35,34 @@ const WritingComponent: React.FC<WritingComponentProps> = ({ placeholder }) => {
     }
   };
 
-  // 유저 정보를 가져오는 함수
   const fetchUserInfo = async () => {
     try {
       const token = Cookies.get('token');
-      if (!token) throw new Error('No token found');
-
+      if (!token) throw new Error('토큰이 없음');
+  
       const response = await fetch("/api/getuseruid", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ idToken: token }),
       });
-
-      if (!response.ok) throw new Error(`Failed to fetch user info: ${await response.text()}`);
-
+  
+      if (!response.ok) throw new Error(`뭔가 오류가 있음: ${await response.text()}`);
+  
       const data = await response.json();
+      
       setUserInfo({ uid: data.uid, email: data.email, nickname: data.nickname });
+
     } catch (e) {
-      console.error("Error fetching user info:", e);
+      console.error("뭔가 오류가 있음:", e);
     }
   };
 
   // 이미지 업로드 및 글 저장 처리
   const handlePostSubmit = async () => {
     try {
-      if (!userInfo) {
-        await fetchUserInfo();
-        if (!userInfo) throw new Error('User information is missing.');
-      }
+      await fetchUserInfo();
+      // setUserInfo({ uid: data.uid, email: data.email, nickname: data.nickname });
+      if (!userInfo) throw new Error('유저 정보가 없습니다.');
 
       const uploaded: { url: string; fileName: string }[] = [];
       for (const image of selectedImages) {
@@ -83,7 +83,7 @@ const WritingComponent: React.FC<WritingComponentProps> = ({ placeholder }) => {
       };
 
       await savePost(postData);
-      alert("The post has been successfully registered!");
+      alert("새 글이 등록되었습니다.");
 
       setContent('');
       setSelectedImages([]);
@@ -91,15 +91,11 @@ const WritingComponent: React.FC<WritingComponentProps> = ({ placeholder }) => {
       setUploadedImages([]);
       closeModal();
     } catch (e) {
-      console.error("An error occurred while saving the post:", e);
+      console.error("글 작성 중 오류가 발생했습니다 :", e);
     }
   };
 
   useEffect(() => {
-    // Fetch user info on component mount
-    fetchUserInfo();
-
-    // Prevent memory leak - release preview URLs
     return () => {
       previewUrls.forEach((url) => URL.revokeObjectURL(url));
     };
