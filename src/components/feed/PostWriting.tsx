@@ -4,6 +4,7 @@ import Cookies from 'js-cookie';
 import { savePost } from '../../services/clientApi';
 import { useModalStore } from '../../states/store';
 import { Button } from '../ui/button';
+import { fetchUserInfo } from '../../services/clientApi';
 
 interface WritingComponentProps {
   placeholder?: string;
@@ -35,34 +36,34 @@ const WritingComponent: React.FC<WritingComponentProps> = ({ placeholder }) => {
     }
   };
 
-  const fetchUserInfo = async () => {
-    try {
-      const token = Cookies.get('token');
-      if (!token) throw new Error('토큰이 없음');
+  // const fetchUserInfo = async () => {
+  //   try {
+  //     const token = Cookies.get('token');
+  //     if (!token) throw new Error('토큰이 없음');
   
-      const response = await fetch("/api/getuseruid", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ idToken: token }),
-      });
+  //     const response = await fetch("/api/getuseruid", {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({ idToken: token }),
+  //     });
   
-      if (!response.ok) throw new Error(`뭔가 오류가 있음: ${await response.text()}`);
+  //     if (!response.ok) throw new Error(`뭔가 오류가 있음: ${await response.text()}`);
   
-      const data = await response.json();
+  //     const data = await response.json();
       
-      setUserInfo({ uid: data.uid, email: data.email, nickname: data.nickname });
+  //     setUserInfo({ uid: data.uid, email: data.email, nickname: data.nickname });
 
-    } catch (e) {
-      console.error("뭔가 오류가 있음:", e);
-    }
-  };
+  //   } catch (e) {
+  //     console.error("뭔가 오류가 있음:", e);
+  //   }
+  // };
 
   // 이미지 업로드 및 글 저장 처리
   const handlePostSubmit = async () => {
     try {
-      await fetchUserInfo();
+      const userData = await fetchUserInfo();
       // setUserInfo({ uid: data.uid, email: data.email, nickname: data.nickname });
-      if (!userInfo) throw new Error('유저 정보가 없습니다.');
+      if (!userData) throw new Error('유저 정보가 없습니다.');
 
       const uploaded: { url: string; fileName: string }[] = [];
       for (const image of selectedImages) {
@@ -73,9 +74,9 @@ const WritingComponent: React.FC<WritingComponentProps> = ({ placeholder }) => {
       setUploadedImages([...uploadedImages, ...uploaded]);
 
       const postData = {
-        userId: userInfo.uid,
-        email: userInfo.email,
-        nickname: userInfo.nickname,
+        userId: userData.uid,
+        email: userData.email,
+        nickname: userData.nickname,
         content,
         likeCount: 0,
         commentCount: 0,

@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     const uid = decodedToken.uid;
 
     // Firestore에서 해당 유저의 문서 가져오기
-    const userDocRef = db.collection('users').doc(uid); // users 컬렉션에서 uid로 문서 참조 생성
+    const userDocRef = db.collection('user').doc(uid); // user 컬렉션에서 uid로 문서 참조 생성
     const userDocSnap = await userDocRef.get();
 
     // 문서가 존재하는지 확인

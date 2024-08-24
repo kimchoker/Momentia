@@ -5,8 +5,6 @@ import { validateEmail } from "../../utils/validation";
 import { useRouter } from "next/navigation";
 import { login } from "../../services/clientApi";
 import { authStore } from "../../states/store";
-import Cookies from "js-cookie";
-
 
 const Login: React.FC = () => {
 
@@ -36,9 +34,7 @@ const Login: React.FC = () => {
       const token :string = await login(inputEmail, inputPW);
 
       if (token) {
-        console.log("로그인 성공");
-        console.log(token)
-        Cookies.set('token', token, { expires: 7 })
+        console.log("로그인 성공", token);
         authStore.getState().login(token)
 
         router.push('/');

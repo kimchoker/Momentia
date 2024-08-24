@@ -1,7 +1,5 @@
 'use client'
 import "./globals.css";
-import Sibar from "../components/new-neo-sidebar";
-import Providers from "../states/providers";
 import Head from "next/head";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
@@ -19,9 +17,7 @@ export default function RootLayout({
           <meta name="description" content=""/>
         </Head>
         <body className="nanumbarungothic">
-            <Providers>
               {children}
-            </Providers>
         </body>
       </html>
     </QueryClientProvider>

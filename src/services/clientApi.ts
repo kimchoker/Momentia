@@ -113,5 +113,26 @@ const getFeedPosts = async () => {
 
 // 글 작성을 위한 유저 정보 받아오기
 
+const fetchUserInfo = async () => {
+  try {
+    const token = Cookies.get('token');
+    if (!token) throw new Error('토큰이 없음');
 
-export { checkIDExists, checkNicknameExists, signUp, login, uploadImage, savePost, getFeedPosts };
+    const response = await fetch("/api/getuseruid", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ idToken: token }),
+    });
+
+    if (!response.ok) throw new Error(`뭔가 오류가 있음: ${await response.text()}`);
+
+    const data = await response.json();
+    
+    return data;
+
+  } catch (e) {
+    console.error("뭔가 오류가 있음:", e);
+  }
+};
+
+export { checkIDExists, checkNicknameExists, signUp, login, uploadImage, savePost, getFeedPosts, fetchUserInfo };
