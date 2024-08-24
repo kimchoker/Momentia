@@ -39,9 +39,7 @@ const Sibar= () => {
 		}
 	}
 
-	useEffect(() => {
 
-	}, [])
 
   if(!sidebar || !showSidebar) return null;
 	
