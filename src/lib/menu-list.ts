@@ -1,9 +1,5 @@
 import {
-  Users,
-  Settings,
-  LucideIcon,
-  MessageSquare,
-  Bell,
+  Users, Settings, LucideIcon, MessageSquare, Bell,
 } from "lucide-react";
 
 

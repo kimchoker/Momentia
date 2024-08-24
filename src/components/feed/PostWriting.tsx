@@ -1,12 +1,9 @@
-"use client";
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { uploadImage } from '../../services/clientApi';
 import Cookies from 'js-cookie';
 import { savePost } from '../../services/clientApi';
 import { useModalStore } from '../../states/store';
 import { Button } from '../ui/button';
-
 
 interface WritingComponentProps {
   placeholder?: string;
@@ -16,7 +13,8 @@ const WritingComponent: React.FC<WritingComponentProps> = ({ placeholder }) => {
   const [content, setContent] = useState<string>('');
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
-  const [uploadedImages, setUploadedImages] = useState<{ url: string; fileName: string }[]>([]); // 업로드된 이미지 정보 저장
+  const [uploadedImages, setUploadedImages] = useState<{ url: string; fileName: string }[]>([]);
+  const [userInfo, setUserInfo] = useState<{ uid: string; email: string; nickname: string } | null>(null);
   const { closeModal } = useModalStore();
 
   // 텍스트 입력 핸들러
@@ -37,104 +35,102 @@ const WritingComponent: React.FC<WritingComponentProps> = ({ placeholder }) => {
     }
   };
 
-  // 이미지 업로드 및 글 저장 처리
-  const handlePostSubmit = async () => {
+  // 유저 정보를 가져오는 함수
+  const fetchUserInfo = async () => {
     try {
-      // 쿠키에서 저장된 토큰 가져오기
       const token = Cookies.get('token');
+      if (!token) throw new Error('No token found');
 
-      // 토큰이 없으면 함수 종료
-      if (!token) return;
-
-      // 서버에 토큰을 보내 사용자 UID를 얻음
       const response = await fetch("/api/getuseruid", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ idToken: token }),
       });
 
-      const { userData } = await response.json();
-      const userID = userData.uid;
+      if (!response.ok) throw new Error(`Failed to fetch user info: ${await response.text()}`);
 
-      // 선택된 이미지 업로드
+      const data = await response.json();
+      setUserInfo({ uid: data.uid, email: data.email, nickname: data.nickname });
+    } catch (e) {
+      console.error("Error fetching user info:", e);
+    }
+  };
+
+  // 이미지 업로드 및 글 저장 처리
+  const handlePostSubmit = async () => {
+    try {
+      if (!userInfo) {
+        await fetchUserInfo();
+        if (!userInfo) throw new Error('User information is missing.');
+      }
+
       const uploaded: { url: string; fileName: string }[] = [];
       for (const image of selectedImages) {
         const result = await uploadImage(image);
-        if (result) {
-          uploaded.push(result);
-        }
+        if (result) uploaded.push(result);
       }
 
       setUploadedImages([...uploadedImages, ...uploaded]);
 
-      // 파이어베이스에 글 데이터 저장
       const postData = {
-        userId: userID, // 서버에서 받은 UID
-        content: content,
+        userId: userInfo.uid,
+        email: userInfo.email,
+        nickname: userInfo.nickname,
+        content,
         likeCount: 0,
         commentCount: 0,
-        images: uploaded.map(img => ({ url: img.url, fileName: img.fileName })), // 이미지 URL과 파일 이름 포함
-     };
+        images: uploaded.map(img => ({ url: img.url, fileName: img.fileName })),
+      };
 
-      await savePost(postData); // 파이어베이스에 저장
-      alert("게시글이 성공적으로 등록되었습니다!");
+      await savePost(postData);
+      alert("The post has been successfully registered!");
 
-      // 초기화
       setContent('');
       setSelectedImages([]);
       setPreviewUrls([]);
       setUploadedImages([]);
-      closeModal()
+      closeModal();
     } catch (e) {
-      console.error("게시글 저장 중 오류 발생:", e);
+      console.error("An error occurred while saving the post:", e);
     }
   };
 
+  useEffect(() => {
+    // Fetch user info on component mount
+    fetchUserInfo();
+
+    // Prevent memory leak - release preview URLs
+    return () => {
+      previewUrls.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [previewUrls]);
 
   return (
-    <div className="max-w-lg mx-auto p-1 bg-white  rounded-lg">
-      <h2 className="text-2xl font-semibold mb-4"></h2>
+    <div className="max-w-lg mx-auto p-1 bg-white rounded-lg">
       <textarea
         className="w-full h-56 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
-        placeholder={placeholder || '멋진 글을 올려주세요!'}
+        placeholder={placeholder || 'Please post a great article!'}
         value={content}
         onChange={handleChange}
       />
 
-      {/* 이미지 업로드 폼 */}
-      
-        <input 
-          type="file" 
-          accept="image/*" 
-          multiple // 다중 이미지 선택 가능
-          onChange={handleImageChange} 
-          className="mb-2"
-        />
-      
+      <div>
+        <input type="file" accept="image/*" multiple onChange={handleImageChange} className="mb-2"/>
+      </div>
 
-      {/* 선택된 이미지 미리보기 (썸네일) */}
       <div className="mt-4 flex flex-wrap">
         {previewUrls.map((url, index) => (
           <div key={index} className="w-20 h-20 border border-gray-300 rounded-lg overflow-hidden m-1">
-            <img 
-              src={url} 
-              alt={`Preview ${index}`} 
-              className="w-full h-full object-contain" // 이미지 비율을 유지하면서 박스 내에 맞춤
-            />
+            <img src={url} alt={`Preview ${index}`} className="w-full h-full object-contain"/>
           </div>
         ))}
       </div>
-      
 
       <div className='mt-4 flex flex-row justify-end'>
-        <Button className='mr-3' onClick={handlePostSubmit}>글쓰기</Button>
-        <Button onClick={closeModal}>취소</Button>
-
+        <Button className='mr-3' onClick={handlePostSubmit}>Write</Button>
+        <Button onClick={closeModal}>Cancel</Button>
       </div>
     </div>
-    
   );
 };
 
