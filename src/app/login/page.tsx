@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect } from "react";
 import { BsEnvelope, BsLock } from "react-icons/bs";
-import { validateEmail } from "../../utils/validation";
+import { validateEmail } from "../../lib/validation";
 import { useRouter } from "next/navigation";
 import { login } from "../../services/clientApi";
 import { authStore } from "../../states/store";

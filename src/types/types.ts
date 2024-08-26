@@ -67,3 +67,25 @@ export interface fetchedPostData {
   createdAt: Date
 }
 
+export interface Feed {
+  id: string;
+  nickname: string;
+  email: string;
+  userId: string;
+  content: string;
+  images: {
+    fileName: string;
+    url: string;
+  }[];
+}
+
+export interface UserState {
+  uid: string | null;
+  email: string | null;
+  nickname: string | null;
+  bio: string | null;
+  follower: number | null;
+  following: number | null;
+  profileImage: string | null;
+  setUser: (user: Partial<UserState>) => void;
+}

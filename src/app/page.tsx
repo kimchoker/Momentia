@@ -3,69 +3,73 @@ import { useState, useEffect } from 'react';
 import FeedItem from '../components/feed/feedItem';
 import { ScrollArea } from '../components/ui/scroll-area';
 import Sibar from '../components/new-neo-sidebar';
-import { fetchedPostData } from '../types/types';
-import { fetchFeedData } from '../services/clientApi';
+import { Feed } from '../types/types';
 
 const Home = () => {
-  const [feedItems, setFeedItems] = useState<fetchedPostData[]>([]);
-  const [nextPage, setNextPage] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [feeds, setFeeds] = useState<Feed[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const loadInitialFeed = async () => {
-      setLoading(true);
-      try {
-        const data = await fetchFeedData(); // 초기 데이터 가져오기
-        setFeedItems(data.items);
-        setNextPage(data.next);
-      } catch (error) {
-        console.error('Error loading initial feed:', error);
-      } finally {
-        setLoading(false);
+  // Fetch feeds from the backend API
+  const fetchFeeds = async () => {
+    try {
+      const response = await fetch('/api/getall');
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
       }
-    };
 
-    loadInitialFeed();
-  }, []);
+      const data = await response.json();
+      // Verify data structure
+      console.log('Fetched data:', data);
 
-  const loadMore = async () => {
-    if (nextPage) {
-      setLoading(true);
-      try {
-        const data = await fetchFeedData(nextPage);
-        setFeedItems((prev) => [...prev, ...data.items]);
-        setNextPage(data.next);
-      } catch (error) {
-        console.error('Error loading more feed:', error);
-      } finally {
-        setLoading(false);
+      if (Array.isArray(data.feeds)) {
+        setFeeds(data.feeds);
+      } else {
+        throw new Error('Invalid data format');
       }
+    } catch (error) {
+      console.error('Error fetching feeds:', error);
+      setError((error as Error).message);
+    } finally {
+      setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchFeeds();
+  }, []);
+
+  // const loadMore = async () => {
+  //   if (nextPage) {
+  //     setLoading(true);
+  //     try {
+  //       const data = await fetchFeedData(nextPage);
+  //       setFeedItems((prev) => [...prev, ...data.items]);
+  //       setNextPage(data.next);
+  //     } catch (error) {
+  //       console.error('Error loading more feed:', error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   }
+  // };
 
   return (
     <div className="flex justify-center items-center h-screen bg-[#ffffff] font-nanum-barun-gothic">
       <Sibar />
       <ScrollArea className="w-[40%] h-[100%] overflow-y-auto">
-        {feedItems.map((item, index) => (
+        {feeds.map(feed => (
           <FeedItem
-            key={`${item.userId}-${index}`} // 고유한 key 설정
-            nickname={item.nickname}
-            userId={item.userId}
-            content={item.content}
-            imageName={item.images.length > 0 ? item.images[0].fileName : ''}
-            imageUrl={item.images.length > 0 ? item.images[0].url : ''}
+            key={feed.id}
+            nickname={feed.nickname}
+            userId={feed.email}
+            content={feed.content}
+            images={feed.images}
           />
         ))}
         {loading && <p className="text-center">Loading...</p>}
-        {nextPage && !loading && (
-          <button
-            onClick={loadMore}
-            className="w-full text-center bg-blue-500 text-white p-3 mt-4"
-          >
-            Load More
-          </button>
-        )}
+       
       </ScrollArea>
     </div>
   );

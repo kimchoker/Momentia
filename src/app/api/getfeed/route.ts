@@ -19,11 +19,12 @@ interface FeedDocument extends DocumentData {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { next, limitNum } = req.query;
+  console.log(next, limitNum)
   
   try {
     const feedCollection = collection(db, "Feed");
     let feedQuery;
-
+    console.log(next, limitNum)
     if (next) {
       const nextDoc = JSON.parse(next as string) as QueryDocumentSnapshot;
       feedQuery = query(feedCollection, orderBy("createdAt", "desc"), startAfter(nextDoc), limit(Number(limitNum) || 20));
@@ -39,10 +40,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         email: data.email,
         nickname: data.nickname,
         content: data.content,
-        images: data.images || [], // Default to empty array if images not present
+        images: data.images || [],
         likeCount: data.likeCount || 0,
         commentCount: data.commentCount || 0,
-        createdAt: data.createdAt.toDate(), // Timestamp to Date
+        createdAt: data.createdAt.toDate(),
       };
     });
 

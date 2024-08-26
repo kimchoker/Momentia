@@ -6,6 +6,7 @@ import { PostData, UserData } from '../types/types';
 import Cookies from "js-cookie";
 import axios from 'axios';
 import { fetchedPostData } from "../types/types";
+import { useUserStore } from "../states/store";
 
 // 아이디 중복확인
 const checkIDExists = async (id: string) => {
@@ -138,7 +139,7 @@ const fetchUserInfo = async () => {
 
 const fetchFeedData = async (next?: string, limitNum: number = 20): Promise<{ items: fetchedPostData[], next: string | null }> => {
   try {
-    const response = await axios.get("/getfeeddata", {
+    const response = await axios.get("/getfeed", {
       params: {
         next,
         limitNum
@@ -151,4 +152,48 @@ const fetchFeedData = async (next?: string, limitNum: number = 20): Promise<{ it
   }
 };
 
-export { checkIDExists, checkNicknameExists, signUp, login, uploadImage, savePost, getFeedPosts, fetchUserInfo, fetchFeedData };
+async function getAllFeeds() {
+  const feedCollection = collection(db, 'Feed');  // Replace 'Feed' with your collection name
+  const feedSnapshot = await getDocs(feedCollection);
+  
+  const feeds = feedSnapshot.docs.map(doc => ({
+    id: doc.id, 
+    ...doc.data()
+  }));
+
+  return feeds;
+}
+
+const fetchUserData = async () => {
+  const token = Cookies.get('token')
+  try {
+    const response = await fetch('/api/getuserprofile', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ idToken: token })
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+
+      const setUser = useUserStore.getState().setUser;
+      setUser({
+        uid: data.uid,
+        email: data.email,
+        nickname: data.nickname,
+        bio: data.bio,
+        follower: data.follower,
+        following: data.following,
+        profileImage: data.profileImage,
+      });
+    } else {
+      console.error('데이터 store에 설정 실패:', response.statusText);
+    }
+  } catch (error) {
+    console.error('데이터 서버에서 가져오기 실패  :', error);
+  }
+};
+
+export { checkIDExists, checkNicknameExists, signUp, login, uploadImage, savePost, getFeedPosts, fetchUserInfo, fetchFeedData, getAllFeeds, fetchUserData };

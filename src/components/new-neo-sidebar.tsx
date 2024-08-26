@@ -10,7 +10,9 @@ import { useSidebarToggle, useModalStore } from "../states/store";
 import { useStore } from "zustand";
 import { authStore } from "../states/store";
 import { usePathname } from "next/navigation";
-
+import { useUserStore } from "../states/store";
+import Cookies from "js-cookie";
+import { fetchUserData } from "../services/clientApi";
 
 
 const Sibar= () => {
@@ -39,6 +41,19 @@ const Sibar= () => {
 		}
 	}
 
+	
+	const handleProfile = async () => {
+		await fetchUserData();
+		
+		const email = useUserStore.getState().email;
+
+		if (email) {
+			router.push(`/profile/${email}`);
+		} else {
+			alert("로그인이 필요한 작업입니다.")
+			router.push("/login")
+		}
+	};
 
 
   if(!sidebar || !showSidebar) return null;
@@ -127,7 +142,7 @@ const Sibar= () => {
 
 					<Button
 						variant="ghost"
-						onClick={openModal}
+						onClick={handleProfile}
 						className={`${isOpen ? "w-[248px]" : "w-[50px]"} justify-start h-10 mb-3`}
 					>
 						<span className={`${isOpen === false ? "" : "mr-4"}`}>

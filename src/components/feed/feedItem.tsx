@@ -1,7 +1,7 @@
-'use client'
+"use client"
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 
-const FeedItem = ({ nickname, userId, content, imageName, imageUrl }) => {
+const FeedItem = ({ nickname, userId, content, images }) => {
   return (
     <div className="w-[100%] border-b border-black">
       <div className="flex flex-row justify-start ml-5 p-3 ">
@@ -17,15 +17,16 @@ const FeedItem = ({ nickname, userId, content, imageName, imageUrl }) => {
       {/* 글&사진 부분 */}
       <div className="p-3 ml-3 mr-3">
         <p>{content}</p>
-        <div className="overflow-hidden w-full h-full max-h-80">
-          <img
-            src={imageUrl}
-            alt={imageName}
-            className="w-full h-full object-cover"
-          />
+        <div className="overflow-hidden w-50 h-50 max-h-80">
+          {images && images.map((image, index) => (
+            <img
+              key={index}
+              src={image.url}
+              alt={image.fileName}
+              className="w-50 h-50 object-cover"
+            />
+          ))}
         </div>
-        {/* 이미지 이름을 숨겨진 값으로 저장 */}
-        <span className="hidden">{imageName}</span>
       </div>
     </div>
   );

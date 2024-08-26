@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { AuthState, ModalState } from "../types/types";
+import { AuthState, ModalState, UserState } from "../types/types";
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { useSidebarToggleStore } from '../types/types';
 import { auth } from '../firebase/firebase';
@@ -30,7 +30,7 @@ const authStore = create<AuthState>((set) => {
   // 로그인 상태 유지 및 갱신 설정
   const startTokenRefresh = () => {
     // 1시간마다 토큰 갱신 (Firebase ID 토큰은 보통 1시간 유효함)
-    const intervalId = setInterval(refreshToken, 60 * 60 * 1000);
+    const intervalId = setInterval(refreshToken, 60);
 
     // 토큰 갱신 시작
     refreshToken();
@@ -91,4 +91,15 @@ const useModalStore = create<ModalState>((set) => ({
 }));
 
 
-export { authStore, useSidebarToggle, useModalStore };
+const useUserStore = create<UserState>((set) => ({
+  uid: null,
+  email: null,
+  nickname: null,
+  bio: null,
+  follower: null,
+  following: null,
+  profileImage: null,
+  setUser: (user) => set((state) => ({ ...state, ...user })),
+}));
+
+export { authStore, useSidebarToggle, useModalStore, useUserStore };
