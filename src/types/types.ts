@@ -47,9 +47,23 @@ export interface ModalState {
 
 // 글쓰기/수정 관련 타입
 export interface PostData {
-  content: string;
-  userId: string;
-  images: { url: string; fileName: string }[];
+  userId: string; // uid
+  email: string; // 이메일
+  nickname: string; // 닉네임
+  content: string; // 글 내용
+  images: { url: string; fileName: string }[]; // 첨부 이미지 
   likeCount: number;
   commentCount: number;
 }
+
+export interface fetchedPostData {
+  userId: string; // uid
+  email: string; // 이메일
+  nickname: string; // 닉네임
+  content: string; // 글 내용
+  images: { url: string; fileName: string }[]; // 첨부 이미지 
+  likeCount: number;
+  commentCount: number;
+  createdAt: Date
+}
+

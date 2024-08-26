@@ -1,10 +1,11 @@
-import { collection, query, where, getDocs, setDoc, doc, Timestamp, addDoc, serverTimestamp  } from "firebase/firestore";
+import { collection, query, where, getDocs, setDoc, doc, Timestamp, addDoc, serverTimestamp, QueryDocumentSnapshot, orderBy, limit, startAfter  } from "firebase/firestore";
 import { db, auth, storage } from "../firebase/firebase";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { PostData, UserData } from '../types/types';
 import Cookies from "js-cookie";
-
+import axios from 'axios';
+import { fetchedPostData } from "../types/types";
 
 // 아이디 중복확인
 const checkIDExists = async (id: string) => {
@@ -135,4 +136,19 @@ const fetchUserInfo = async () => {
   }
 };
 
-export { checkIDExists, checkNicknameExists, signUp, login, uploadImage, savePost, getFeedPosts, fetchUserInfo };
+const fetchFeedData = async (next?: string, limitNum: number = 20): Promise<{ items: fetchedPostData[], next: string | null }> => {
+  try {
+    const response = await axios.get("/getfeeddata", {
+      params: {
+        next,
+        limitNum
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('피드를 불러오는 것에 실패했습니다:', error);
+    throw error;
+  }
+};
+
+export { checkIDExists, checkNicknameExists, signUp, login, uploadImage, savePost, getFeedPosts, fetchUserInfo, fetchFeedData };
