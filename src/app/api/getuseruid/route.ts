@@ -33,8 +33,12 @@ export async function POST(req: NextRequest) {
     const userData = userDocSnap.data();
     const email = userData?.email;
     const nickname = userData?.nickname;
+    const bio = userData?.bio;
+    const follower = userData?.follower;
+    const following = userData?.following;
+    const profileImage = userData?.profileImage;
 
-    return NextResponse.json({ uid, email, nickname }, { status: 200 });
+    return NextResponse.json({ uid, email, nickname, bio, follower, following, profileImage }, { status: 200 });
   } catch (error) {
     console.error('토큰 유효성 검증에 실패했습니다:', error);
     return NextResponse.json({ error: '허가되지 않은 토큰' }, { status: 401 });

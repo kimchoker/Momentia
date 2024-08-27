@@ -1,6 +1,6 @@
 import { collection, query, where, getDocs, setDoc, doc, Timestamp, addDoc, serverTimestamp, QueryDocumentSnapshot, orderBy, limit, startAfter  } from "firebase/firestore";
 import { db, auth, storage } from "../firebase/firebase";
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, User } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { PostData, UserData } from '../types/types';
 import Cookies from "js-cookie";
@@ -54,13 +54,13 @@ async function signUp(email: string, password: string, nickname: string) {
 }
 
 // 로그인
-const login = async (email: string, password: string): Promise<string> => {
+const login = async (email: string, password: string): Promise<User> => {
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
-    const token = await user.getIdToken();
-
-    return token;
+    // const token = await user.getIdToken();
+    // return token;
+      return user;
 
   } catch (error) {
     throw new Error('로그인에 실패했습니다.');

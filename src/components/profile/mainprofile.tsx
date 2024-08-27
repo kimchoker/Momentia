@@ -15,19 +15,20 @@ const MainProfile = () => {
 
   return (
     <div className="bg-[#d6d6d6] p-5 border-b-2 border-black z-10">
-      <div className="flex flex-row justify-start">
+      <div className="flex flex-row">
         {/* 프로필 이미지 */}
         <Profile>
           <ProfileImage src={profileImage || "default-profile-image-url"} />
           <ProfileFallback />
         </Profile>
         {/* 닉네임/아이디 */}
-        <div className="flex flex-row justify-end ml-5">
+        <div className="flex flex-row ml-5">
           <div className="flex flex-col ml-3">
-            <div className="flex flex-row justify-between">
+            <div className="flex flex-row ">
               <p className="font-bold text-xl">{nickname}</p>
-              <Button variant="outline">프로필 수정</Button>
+              
             </div>
+
             <p className="text-s">{email}</p>
             {/* 상태메시지 */}
             <div className="mt-3 mb-5">
@@ -35,11 +36,12 @@ const MainProfile = () => {
                 {bio || ''}
               </p>
             </div>
-            <div className='flex flex-row justify-start mb-2 text-m font-bold'>
-              <p className='mr-[120px]'>팔로잉 {following || 0}</p>
+            <div className='flex flex-row justify-between mb-2 text-m font-bold'>
+              <p className='mr-[60px]'>팔로잉 {following || 0}</p>
               <p>팔로워 {follower || 0}</p>
             </div>
           </div>
+          <Button variant="outline" className="">프로필 수정</Button>
         </div>
       </div>
     </div>

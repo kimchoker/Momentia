@@ -1,10 +1,10 @@
 'use client';
 import React, { useState, useEffect } from "react";
 import { BsEnvelope, BsLock } from "react-icons/bs";
-import { validateEmail } from "../../lib/validation";
+import { validateEmail } from "../../../lib/validation";
 import { useRouter } from "next/navigation";
-import { fetchUserInfo, login } from "../../services/clientApi";
-import { authStore } from "../../states/store";
+import { login } from "../../../services/clientApi";
+import { authStore } from "../../../states/store";
 
 const Login: React.FC = () => {
 
@@ -31,18 +31,11 @@ const Login: React.FC = () => {
     event.preventDefault();
     
     try {
-      const user = await login(inputEmail, inputPW);
+      const token :string = await login(inputEmail, inputPW);
 
-      if (user) {
-        // user 객체를 받아와서 토큰을 추출한 다음 store 로그인에 전달
-        const token = await user.getIdToken();
+      if (token) {
         console.log("로그인 성공", token);
-        authStore.getState().login(token);
-        const userData = await fetchUserInfo();
-        console.log(userData);
-        if (userData) {
-          authStore.getState().setUser(userData); // 받아온 사용자 정보 저장
-        }
+        authStore.getState().login(token)
 
         router.push('/');
       }

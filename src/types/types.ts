@@ -12,9 +12,24 @@ export interface User {
 export interface AuthState {
   isLoggedIn: boolean;
   token: string | null;
-  intervalId: NodeJS.Timeout | null;
+  uid: string | null;
+  email: string | null;
+  nickname: string | null;
+  bio: string | null;
+  follower: number | null 
+  following: number | null 
+  profileImage: string | null;
   login: (token :string) => void;
   logout: () => void;
+  setUser: (userData: {
+    uid: string;
+    email: string;
+    nickname: string;
+    bio: string;
+    follower: number;
+    following: number;
+    profileImage: string;
+  }) => void;
 }
 
 // 사이드바 열림 닫힘

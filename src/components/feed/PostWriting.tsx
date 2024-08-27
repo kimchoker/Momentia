@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { uploadImage } from '../../services/clientApi';
-import Cookies from 'js-cookie';
 import { savePost } from '../../services/clientApi';
 import { useModalStore } from '../../states/store';
 import { Button } from '../ui/button';
 import { fetchUserInfo } from '../../services/clientApi';
+import { authStore } from '../../states/store';
+import { CircleX } from 'lucide-react';
 
 interface WritingComponentProps {
   placeholder?: string;
@@ -15,8 +16,10 @@ const WritingComponent: React.FC<WritingComponentProps> = ({ placeholder }) => {
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [uploadedImages, setUploadedImages] = useState<{ url: string; fileName: string }[]>([]);
-  const [userInfo, setUserInfo] = useState<{ uid: string; email: string; nickname: string } | null>(null);
   const { closeModal } = useModalStore();
+  const { isLoggedIn, uid, email, nickname } = authStore();
+  console.log("글쓰기 컴포넌트 상태:", isLoggedIn, uid, email, nickname)
+
 
   // 텍스트 입력 핸들러
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -35,35 +38,16 @@ const WritingComponent: React.FC<WritingComponentProps> = ({ placeholder }) => {
       setPreviewUrls([...previewUrls, ...newPreviewUrls]);
     }
   };
-
-  // const fetchUserInfo = async () => {
-  //   try {
-  //     const token = Cookies.get('token');
-  //     if (!token) throw new Error('토큰이 없음');
-  
-  //     const response = await fetch("/api/getuseruid", {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({ idToken: token }),
-  //     });
-  
-  //     if (!response.ok) throw new Error(`뭔가 오류가 있음: ${await response.text()}`);
-  
-  //     const data = await response.json();
-      
-  //     setUserInfo({ uid: data.uid, email: data.email, nickname: data.nickname });
-
-  //   } catch (e) {
-  //     console.error("뭔가 오류가 있음:", e);
-  //   }
-  // };
+  const handleImageDelete = (index: number) => {
+    // 삭제할 이미지의 URL과 파일 객체를 필터링
+    setPreviewUrls(prevUrls => prevUrls.filter((_, i) => i !== index));
+    setSelectedImages(prevImages => prevImages.filter((_, i) => i !== index));
+  };
 
   // 이미지 업로드 및 글 저장 처리
   const handlePostSubmit = async () => {
     try {
-      const userData = await fetchUserInfo();
-      // setUserInfo({ uid: data.uid, email: data.email, nickname: data.nickname });
-      if (!userData) throw new Error('유저 정보가 없습니다.');
+    
 
       const uploaded: { url: string; fileName: string }[] = [];
       for (const image of selectedImages) {
@@ -74,9 +58,9 @@ const WritingComponent: React.FC<WritingComponentProps> = ({ placeholder }) => {
       setUploadedImages([...uploadedImages, ...uploaded]);
 
       const postData = {
-        userId: userData.uid,
-        email: userData.email,
-        nickname: userData.nickname,
+        userId: uid,
+        email: email,
+        nickname: nickname,
         content,
         likeCount: 0,
         commentCount: 0,
@@ -117,8 +101,15 @@ const WritingComponent: React.FC<WritingComponentProps> = ({ placeholder }) => {
 
       <div className="mt-4 flex flex-wrap">
         {previewUrls.map((url, index) => (
-          <div key={index} className="w-20 h-20 border border-gray-300 rounded-lg overflow-hidden m-1">
-            <img src={url} alt={`Preview ${index}`} className="w-full h-full object-contain"/>
+          <div key={index} className="relative w-20 h-20 border border-gray-300 rounded-lg overflow-hidden m-1">
+            <img src={url} alt={`Preview ${index}`} className="w-full h-full object-cover"/>
+            <button
+              type="button"
+              onClick={() => handleImageDelete(index)}
+              className="absolute top-1 right-1 bg-transparent text-white rounded-full hover:bg-red-600"
+            >
+              <CircleX/>
+            </button>
           </div>
         ))}
       </div>
