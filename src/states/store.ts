@@ -4,6 +4,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import { useSidebarToggleStore } from '../types/types';
 import { auth } from '../firebase/firebase';
 import Cookies from 'js-cookie';
+import { DrawerState } from '../types/types';
 
 const authStore = create<AuthState>((set) => {
   const token = Cookies.get('token');
@@ -92,4 +93,10 @@ const useUserStore = create<UserState>((set) => ({
   setUser: (user) => set((state) => ({ ...state, ...user })),
 }));
 
-export { authStore, useSidebarToggle, useModalStore, useUserStore };
+const profileEditStore = create<DrawerState>((set) => ({
+  isEditOpen: false,
+  openEdit: () => set({ isEditOpen: true }),
+  closeEdit: () => set({ isEditOpen: false }),
+}))
+
+export { authStore, useSidebarToggle, useModalStore, useUserStore, profileEditStore };

@@ -60,6 +60,13 @@ export interface ModalState {
   closeModal: () => void;
 }
 
+export interface DrawerState {
+  isEditOpen: boolean;
+  openEdit: () => void;
+  closeEdit: () => void;
+}
+
+
 // 글쓰기/수정 관련 타입
 export interface PostData {
   userId: string; // uid
