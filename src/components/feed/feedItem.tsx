@@ -17,13 +17,13 @@ const FeedItem = ({ nickname, userId, content, images }) => {
       {/* 글&사진 부분 */}
       <div className="p-3 ml-3 mr-3">
         <p>{content}</p>
-        <div className="overflow-hidden w-50 h-50 max-h-80">
+        <div className="flex gap-2 overflow-x-auto">
           {images && images.map((image, index) => (
             <img
               key={index}
               src={image.url}
               alt={image.fileName}
-              className="w-50 h-50 object-cover"
+              className="w-24 h-24 object-cover"
             />
           ))}
         </div>

@@ -10,8 +10,6 @@ import { useSidebarToggle, useModalStore } from "../states/store";
 import { useStore } from "zustand";
 import { authStore } from "../states/store";
 import { usePathname } from "next/navigation";
-import { useUserStore } from "../states/store";
-import Cookies from "js-cookie";
 import { fetchUserData } from "../services/clientApi";
 
 
@@ -30,6 +28,7 @@ const Sibar= () => {
   useEffect(() => {
     // 클라이언트에서 상태를 가져옵니다.
     setIsLoggedIn(storeIsLoggedIn);
+		console.log(isLoggedIn)
   }, [storeIsLoggedIn]);
 
 	
@@ -45,7 +44,7 @@ const Sibar= () => {
 	const handleProfile = async () => {
 		await fetchUserData();
 		
-		const email = useUserStore.getState().email;
+		const email = authStore.getState().email;
 
 		if (email) {
 			router.push(`/profile/${email}`);

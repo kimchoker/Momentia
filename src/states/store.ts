@@ -82,16 +82,16 @@ const useModalStore = create<ModalState>((set) => ({
 }));
 
 
-const useUserStore = create<UserState>((set) => ({
-  uid: null,
-  email: null,
-  nickname: null,
-  bio: null,
-  follower: null,
-  following: null,
-  profileImage: null,
-  setUser: (user) => set((state) => ({ ...state, ...user })),
-}));
+// const useUserStore = create<UserState>((set) => ({
+//   uid: null,
+//   email: null,
+//   nickname: null,
+//   bio: null,
+//   follower: null,
+//   following: null,
+//   profileImage: null,
+//   setUser: (user) => set((state) => ({ ...state, ...user })),
+// }));
 
 const profileEditStore = create<DrawerState>((set) => ({
   isEditOpen: false,
@@ -99,4 +99,4 @@ const profileEditStore = create<DrawerState>((set) => ({
   closeEdit: () => set({ isEditOpen: false }),
 }))
 
-export { authStore, useSidebarToggle, useModalStore, useUserStore, profileEditStore };
+export { authStore, useSidebarToggle, useModalStore, profileEditStore };

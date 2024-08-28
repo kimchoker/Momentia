@@ -7,6 +7,7 @@ import { fetchedPostData } from '../../../types/types';
 
 // Firestore 문서 데이터 구조를 명시하는 타입
 interface FeedDocument extends DocumentData {
+  id: string;
   userId: string;
   email: string;
   nickname: string;
@@ -36,6 +37,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const items: fetchedPostData[] = querySnapshot.docs.map(doc => {
       const data = doc.data() as FeedDocument; // 데이터 타입을 FeedDocument으로 단언
       return {
+        id: doc.id,
         userId: data.userId,
         email: data.email,
         nickname: data.nickname,

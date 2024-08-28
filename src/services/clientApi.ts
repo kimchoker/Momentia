@@ -6,7 +6,7 @@ import { PostData, UserData } from '../types/types';
 import Cookies from "js-cookie";
 import axios from 'axios';
 import { fetchedPostData } from "../types/types";
-import { useUserStore } from "../states/store";
+import { authStore } from "../states/store";
 
 // 아이디 중복확인
 const checkIDExists = async (id: string) => {
@@ -178,7 +178,7 @@ const fetchUserData = async () => {
     if (response.ok) {
       const data = await response.json();
 
-      const setUser = useUserStore.getState().setUser;
+      const setUser = authStore.getState().setUser;
       setUser({
         uid: data.uid,
         email: data.email,
@@ -195,5 +195,8 @@ const fetchUserData = async () => {
     console.error('데이터 서버에서 가져오기 실패  :', error);
   }
 };
+
+
+
 
 export { checkIDExists, checkNicknameExists, signUp, login, uploadImage, savePost, getFeedPosts, fetchUserInfo, fetchFeedData, getAllFeeds, fetchUserData };
