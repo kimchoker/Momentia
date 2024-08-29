@@ -14,8 +14,7 @@ const MainProfile = () => {
     profileImage: state.profileImage,
   }));
 
-  const { isEditOpen } = profileEditStore();
-
+ 
   const handleEdit = () => {
     profileEditStore.getState().openEdit();
   }

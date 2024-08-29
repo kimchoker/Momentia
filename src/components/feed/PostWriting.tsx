@@ -87,9 +87,9 @@ const WritingComponent: React.FC<WritingComponentProps> = ({ placeholder }) => {
   }, [previewUrls]);
 
   return (
-    <div className="max-w-lg mx-auto p-1 bg-white rounded-lg">
+    <div className="max-w-full p-1 bg-white rounded-lg">
       <textarea
-        className="w-full h-56 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+        className="w-[100%] h-56 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
         placeholder={placeholder || 'Please post a great article!'}
         value={content}
         onChange={handleChange}

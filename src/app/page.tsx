@@ -4,6 +4,7 @@ import FeedItem from '../components/feed/feedItem';
 import { ScrollArea } from '../components/ui/scroll-area';
 import Sibar from '../components/new-neo-sidebar';
 import { Feed } from '../types/types';
+import Spinner from '../components/ui/spinner';
 
 const Home = () => {
   const [feeds, setFeeds] = useState<Feed[]>([]);
@@ -59,16 +60,21 @@ const Home = () => {
     <div className="flex justify-center items-center h-screen bg-[#ffffff] font-nanum-barun-gothic">
       <Sibar />
       <ScrollArea className="w-[40%] h-[100%] overflow-y-auto">
-        {feeds.map(feed => (
-          <FeedItem
-            key={feed.id}
-            nickname={feed.nickname}
-            userId={feed.email}
-            content={feed.content}
-            images={feed.images}
-          />
-        ))}
-        {loading && <p className="text-center">Loading...</p>}
+      {loading ? (
+            <div className="flex justify-center items-center h-full">
+              <Spinner /> {/* 로딩 스피너 표시 */}
+            </div>
+          ) : (
+            feeds.map(feed => (
+              <FeedItem
+                key={feed.id}
+                nickname={feed.nickname}
+                userId={feed.email}
+                content={feed.content}
+                images={feed.images}
+              />
+            ))
+          )}
        
       </ScrollArea>
     </div>

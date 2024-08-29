@@ -57,6 +57,21 @@ const authStore = create<AuthState>((set) => {
         profileImage: userData.profileImage,
       });
     },
+
+    // 닉네임 업데이트
+    setNickname: (nickname: string) => {
+      set({ nickname });
+    },
+
+    // 바이오 업데이트
+    setBio: (bio: string) => {
+      set({ bio });
+    },
+
+    // 프로필 이미지 업데이트
+    setProfileImage: (profileImage :string) => {
+      set({ profileImage });
+    }
   };
 });
 
@@ -77,8 +92,10 @@ const useSidebarToggle = create(
 
 const useModalStore = create<ModalState>((set) => ({
   isModalOpen: false,
+  modalContent: null,
   openModal: () => set({ isModalOpen: true }),
   closeModal: () => set({ isModalOpen: false }),
+  setModalContent: (content) => set({ modalContent: content }),
 }));
 
 

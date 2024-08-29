@@ -30,6 +30,9 @@ export interface AuthState {
     following: number;
     profileImage: string;
   }) => void;
+  setNickname: (nickname: string) => void;
+  setBio: (bio: string) => void;
+  setProfileImage: (profileImage: string) => void;
 }
 
 // 사이드바 열림 닫힘
@@ -56,8 +59,10 @@ export interface LayoutProps {
 // 글쓰기/수정 모달 상태 관리용
 export interface ModalState {
   isModalOpen: boolean;
+  modalContent: ReactNode | null;  // modalContent를 ReactNode로 정의
   openModal: () => void;
   closeModal: () => void;
+  setModalContent: (content: ReactNode) => void;
 }
 
 export interface DrawerState {
@@ -110,4 +115,9 @@ export interface UserState {
   following: number | null;
   profileImage: string | null;
   setUser: (user: Partial<UserState>) => void;
+}
+
+export interface imageArray {
+	url: string
+	fileName: string
 }

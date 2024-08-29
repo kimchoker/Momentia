@@ -16,7 +16,7 @@ import { fetchUserData } from "../services/clientApi";
 const Sibar= () => {
 	const currentPath = usePathname();
 	const [isOpen, setIsOpen] = useState(false);
-	const { isModalOpen, closeModal, openModal } = useModalStore();
+	const { isModalOpen, closeModal, openModal, modalContent, setModalContent } = useModalStore();
 	const sidebar = useStore(useSidebarToggle, (state) => state);
 	const invisibleRoutes = ["/login", "/signup"];
   const showSidebar = !invisibleRoutes.includes(currentPath)
@@ -54,6 +54,13 @@ const Sibar= () => {
 		}
 	};
 
+	const handleNewPost = () => {
+		setModalContent(
+			<WritingComponent/>
+		)
+		openModal();
+	}
+
 
   if(!sidebar || !showSidebar) return null;
 	
@@ -64,16 +71,7 @@ const Sibar= () => {
 			<div className="relative h-full flex flex-col px-3 py-4 overflow-y-auto shadow-md dark:shadow-zinc-800 border-none overflow-x-hidden ">
 				<PostModalDialog open={isModalOpen} onOpenChange={closeModal}>
 					<PostModalDialogContent>
-						<PostModalDialogHeader>
-							<PostModalDialogTitle></PostModalDialogTitle>
-							<div>
-								<PostModalDialogDescription>
-								</PostModalDialogDescription>
-								<WritingComponent/>
-							</div>
-						</PostModalDialogHeader>
-						<PostModalDialogFooter>
-						</PostModalDialogFooter>
+						{modalContent}
 					</PostModalDialogContent>
 				</PostModalDialog>
 				<div className=" absolute top-[60px] -right-[0px] z-20">
@@ -102,14 +100,14 @@ const Sibar= () => {
 
 					<Button
 						variant="ghost"
-						onClick={openModal}
+						onClick={handleNewPost}
 						className={`${isOpen ? "w-[248px]" : "w-[50px]"} justify-start h-10 mb-3`}
 					>
 						<span className={`${isOpen === false ? "" : "mr-4"}`}>
 							<SquarePen size={18} />
 						</span>
 						<p className={`max-w-[200px] truncate ${!isOpen ? "-translate-x-96 opacity-0" : "translate-x-0 opacity-100"}`}>
-							Create New Post
+							글쓰기
 						</p>
 					</Button>
 
@@ -122,7 +120,7 @@ const Sibar= () => {
 							<MessageSquare size={18} />
 						</span>
 						<p className={`max-w-[200px] truncate ${!isOpen ? "-translate-x-96 opacity-0" : "translate-x-0 opacity-100"}`}>
-							DM
+							메시지
 						</p>
 					</Button>
 
@@ -135,7 +133,7 @@ const Sibar= () => {
 							<Bell size={18} />
 						</span>
 						<p className={`max-w-[200px] truncate ${!isOpen ? "-translate-x-96 opacity-0" : "translate-x-0 opacity-100"}`}>
-							notification
+							알림
 						</p>
 					</Button>
 
@@ -148,7 +146,7 @@ const Sibar= () => {
 							<Users size={18} />
 						</span>
 						<p className={`max-w-[200px] truncate ${!isOpen ? "-translate-x-96 opacity-0" : "translate-x-0 opacity-100"}`}>
-							My Profile
+							프로필
 						</p>
 					</Button>
 
@@ -161,7 +159,7 @@ const Sibar= () => {
 							<Settings size={18} />
 						</span>
 						<p className={`max-w-[200px] truncate ${!isOpen ? "-translate-x-96 opacity-0" : "translate-x-0 opacity-100"}`}>
-							Account
+							계정 설정
 						</p>
 					</Button>
 				
@@ -172,7 +170,7 @@ const Sibar= () => {
                 {isLoggedIn ? <LogOut size={18} /> : <LogIn size={18} />}
               </span>
               <p className={`whitespace-nowrap ${isOpen ? "opacity-100" : "opacity-0 hidden"}`}>
-                {isLoggedIn ? "Sign out" : "Sign in"}
+                {isLoggedIn ? "로그아웃" : "로그인"}
               </p>
             </Button>
 
