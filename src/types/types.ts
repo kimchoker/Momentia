@@ -72,7 +72,7 @@ export interface DrawerState {
 }
 
 
-// 글쓰기/수정 관련 타입
+// 글쓰기 관련 타입
 export interface PostData {
   userId: string; // uid
   email: string; // 이메일
@@ -83,27 +83,19 @@ export interface PostData {
   commentCount: number;
 }
 
-export interface fetchedPostData {
-  userId: string; // uid
-  email: string; // 이메일
+export interface post {
+  postId: string; // 글 식별값
   nickname: string; // 닉네임
+  email: string; // 이메일
+  userId: string; // uid
   content: string; // 글 내용
-  images: { url: string; fileName: string }[]; // 첨부 이미지 
-  likeCount: number;
-  commentCount: number;
-  createdAt: Date
-}
-
-export interface Feed {
-  id: string;
-  nickname: string;
-  email: string;
-  userId: string;
-  content: string;
   images: {
     fileName: string;
     url: string;
   }[];
+  likeCount: number;
+  commentCount: number;
+  createdAt: string;
 }
 
 export interface UserState {
@@ -120,4 +112,9 @@ export interface UserState {
 export interface imageArray {
 	url: string
 	fileName: string
+}
+
+export interface UpdatePostData {
+  content: string;
+  images: { url: string; fileName: string }[];
 }

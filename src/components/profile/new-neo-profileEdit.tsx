@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { profileEditStore, authStore } from '../../states/store';
 import { CirclePlus } from 'lucide-react';
+import { getAuth } from 'firebase/auth';
 
 interface ModalProps {
   isOpen: boolean;
@@ -33,6 +34,8 @@ const ProfileEdit: React.FC<ModalProps> = ({ isOpen }) => {
   const [visible, setVisible] = useState(false);
   const [animate, setAnimate] = useState(false);
 
+  const auth = getAuth();
+
   useEffect(() => {
     if (isOpen) {
       setVisible(true);
@@ -44,7 +47,7 @@ const ProfileEdit: React.FC<ModalProps> = ({ isOpen }) => {
     }
   }, [isOpen]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     let hasChanges = false;
 
     if (newNickname !== initialNickname) {
@@ -61,7 +64,34 @@ const ProfileEdit: React.FC<ModalProps> = ({ isOpen }) => {
     }
 
     if (hasChanges) {
-      closeEdit(); // 변경사항이 있을 경우에만 모달을 닫음
+      try {
+      
+        const idToken = await auth.currentUser?.getIdToken();
+
+        const response = await fetch('/api/profile/update', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            idToken,
+            nickname: newNickname,
+            bio: newBio,
+            profileImage: newProfileImage,
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log('프로필 업데이트 성공:', data);
+        } else {
+          console.error('프로필 업데이트 실패:', await response.json());
+        }
+
+        closeEdit(); // 변경사항이 있을 경우에만 모달을 닫음
+      } catch (error) {
+        console.error('프로필 업데이트 중 오류 발생:', error);
+      }
     }
   };
 

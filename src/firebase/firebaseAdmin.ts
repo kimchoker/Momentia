@@ -9,11 +9,12 @@ const firebaseAdminConfig = {
 if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.cert(firebaseAdminConfig),
-    
+    storageBucket: `${process.env.NEXT_PUBLIC_PROJECT_ID}.appspot.com`,
   });
 }
 
 const adminAuth = admin.auth();
 const adminDB = admin.firestore();
+const adminStorage = admin.storage().bucket();
 
-export { admin, adminAuth, adminDB };
+export { admin, adminAuth, adminDB, adminStorage };

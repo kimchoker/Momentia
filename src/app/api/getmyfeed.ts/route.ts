@@ -1,7 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { db } from "../../../firebase/firebase";
 import { collection, getDocs, query, DocumentData, where } from 'firebase/firestore';
-import { fetchedPostData } from "../../../types/types";
 
 interface FeedDocument extends DocumentData {
   userId: string;

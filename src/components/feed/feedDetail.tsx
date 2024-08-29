@@ -1,12 +1,39 @@
 "use client"
+import React, { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { imageArray } from '../../types/types';
 import { useModalStore } from '../../states/store';
-import { X } from 'lucide-react'; 
+import { X } from 'lucide-react';
+import EditPostComponent from './feedEdit';
 
 
-const FeedDetail = ({ nickname, userId, content, images }) => {
+const FeedDetail = ({ nickname, userId, content, images, postId }) => {
   const { closeModal } = useModalStore();
+  const [isEditing, setIsEditing] = useState(false);
+
+  const handleEdit = () => {
+    setIsEditing(true);
+		
+  };
+
+
+  const handleDelete = () => {
+    // 여기에 삭제 로직 추가
+    alert("삭제 기능은 구현되지 않았습니다.");  // 예시 경고창
+  };
+
+  if (isEditing) {
+    return (
+      <div className="relative p-3">
+       
+        <EditPostComponent
+          initialContent={content}
+          initialImages={images}
+					postId={postId}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="relative p-3">
@@ -35,7 +62,7 @@ const FeedDetail = ({ nickname, userId, content, images }) => {
       <div className="mt-4">
         <p>{content}</p>
         <div className="flex gap-2 overflow-x-auto mt-2">
-          {images && images.map((image :imageArray, index :string) => (
+          {images && images.map((image: imageArray, index: string) => (
             <img
               key={index}
               src={image.url}
@@ -48,6 +75,22 @@ const FeedDetail = ({ nickname, userId, content, images }) => {
 
       {/* 글과 댓글 사이의 구분선 */}
       <hr className="my-4" />
+
+      {/* 수정 및 삭제 버튼 */}
+      <div className="flex justify-end space-x-2">
+        <button 
+          onClick={handleEdit}
+          className="px-4 py-2 bg-white text-black rounded-md hover:bg-[#d6d6d6]"
+        >
+          수정
+        </button>
+        <button 
+          onClick={handleDelete}
+          className="px-4 py-2 bg-white text-black rounded-md hover:bg-[#d6d6d6]"
+        >
+          삭제
+        </button>
+      </div>
 
       {/* 댓글 영역 (나중에 댓글 컴포넌트를 추가) */}
       <div>댓글 부분</div>

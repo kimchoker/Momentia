@@ -3,11 +3,11 @@ import { useState, useEffect } from 'react';
 import FeedItem from '../components/feed/feedItem';
 import { ScrollArea } from '../components/ui/scroll-area';
 import Sibar from '../components/new-neo-sidebar';
-import { Feed } from '../types/types';
+import { post } from '../types/types';
 import Spinner from '../components/ui/spinner';
 
 const Home = () => {
-  const [feeds, setFeeds] = useState<Feed[]>([]);
+  const [feeds, setFeeds] = useState<post[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -67,7 +67,8 @@ const Home = () => {
           ) : (
             feeds.map(feed => (
               <FeedItem
-                key={feed.id}
+                key={feed.postId}
+                postId={feed.postId}
                 nickname={feed.nickname}
                 userId={feed.email}
                 content={feed.content}

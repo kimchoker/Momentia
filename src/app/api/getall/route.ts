@@ -1,14 +1,10 @@
 import { NextResponse } from 'next/server';
 import { adminDB } from '../../../firebase/firebaseAdmin';
 import { QueryDocumentSnapshot, DocumentData, CollectionReference, QuerySnapshot } from 'firebase-admin/firestore';
-import { Feed } from '../../../types/types';
+import { post } from '../../../types/types';
 
-
-
-// Handle GET requests
 export async function GET(request: Request) {
   try {
-    // Extract query parameters from the request URL
     const url = new URL(request.url);
     const next = url.searchParams.get('next');
     const limitNum = url.searchParams.get('limitNum');
@@ -34,10 +30,20 @@ export async function GET(request: Request) {
       return NextResponse.json({ message: 'No feeds found' }, { status: 404 });
     }
 
-    const feeds = feedSnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    })) as Feed[];
+    const feeds: post[] = feedSnapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        postId: doc.id, 
+        nickname: data.nickname,
+        email: data.email,
+        userId: data.userId,
+        content: data.content,
+        images: data.images || [],
+        likeCount: data.likeCount || 0,
+        commentCount: data.commentCount || 0,
+        createdAt: data.createdAt.toDate()
+      };
+    });
 
     const lastVisible = feedSnapshot.docs[feedSnapshot.docs.length - 1];
     return NextResponse.json({

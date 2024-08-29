@@ -1,19 +1,19 @@
-"use client"
-import { useRef, useState, useEffect } from 'react';
-import MainProfile from '../../../components/profile/mainprofile';
+'use client'
+import React, { useRef, useState, useEffect } from 'react';
 import { ScrollArea } from '../../../components/ui/feed-scroll-area';
-import ProfileEdit from '../../../components/profile/new-neo-profileEdit';
 import { profileEditStore, authStore } from '../../../states/store';
+import { post } from '../../../types/types';
+import MainProfile from '../../../components/profile/mainprofile';
+import ProfileEdit from '../../../components/profile/new-neo-profileEdit';
 import Sibar from '../../../components/new-neo-sidebar';
-import { Feed } from '../../../types/types';
 import FeedItem from '../../../components/feed/feedItem';
 import Spinner from '../../../components/ui/spinner';
 
 const MyPage = () => {
   const scrollRef = useRef<HTMLDivElement | null>(null);
-  const { isEditOpen, closeEdit } = profileEditStore();
+  const { isEditOpen } = profileEditStore();
   const { uid } = authStore();
-  const [feeds, setFeeds] = useState<Feed[]>([]);
+  const [feeds, setFeeds] = useState<post[]>([]);
   const [loading, setLoading] = useState(true);
 
   const scrollToTop = () => {
@@ -64,7 +64,8 @@ const MyPage = () => {
           ) : (
             feeds.map(feed => (
               <FeedItem
-                key={feed.id}
+                key={feed.postId} // `key`를 여기서 지정하고 FeedItem 내부에서는 사용하지 않음
+                postId={feed.postId}
                 nickname={feed.nickname}
                 userId={feed.email}
                 content={feed.content}

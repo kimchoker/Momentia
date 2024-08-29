@@ -2,21 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { collection, getDocs, query, orderBy, limit, startAfter, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import { db } from '../../../firebase/firebase';
-import { fetchedPostData } from '../../../types/types';
-
-
-// Firestore 문서 데이터 구조를 명시하는 타입
-interface FeedDocument extends DocumentData {
-  id: string;
-  userId: string;
-  email: string;
-  nickname: string;
-  content: string;
-  images?: { url: string; fileName: string }[];
-  likeCount?: number;
-  commentCount?: number;
-  createdAt: any; // Firestore Timestamp 타입
-}
+import { post } from '../../../types/types';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { next, limitNum } = req.query;
@@ -34,10 +20,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const querySnapshot = await getDocs(feedQuery);
-    const items: fetchedPostData[] = querySnapshot.docs.map(doc => {
-      const data = doc.data() as FeedDocument; // 데이터 타입을 FeedDocument으로 단언
+    const items: post[] = querySnapshot.docs.map(doc => {
+      const data = doc.data() as post; // 데이터 타입을 FeedDocument으로 단언
       return {
-        id: doc.id,
+        postId: doc.id,
         userId: data.userId,
         email: data.email,
         nickname: data.nickname,
@@ -45,7 +31,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         images: data.images || [],
         likeCount: data.likeCount || 0,
         commentCount: data.commentCount || 0,
-        createdAt: data.createdAt.toDate(),
+        createdAt: data.createdAt
       };
     });
 

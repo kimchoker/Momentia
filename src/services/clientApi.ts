@@ -1,11 +1,10 @@
-import { collection, query, where, getDocs, setDoc, doc, Timestamp, addDoc, serverTimestamp, QueryDocumentSnapshot, orderBy, limit, startAfter  } from "firebase/firestore";
+import { collection, query, where, getDocs, setDoc, doc, Timestamp, addDoc, serverTimestamp, QueryDocumentSnapshot, orderBy, limit, startAfter, updateDoc } from "firebase/firestore";
 import { db, auth, storage } from "../firebase/firebase";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, User } from "firebase/auth";
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { PostData, UserData } from '../types/types';
+import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
+import { PostData, UserData, UpdatePostData, post } from '../types/types';
 import Cookies from "js-cookie";
 import axios from 'axios';
-import { fetchedPostData } from "../types/types";
 import { authStore } from "../states/store";
 
 // 아이디 중복확인
@@ -137,7 +136,7 @@ const fetchUserInfo = async () => {
   }
 };
 
-const fetchFeedData = async (next?: string, limitNum: number = 20): Promise<{ items: fetchedPostData[], next: string | null }> => {
+const fetchFeedData = async (next?: string, limitNum: number = 20): Promise<{ items: post[], next: string | null }> => {
   try {
     const response = await axios.get("/getfeed", {
       params: {
@@ -196,7 +195,54 @@ const fetchUserData = async () => {
   }
 };
 
+const updatePost = async (postId: string, updatedData: UpdatePostData, removedImages: { url: string; fileName: string }[]) => {
+  try {
+    if (!postId) {
+      throw new Error("postId가 유효하지 않습니다.");
+    }
+
+    // 포스트 문서 참조
+    const postRef = doc(db, 'Feed', postId); // 'Feed' 컬렉션으로 수정
+
+    // 삭제된 이미지가 있는 경우 Firebase Storage에서 삭제
+    for (const image of removedImages) {
+      const imageRef = ref(storage, `images/${image.fileName}`);
+      await deleteObject(imageRef); // Firebase Storage에서 이미지 삭제
+    }
+
+    // 포스트 데이터 업데이트
+    await updateDoc(postRef, {
+      content: updatedData.content,
+      images: updatedData.images,
+    });
+
+    console.log('포스트가 성공적으로 수정되었습니다.');
+  } catch (error) {
+    console.error('포스트 수정 중 오류가 발생했습니다:', error);
+    throw new Error('포스트 수정 실패');
+  }
+};
+
+const deletePost = async (postId: string, imageFiles: string[]) => {
+  try {
+    const response = await axios.delete('/api/deletepost', {
+      data: {
+        postId,
+        imageFiles,
+      },
+    });
+
+    if (response.status === 200) {
+      alert('글 삭제 성공');
+    } else {
+      alert('글 삭제에 실패했습니다.');
+    }
+  } catch (error) {
+    console.error('Error deleting post:', error);
+    alert('Error deleting post');
+  }
+};
 
 
 
-export { checkIDExists, checkNicknameExists, signUp, login, uploadImage, savePost, getFeedPosts, fetchUserInfo, fetchFeedData, getAllFeeds, fetchUserData };
+export { checkIDExists, checkNicknameExists, signUp, login, uploadImage, savePost, getFeedPosts, fetchUserInfo, fetchFeedData, getAllFeeds, fetchUserData, updatePost, deletePost };

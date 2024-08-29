@@ -20,7 +20,7 @@ const MainProfile = () => {
   }
 
   return (
-    <div className="bg-[#d6d6d6] p-5 border-b-2 border-black z-10 flex flex-row justify-evenly">
+    <div className="bg-white p-5 border-b-1 border-[#d6d6d6] z-10 flex flex-row justify-evenly">
       <div className="flex flex-row">
         {/* 프로필 이미지 */}
         <Profile>
