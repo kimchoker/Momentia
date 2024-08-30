@@ -1,34 +1,42 @@
-import { NextResponse } from 'next/server';
-import { adminDB } from '../../../firebase/firebaseAdmin';
-import { DocumentData, QuerySnapshot } from 'firebase-admin/firestore';
-import { Feed } from '../../../types/types';
+import { NextRequest, NextResponse } from "next/server";
+import { db } from "../../../firebase/firebase";
+import { collection, getDocs, query, where } from 'firebase/firestore';
 
-export async function GET(request: Request) {
+interface FeedDocument {
+  userId: string;
+  email: string;
+  nickname: string;
+  content: string;
+  images?: { url: string; fileName: string }[];
+  likeCount?: number;
+  commentCount?: number;
+  createdAt: any;
+}
+
+export async function POST(req: NextRequest) {
+  const { email } = await req.json();
+
+  if (!email) {
+    return NextResponse.json({ message: 'Email is required' }, { status: 400 });
+  }
+
   try {
-    const url = new URL(request.url);
-    const uid = url.searchParams.get('uid'); // 요청에서 uid 쿼리 파라미터 가져오기
+    const feedCollection = collection(db, 'Feed');
+    const q = query(feedCollection, where('email', '==', email));
+    const querySnapshot = await getDocs(q);
 
-    if (!uid) {
-      return NextResponse.json({ message: 'UID가 전달되지 않았습니다' }, { status: 400 });
+    if (querySnapshot.empty) {
+      return NextResponse.json({ message: 'No feeds found for this email' }, { status: 404 });
     }
 
-    const feedCollection = adminDB.collection('Feed');
-    const feedQuery = feedCollection.where('userId', '==', uid).orderBy('createdAt', 'desc'); // 사용자 UID로 필터링
-
-    const feedSnapshot: QuerySnapshot<DocumentData> = await feedQuery.get();
-
-    if (feedSnapshot.empty) {
-      return NextResponse.json({ message: '불러올 수 있는 피드가 없습니다' }, { status: 404 });
-    }
-
-    const feeds = feedSnapshot.docs.map((doc) => ({
+    const feeds: FeedDocument[] = querySnapshot.docs.map((doc) => ({
       id: doc.id,
-      ...doc.data(),
-    })) as Feed[];
+      ...(doc.data() as FeedDocument),
+    }));
 
     return NextResponse.json({ feeds });
   } catch (error) {
-    console.error('DB에서 데이터를 불러오는 데 실패했습니다:', error);
-    return NextResponse.json({ message: 'DB에서 데이터를 불러오는 데 실패했습니다:' }, { status: 500 });
+    console.error('Error fetching feeds:', error);
+    return NextResponse.json({ message: 'Failed to fetch feeds' }, { status: 500 });
   }
 }

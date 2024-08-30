@@ -27,13 +27,21 @@ const MyPage = () => {
 
   const fetchMyFeeds = async () => {
     try {
-      const response = await fetch(`/api/myfeed?uid=${uid}`);
+      const response = await fetch(`/api/myfeed`, {
+        method: 'POST',  
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: uid }),
+      });
+  
       if (!response.ok) {
         throw new Error("서버에서 피드를 불러오는 데 실패했습니다.");
       }
+  
       const data = await response.json();
       console.log("서버에서 받아온 데이터:", data);
-
+  
       if (Array.isArray(data.feeds)) {
         setFeeds(data.feeds);
       } else {

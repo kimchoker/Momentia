@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { adminDB } from '../../../firebase/firebaseAdmin';
-import { QueryDocumentSnapshot, DocumentData, CollectionReference, QuerySnapshot } from 'firebase-admin/firestore';
+import { QueryDocumentSnapshot, DocumentData, QuerySnapshot } from 'firebase-admin/firestore';
 import { post } from '../../../types/types';
 
 export async function GET(request: Request) {

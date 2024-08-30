@@ -1,32 +1,42 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import { adminDB, adminStorage } from '../../../firebase/firebaseAdmin';
+import { NextRequest, NextResponse } from "next/server";
+import { db } from "../../../firebase/firebase";
+import { doc, getDoc, deleteDoc } from "firebase/firestore";
+import { adminAuth } from "../../../firebase/firebaseAdmin"; // Firebase Admin SDK 사용
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'DELETE') {
-    return res.status(405).json({ error: '올바른 요청이 아닙니다' });
-  }
-
-  const { postId, imageFiles } = req.body;
-
-  if (!postId) {
-    return res.status(400).json({ error: 'postId가 없습니다' });
-  }
-
+export async function POST(req: NextRequest) {
   try {
-    // Firestore에서 포스트 삭제
-    await adminDB.collection('Feed').doc(postId).delete();
+    // 요청 본문에서 글 ID와 사용자 토큰을 추출
+    const { postId, idToken } = await req.json();
 
-    // Firebase Storage에서 이미지 삭제
-    if (imageFiles && imageFiles.length > 0) {
-      for (const fileName of imageFiles) {
-        const file = adminStorage.file(`images/${fileName}`);
-        await file.delete();
-      }
+    if (!postId || !idToken) {
+      return NextResponse.json({ message: "Post ID and Token are required" }, { status: 400 });
     }
 
-    return res.status(200).json({ message: '포스트 삭제에 성공했습니다' });
+    // 토큰을 통해 사용자 인증
+    const decodedToken = await adminAuth.verifyIdToken(idToken);
+    const userId = decodedToken.uid;
+
+    // 삭제하려는 글의 문서 참조를 가져옴
+    const postRef = doc(db, "Feed", postId);
+    const postDoc = await getDoc(postRef);
+
+    if (!postDoc.exists()) {
+      return NextResponse.json({ message: "Post not found" }, { status: 404 });
+    }
+
+    const postData = postDoc.data();
+
+    // 글 작성자와 현재 사용자 ID 비교
+    if (postData.userId !== userId) {
+      return NextResponse.json({ message: "You can only delete your own posts" }, { status: 403 });
+    }
+
+    // 글 삭제 처리
+    await deleteDoc(postRef);
+
+    return NextResponse.json({ message: "Post deleted successfully" });
   } catch (error) {
-    console.error('포스트 삭제 중 오류가 발생했습니다:', error);
-    return res.status(500).json({ error: '포스트 삭제 중 오류가 발생했습니다' });
+    console.error("Error deleting post:", error);
+    return NextResponse.json({ message: "Failed to delete post" }, { status: 500 });
   }
 }

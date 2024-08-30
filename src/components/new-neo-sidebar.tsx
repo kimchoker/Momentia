@@ -1,16 +1,15 @@
 "use client"
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Swords, SquarePen, Users, Settings, MessageSquare, Bell, ChevronLeft, LogIn, LogOut } from "lucide-react";
 import { Button } from "./ui/button";
-import WritingComponent from "./feed/PostWriting";
-import { PostModalDialog, PostModalDialogContent, PostModalDialogHeader, PostModalDialogFooter, PostModalDialogTitle, PostModalDialogDescription } from "../components/feed/PostModal"
-import { useSidebarToggle, useModalStore } from "../states/store";
+import { PostModalDialog, PostModalDialogContent } from "../components/feed/PostModal"
+import { useSidebarToggle, useModalStore, authStore } from "../states/store";
 import { useStore } from "zustand";
-import { authStore } from "../states/store";
 import { usePathname } from "next/navigation";
 import { fetchUserData } from "../services/clientApi";
+import WritingComponent from "./feed/PostWriting";
+import Link from "next/link";
 
 
 const Sibar= () => {

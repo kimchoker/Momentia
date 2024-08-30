@@ -119,7 +119,7 @@ const fetchUserInfo = async () => {
     const token = Cookies.get('token');
     if (!token) throw new Error('토큰이 없음');
 
-    const response = await fetch("/api/getuseruid", {
+    const response = await fetch("/api/useruid", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ idToken: token }),
@@ -138,7 +138,7 @@ const fetchUserInfo = async () => {
 
 const fetchFeedData = async (next?: string, limitNum: number = 20): Promise<{ items: post[], next: string | null }> => {
   try {
-    const response = await axios.get("/getfeed", {
+    const response = await axios.get("/allfeed", {
       params: {
         next,
         limitNum
@@ -166,7 +166,7 @@ async function getAllFeeds() {
 const fetchUserData = async () => {
   const token = Cookies.get('token')
   try {
-    const response = await fetch('/api/getuserprofile', {
+    const response = await fetch('/api/profile', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -225,7 +225,11 @@ const updatePost = async (postId: string, updatedData: UpdatePostData, removedIm
 
 const deletePost = async (postId: string, imageFiles: string[]) => {
   try {
+    const token = Cookies.get('token');
     const response = await axios.delete('/api/deletepost', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
       data: {
         postId,
         imageFiles,

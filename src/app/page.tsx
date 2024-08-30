@@ -11,17 +11,15 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch feeds from the backend API
   const fetchFeeds = async () => {
     try {
-      const response = await fetch('/api/getall');
+      const response = await fetch('/api/allfeed');
 
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
 
       const data = await response.json();
-      // Verify data structure
       console.log('Fetched data:', data);
 
       if (Array.isArray(data.feeds)) {
