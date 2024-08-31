@@ -1,42 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "../../../firebase/firebase";
-import { collection, getDocs, query, where, orderBy, limit, startAfter } from 'firebase/firestore';
-
-interface FeedDocument {
-  userId: string;
-  email: string;
-  nickname: string;
-  content: string;
-  images?: { url: string; fileName: string }[];
-  likeCount?: number;
-  commentCount?: number;
-  createdAt: any;
-}
+import { collection, getDocs, query, where, orderBy, limit, startAfter, Timestamp } from 'firebase/firestore';
+import { post } from "../../../types/types";
 
 export async function POST(req: NextRequest) {
-  const { email, pageParam } = await req.json(); // pageParam이 마지막 문서의 정보
-  const pageSize = 10; // 한번에 불러올 피드의 개수
-
-  if (!email) {
-    return NextResponse.json({ message: '이메일이 없습니다.' }, { status: 400 });
-  }
-
   try {
+    const { email, pageParam } = await req.json();
+    if (!email) {
+      return NextResponse.json({ message: '이메일이 없습니다.' }, { status: 400 });
+    }
+
     const feedCollection = collection(db, 'Feed');
-    const q = pageParam 
-      ? query(
-          feedCollection,
-          where('email', '==', email),
-          orderBy('createdAt', 'desc'),
-          startAfter(pageParam),
-          limit(pageSize)
-        )
-      : query(
-          feedCollection,
-          where('email', '==', email),
-          orderBy('createdAt', 'desc'),
-          limit(pageSize)
-        );
+    let q;
+
+    if (pageParam) {
+      const lastVisibleTimestamp = Timestamp.fromDate(new Date(pageParam));
+      q = query(
+        feedCollection,
+        where('email', '==', email),
+        orderBy('createdAt', 'desc'),
+        startAfter(lastVisibleTimestamp),
+        limit(10)
+      );
+    } else {
+      q = query(
+        feedCollection,
+        where('email', '==', email),
+        orderBy('createdAt', 'desc'),
+        limit(10)
+      );
+    }
 
     const querySnapshot = await getDocs(q);
 
@@ -44,17 +37,24 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: '피드의 마지막입니다.' }, { status: 404 });
     }
 
-    const feeds: FeedDocument[] = querySnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...(doc.data() as FeedDocument),
-    }));
+    const feeds: post[] = querySnapshot.docs.map((doc) => {
+      const data = doc.data() as post;
+      return {
+        postId: doc.id,
+        ...data,
+        createdAt: (data.createdAt as Timestamp).toDate().toISOString(),
+      };
+    });
 
-    // 마지막 문서의 정보도 반환
     const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
+    const lastVisibleData = lastVisible.data() as post; // 여기에 타입 캐스팅을 추가합니다.
+    const nextCursor = lastVisibleData.createdAt instanceof Timestamp
+      ? lastVisibleData.createdAt.toDate().toISOString()
+      : null;
 
-    return NextResponse.json({ feeds, lastVisible });
+    return NextResponse.json({ feeds, nextCursor });
   } catch (error) {
-    console.error('페이지 불러오기에 실패했습니다:', error);
-    return NextResponse.json({ message: '페이지 불러오기에 실패했습니다:' }, { status: 500 });
+    console.error('에러 발생:', error);
+    return NextResponse.json({ message: '서버 오류 발생' }, { status: 500 });
   }
 }

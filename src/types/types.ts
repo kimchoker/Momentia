@@ -95,7 +95,7 @@ export interface post {
   }[];
   likeCount: number;
   commentCount: number;
-  createdAt: string;
+  createdAt: string | Timestamp;
 }
 
 export interface UserState {
