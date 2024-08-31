@@ -21,7 +21,7 @@ const FeedItem = ({ nickname, userId, content, images, postId }) => {
   }
 
   return (
-    <div className="w-[100%] border-b border-[#d6d6d6] bg-white" onClick={handleClick}>
+    <div className="w-[100%] min-w-[500px] border-b border-[#d6d6d6] bg-white" onClick={handleClick}>
       <div className="flex flex-row justify-start ml-5 p-3 ">
         <Avatar>
           <AvatarImage src="https://firebasestorage.googleapis.com/v0/b/snsproject-85107.appspot.com/o/images%2Fkuromi.jpg?alt=media&token=b82213e1-0e86-4146-b1f4-5454fcd6220e" />

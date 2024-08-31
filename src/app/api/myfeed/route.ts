@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "../../../firebase/firebase";
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { collection, getDocs, query, where, orderBy, limit, startAfter } from 'firebase/firestore';
 
 interface FeedDocument {
   userId: string;
@@ -14,19 +14,34 @@ interface FeedDocument {
 }
 
 export async function POST(req: NextRequest) {
-  const { email } = await req.json();
+  const { email, pageParam } = await req.json(); // pageParam이 마지막 문서의 정보
+  const pageSize = 10; // 한번에 불러올 피드의 개수
 
   if (!email) {
-    return NextResponse.json({ message: 'Email is required' }, { status: 400 });
+    return NextResponse.json({ message: '이메일이 없습니다.' }, { status: 400 });
   }
 
   try {
     const feedCollection = collection(db, 'Feed');
-    const q = query(feedCollection, where('email', '==', email));
+    const q = pageParam 
+      ? query(
+          feedCollection,
+          where('email', '==', email),
+          orderBy('createdAt', 'desc'),
+          startAfter(pageParam),
+          limit(pageSize)
+        )
+      : query(
+          feedCollection,
+          where('email', '==', email),
+          orderBy('createdAt', 'desc'),
+          limit(pageSize)
+        );
+
     const querySnapshot = await getDocs(q);
 
     if (querySnapshot.empty) {
-      return NextResponse.json({ message: 'No feeds found for this email' }, { status: 404 });
+      return NextResponse.json({ message: '피드의 마지막입니다.' }, { status: 404 });
     }
 
     const feeds: FeedDocument[] = querySnapshot.docs.map((doc) => ({
@@ -34,9 +49,12 @@ export async function POST(req: NextRequest) {
       ...(doc.data() as FeedDocument),
     }));
 
-    return NextResponse.json({ feeds });
+    // 마지막 문서의 정보도 반환
+    const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
+
+    return NextResponse.json({ feeds, lastVisible });
   } catch (error) {
-    console.error('Error fetching feeds:', error);
-    return NextResponse.json({ message: 'Failed to fetch feeds' }, { status: 500 });
+    console.error('페이지 불러오기에 실패했습니다:', error);
+    return NextResponse.json({ message: '페이지 불러오기에 실패했습니다:' }, { status: 500 });
   }
 }

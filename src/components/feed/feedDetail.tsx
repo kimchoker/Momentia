@@ -3,16 +3,18 @@ import React, { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { imageArray } from '../../types/types';
 import { useModalStore } from '../../states/store';
-import { X } from 'lucide-react';
-import EditPostComponent from './feedEdit';
+import { X, ArrowUp } from 'lucide-react';
 import { deletePost } from '../../services/clientApi';
 import { authStore } from '../../states/store';
-import Cookies from 'js-cookie';
+import CommentComponent from './CommentComponent';
+import EditPostComponent from './feedEdit';
 
 const FeedDetail = ({ nickname, userId, content, images, postId }) => {
   const { closeModal } = useModalStore();
   const [isEditing, setIsEditing] = useState(false);
   const { email } = authStore();
+  const [commentText, setCommentText] = useState(""); // 댓글 텍스트 상태 추가
+  const [comments, setComments] = useState([]); // 댓글 목록 상태 추가
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -36,6 +38,20 @@ const FeedDetail = ({ nickname, userId, content, images, postId }) => {
       console.error("글 삭제 중 오류가 발생했습니다:", error);
       alert("글 삭제 중 오류가 발생했습니다.");
     }
+  };
+
+  const handleCommentSave = () => {
+    if (!commentText.trim()) return;
+
+    // 새로운 댓글 추가
+    const newComment = {
+      id: Date.now(), // 임시로 고유한 ID 생성
+      userId: email,
+      nickname, // 현재 사용자의 닉네임
+      text: commentText,
+    };
+    setComments([...comments, newComment]);
+    setCommentText("");
   };
 
   if (isEditing) {
@@ -91,9 +107,37 @@ const FeedDetail = ({ nickname, userId, content, images, postId }) => {
       {/* 글과 댓글 사이의 구분선 */}
       <hr className="my-4" />
 
-      {/* 수정 및 삭제 버튼 - uid와 userId가 같을 때만 보이도록 */}
+      {/* 댓글 작성 및 저장 버튼 */}
+      <div className="mt-4 flex items-center space-x-2">
+        <input
+          type="text"
+          value={commentText}
+          onChange={(e) => setCommentText(e.target.value)}
+          className="flex-grow p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          placeholder="댓글을 입력하세요"
+        />
+        <button
+          onClick={handleCommentSave}
+          className="px-1 py-1 bg-black text-white rounded-full transition-all hover:bg-[#d6d6d6]"
+        >
+          <ArrowUp/>
+        </button>
+      </div>
+
+      {/* 댓글 목록 */}
+      <div className="mt-4">
+        {comments.map((comment) => (
+          <CommentComponent
+            key={comment.id}
+            comment={comment}
+            currentUserId={email}
+          />
+        ))}
+      </div>
+
+      {/* 수정 및 삭제 버튼 - email과 userId가 같을 때만 보이도록 */}
       {email === userId && (
-        <div className="flex justify-end space-x-2">
+        <div className="flex justify-end space-x-2 mt-4">
           <button 
             onClick={handleEdit}
             className="px-4 py-2 bg-white text-black rounded-md hover:bg-[#d6d6d6]"
@@ -108,9 +152,6 @@ const FeedDetail = ({ nickname, userId, content, images, postId }) => {
           </button>
         </div>
       )}
-
-      {/* 댓글 영역 (나중에 댓글 컴포넌트를 추가) */}
-      <div>댓글 부분</div>
     </div>
   );
 };
