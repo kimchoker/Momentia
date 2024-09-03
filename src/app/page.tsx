@@ -5,8 +5,6 @@ import { ScrollArea } from '../components/ui/scroll-area';
 import Sibar from '../components/new-neo-sidebar';
 import { post } from '../types/types';
 import Spinner from '../components/ui/spinner';
-import { useInfiniteQuery } from '@tanstack/react-query';
-import { fetchFeedData } from '../services/clientApi';
 
 const Home = () => {
   const [feeds, setFeeds] = useState<post[]>([]);
@@ -73,6 +71,9 @@ const Home = () => {
                 userId={feed.email}
                 content={feed.content}
                 images={feed.images}
+                time={feed.createdAt}
+                commentCount={feed.commentCount}
+                likeCount={feed.likeCount}
               />
             ))
           )}

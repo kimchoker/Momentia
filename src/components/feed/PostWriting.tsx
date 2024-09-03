@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { uploadImage } from '../../services/clientApi';
-import { savePost } from '../../services/clientApi';
+import { uploadImage } from '../../lib/api/feedApi';
+import { savePost } from '../../lib/api/feedApi';
 import { useModalStore } from '../../states/store';
 import { Button } from '../ui/button';
-import { fetchUserInfo } from '../../services/clientApi';
 import { authStore } from '../../states/store';
 import { CircleX } from 'lucide-react';
 

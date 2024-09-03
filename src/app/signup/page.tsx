@@ -2,19 +2,17 @@
 import React, { useState, useEffect } from "react";
 import { validateEmail, validatePassword } from "../../lib/validation";
 import { BsEnvelope, BsFillLockFill } from "react-icons/bs";
-import { useRouter } from "next/navigation";
-import { signUp, checkIDExists, checkNicknameExists } from "../../services/clientApi";
-import { authStore } from "../../states/store";
+import { signUp, checkIDExists } from "../../lib/api/userApi";
 
 
 const SignUp: React.FC = () => {
+
 
   // ID 부분
   const [inputEmail, setInputEmail] = useState<string>("");
   const [validateID, setValidateID] = useState<boolean>(true);
   const [isIDFocused, setIsIDFocused] = useState<boolean>(false);
 
-  // 얘도 나중에 ref로 최적화 해줘야 하지 않을까
   const onChangeEmail = (event: React.ChangeEvent<HTMLInputElement>) => {
     validateEmail(event.target.value, setInputEmail, setValidateID);
   };
@@ -54,7 +52,6 @@ const checkID = async (id :string) => {
     validatePassword(event.target.value, setInputPW, setValidatePW);
   }  
 
-  // 이부분 나중에 ref 사용해서 성능 최적화 해야하지 않을까
   useEffect(() => {
     if (inputPW === "") {
       setPWInfo("");
@@ -78,17 +75,10 @@ const checkID = async (id :string) => {
 
 
 
-
-
-  const router = useRouter();
-
-
   // 닉네임 부분
   const [inputNickname, setInputNickname] = useState<string>("");
   const [isNicknameFocused, setIsNicknameFocused] = useState<boolean>(false);
 
-  // 얘도 나중에 최적화 가능할 것 같구나
-  // 아이디 비밀번호가 모두 옳으면
   useEffect(() => {
     if (inputEmail !== "" && inputPW !== "" && inputNickname !== "" && validateID && validatePW) {
       setButtonDisabled(false);

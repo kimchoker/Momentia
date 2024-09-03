@@ -3,8 +3,8 @@ import React, { useState, useEffect } from "react";
 import { BsEnvelope, BsLock } from "react-icons/bs";
 import { validateEmail } from "../../lib/validation";
 import { useRouter } from "next/navigation";
-import { fetchUserInfo, login } from "../../services/clientApi";
 import { authStore } from "../../states/store";
+import { fetchUserInfo, login } from "../../lib/api/userApi";
 
 const Login: React.FC = () => {
 

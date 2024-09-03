@@ -4,18 +4,18 @@ import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar'
 import { imageArray } from '../../types/types';
 import { useModalStore, authStore } from '../../states/store';
 import { X, ArrowUp } from 'lucide-react';
-import { deletePost } from '../../services/clientApi';
+import { deletePost } from '../../lib/api/feedApi';
+import { FaHeart, FaComment } from 'react-icons/fa';
 import CommentComponent from './CommentComponent';
 import EditPostComponent from './feedEdit';
-import { FaHeart, FaComment } from 'react-icons/fa'; // 좋아요와 댓글 아이콘을 위한 라이브러리
-import { getAuth } from 'firebase/auth';
+
 
 const FeedDetail = ({ nickname, userId, content, images, postId, time, likes = 0, commentsCount = 0 }) => {
   const { closeModal } = useModalStore();
   const [isEditing, setIsEditing] = useState(false);
   const { email } = authStore();
-  const [commentText, setCommentText] = useState(""); // 댓글 텍스트 상태 추가
-  const [comments, setComments] = useState([]); // 댓글 목록 상태 추가
+  const [commentText, setCommentText] = useState(""); 
+  const [comments, setComments] = useState([]);
 
   const createdAt = new Date(time);
   const formattedCreatedAt = `${createdAt.getFullYear() % 100}년 ${createdAt.getMonth() + 1}월 ${createdAt.getDate()}일 ${createdAt.getHours()}시 ${createdAt.getMinutes()}분`;
@@ -118,7 +118,7 @@ const FeedDetail = ({ nickname, userId, content, images, postId, time, likes = 0
           <span>{likes}</span> {/* 좋아요 수 */}
         </div>
         <div className="flex items-center">
-          <FaComment className="mr-1 text-blue-500" /> {/* 댓글 아이콘 */}
+          <FaComment className="mr-1 text-black-500" /> {/* 댓글 아이콘 */}
           <span>{commentsCount}</span> {/* 댓글 수 */}
         </div>
       </div>

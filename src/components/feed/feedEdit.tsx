@@ -1,6 +1,6 @@
 "use client"
 import React, { useState, useEffect } from 'react';
-import { uploadImage, updatePost } from '../../services/clientApi';
+import { uploadImage, updatePost } from '../../lib/api/feedApi';
 import { useModalStore } from '../../states/store';
 import { Button } from '../ui/button';
 import { CircleX } from 'lucide-react';

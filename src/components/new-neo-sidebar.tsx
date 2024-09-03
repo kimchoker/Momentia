@@ -7,7 +7,7 @@ import { PostModalDialog, PostModalDialogContent } from "../components/feed/Post
 import { useSidebarToggle, useModalStore, authStore } from "../states/store";
 import { useStore } from "zustand";
 import { usePathname } from "next/navigation";
-import { fetchUserData } from "../services/clientApi";
+import { fetchProfile } from "../lib/api/userApi";
 import WritingComponent from "./feed/PostWriting";
 import Link from "next/link";
 
@@ -41,7 +41,7 @@ const Sibar= () => {
 
 	
 	const handleProfile = async () => {
-		await fetchUserData();
+		await fetchProfile();
 		
 		const email = authStore.getState().email;
 
