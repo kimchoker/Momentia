@@ -20,7 +20,6 @@ const MyPage = () => {
   const router = useRouter();
 
   const fetchFeeds = async ({ pageParam }) => {
-    console.log("email:", email, "pageParam:", pageParam);
     const response = await fetch(`/api/myfeed`, {
       method: 'POST',  
       headers: {

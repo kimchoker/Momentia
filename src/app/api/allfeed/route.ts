@@ -1,39 +1,42 @@
-import { NextResponse } from 'next/server';
-import { adminDB } from '../../../firebase/firebaseAdmin';
-import { QueryDocumentSnapshot, DocumentData, QuerySnapshot } from 'firebase-admin/firestore';
-import { post } from '../../../types/types';
+import { NextRequest, NextResponse } from "next/server";
+import { db } from "../../../firebase/firebase";
+import { collection, getDocs, query, where, orderBy, limit, startAfter, Timestamp } from 'firebase/firestore';
+import { post } from "../../../types/types";
 
-export async function GET(request: Request) {
+export async function POST(req: NextRequest) {
   try {
-    const url = new URL(request.url);
-    const next = url.searchParams.get('next');
-    const limitNum = url.searchParams.get('limitNum');
+    const { pageParam } = await req.json();
+ 
+    const feedCollection = collection(db, 'Feed');
+    let q;
 
-    const feedCollection = adminDB.collection('Feed');
-    let feedQuery;
-
-    if (next) {
-      const nextDoc = JSON.parse(next) as QueryDocumentSnapshot<DocumentData>;
-      feedQuery = feedCollection
-        .orderBy('createdAt', 'desc')
-        .startAfter(nextDoc)
-        .limit(Number(limitNum) || 20);
+    if (pageParam) {
+      const lastVisibleTimestamp = Timestamp.fromDate(new Date(pageParam));
+      q = query(
+        feedCollection,
+        orderBy('createdAt', 'desc'),
+        startAfter(lastVisibleTimestamp),
+        limit(10)
+      );
     } else {
-      feedQuery = feedCollection
-        .orderBy('createdAt', 'desc')
-        .limit(Number(limitNum) || 20);
+      q = query(
+        feedCollection,
+        orderBy('createdAt', 'desc'),
+        limit(10)
+      );
     }
 
-    const feedSnapshot: QuerySnapshot<DocumentData> = await feedQuery.get();
+    const querySnapshot = await getDocs(q);
 
-    if (feedSnapshot.empty) {
-      return NextResponse.json({ message: 'No feeds found' }, { status: 404 });
+    if (querySnapshot.empty) {
+      return NextResponse.json({ message: '피드의 마지막입니다.' }, { status: 404 });
     }
 
-    const feeds: post[] = feedSnapshot.docs.map((doc) => {
-      const data = doc.data();
+    const feeds: post[] = querySnapshot.docs.map((doc) => {
+      const data = doc.data() as post;
+
       return {
-        postId: doc.id, 
+        postId: doc.id,
         nickname: data.nickname,
         email: data.email,
         userId: data.userId,
@@ -41,17 +44,19 @@ export async function GET(request: Request) {
         images: data.images || [],
         likeCount: data.likeCount || 0,
         commentCount: data.commentCount || 0,
-        createdAt: data.createdAt.toDate()
+        createdAt: (data.createdAt as Timestamp).toDate().toISOString(),
       };
     });
 
-    const lastVisible = feedSnapshot.docs[feedSnapshot.docs.length - 1];
-    return NextResponse.json({
-      feeds,
-      next: lastVisible ? JSON.stringify(lastVisible) : null
-    });
+    const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
+    const lastVisibleData = lastVisible.data() as post; // 여기에 타입 캐스팅을 추가합니다.
+    const nextCursor = lastVisibleData.createdAt instanceof Timestamp
+      ? lastVisibleData.createdAt.toDate().toISOString()
+      : null;
+
+    return NextResponse.json({ feeds, nextCursor });
   } catch (error) {
-    console.error('Error fetching feeds:', error);
-    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+    console.error('에러 발생:', error);
+    return NextResponse.json({ message: '서버 오류 발생' }, { status: 500 });
   }
 }
