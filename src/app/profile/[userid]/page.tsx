@@ -3,13 +3,14 @@ import React, { useRef, useEffect } from 'react';
 import { ScrollArea } from '../../../components/ui/feed-scroll-area';
 import { profileEditStore, authStore } from '../../../states/store';
 import { useInfiniteQuery } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
 import MainProfile from '../../../components/profile/mainprofile';
 import ProfileEdit from '../../../components/profile/new-neo-profileEdit';
 import Sibar from '../../../components/new-neo-sidebar';
 import FeedItem from '../../../components/feed/feedItem';
 import Spinner from '../../../components/ui/spinner';
 import Cookies from 'js-cookie';
-import { useRouter } from 'next/navigation';
+
 
 const MyPage = () => {
   const scrollRef = useRef<HTMLDivElement | null>(null);
@@ -105,6 +106,9 @@ const MyPage = () => {
               userId={feed.email}
               content={feed.content}
               images={feed.images}
+              time={feed.createdAt}
+              commentCount={feed.commentCount}
+              likeCount={feed.likeCount}
             />
           ))}
           {isFetchingNextPage && (

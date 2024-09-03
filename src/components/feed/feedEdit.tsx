@@ -9,9 +9,10 @@ interface EditPostComponentProps {
   initialContent: string;
   initialImages: { url: string; fileName: string }[];
   postId: string;
+  setIsEditing: React.Dispatch<React.SetStateAction<boolean>>; // 상태 업데이트 함수를 prop으로 받음
 }
 
-const EditPostComponent: React.FC<EditPostComponentProps> = ({ initialContent, initialImages, postId }) => {
+const EditPostComponent: React.FC<EditPostComponentProps> = ({ initialContent, initialImages, postId, setIsEditing }) => {
   const [content, setContent] = useState<string>(initialContent);
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>(initialImages.map(image => image.url));
@@ -115,7 +116,7 @@ const EditPostComponent: React.FC<EditPostComponentProps> = ({ initialContent, i
 
       <div className='mt-4 flex flex-row justify-end'>
         <Button className='mr-3' onClick={handlePostSubmit}>Save</Button>
-        <Button onClick={closeModal}>Cancel</Button>
+        <Button onClick={() => setIsEditing(false)}>Cancel</Button> {/* isEditing을 false로 설정 */}
       </div>
     </div>
   );

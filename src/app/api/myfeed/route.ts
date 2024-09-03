@@ -39,9 +39,16 @@ export async function POST(req: NextRequest) {
 
     const feeds: post[] = querySnapshot.docs.map((doc) => {
       const data = doc.data() as post;
+
       return {
         postId: doc.id,
-        ...data,
+        nickname: data.nickname,
+        email: data.email,
+        userId: data.userId,
+        content: data.content,
+        images: data.images || [],
+        likeCount: data.likeCount || 0,
+        commentCount: data.commentCount || 0,
         createdAt: (data.createdAt as Timestamp).toDate().toISOString(),
       };
     });

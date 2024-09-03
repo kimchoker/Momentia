@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "../../../firebase/firebase";
 import { doc, getDoc, deleteDoc } from "firebase/firestore";
-import { adminAuth } from "../../../firebase/firebaseAdmin"; // Firebase Admin SDK 사용
+import { adminAuth, adminStorage } from "../../../firebase/firebaseAdmin"; // Firebase Admin SDK 사용
 
 export async function POST(req: NextRequest) {
   try {
@@ -31,7 +31,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "You can only delete your own posts" }, { status: 403 });
     }
 
-    // 글 삭제 처리
+    // Firebase Storage에서 이미지 삭제
+    const deleteImagePromises = postData.images.map(async (image: { fileName: string }) => {
+      const fileRef = adminStorage.file(`images/${image.fileName}`);
+      await fileRef.delete();
+    });
+
+    await Promise.all(deleteImagePromises);
+
+    // Firestore에서 글 삭제
     await deleteDoc(postRef);
 
     return NextResponse.json({ message: "Post deleted successfully" });

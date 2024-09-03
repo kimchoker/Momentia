@@ -6,6 +6,7 @@ import { PostData, UserData, UpdatePostData, post } from '../types/types';
 import Cookies from "js-cookie";
 import axios from 'axios';
 import { authStore } from "../states/store";
+import { getAuth } from "firebase/auth";
 
 // 아이디 중복확인
 const checkIDExists = async (id: string) => {
@@ -223,27 +224,39 @@ const updatePost = async (postId: string, updatedData: UpdatePostData, removedIm
   }
 };
 
-const deletePost = async (postId: string, imageFiles: string[]) => {
+
+const deletePost = async (postId: string) => {
   try {
-    const token = Cookies.get('token');
-    const response = await axios.delete('/api/deletepost', {
+    // Firebase 인증에서 현재 사용자의 ID 토큰 가져오기
+    const auth = getAuth();
+    const idToken = await auth.currentUser?.getIdToken();
+
+    if (!idToken) {
+      throw new Error("User not authenticated");
+    }
+
+    // 서버에 삭제 요청 보내기
+    const response = await fetch("/api/deletepost", {
+      method: "POST",
       headers: {
-        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
       },
-      data: {
+      body: JSON.stringify({
         postId,
-        imageFiles,
-      },
+        idToken,
+      }),
     });
 
-    if (response.status === 200) {
-      alert('글 삭제 성공');
-    } else {
-      alert('글 삭제에 실패했습니다.');
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.message || "Failed to delete post");
     }
+
+    return result;
   } catch (error) {
-    console.error('Error deleting post:', error);
-    alert('Error deleting post');
+    console.error("글 삭제 중 오류가 발생했습니다:", error);
+    throw error;
   }
 };
 
