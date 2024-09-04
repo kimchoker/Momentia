@@ -4,7 +4,7 @@ import { useModalStore } from '../../states/store';
 import FeedDetail from './feedDetail';
 import { FaHeart, FaComment } from 'react-icons/fa'; // 좋아요와 댓글 아이콘을 위한 라이브러리
 
-const FeedItem = ({ nickname, userId, content, images, postId, time, commentCount, likeCount }) => {
+const FeedItem = ({ nickname, userId, content, images, postId, time, commentCount, likeCount, profileImage }) => {
   const createdAt = new Date(time);
 
   const formattedCreatedAt = `${createdAt.getFullYear() % 100}년 ${createdAt.getMonth() + 1}월 ${createdAt.getDate()}일 ${createdAt.getHours()}시 ${createdAt.getMinutes()}분 ${createdAt.getSeconds()}초`;
@@ -15,11 +15,14 @@ const FeedItem = ({ nickname, userId, content, images, postId, time, commentCoun
     setModalContent(
       <FeedDetail
         nickname={nickname}
+        profileImage={profileImage}
         userId={userId}
         content={content}
         images={images}
         postId={postId}
         time={createdAt}
+        commentCount={commentCount}
+        likeCount={likeCount}
       />
     )
     openModal();
@@ -29,7 +32,7 @@ const FeedItem = ({ nickname, userId, content, images, postId, time, commentCoun
     <div className="w-[100%] min-w-[500px] border-b border-[#d6d6d6] bg-white" onClick={handleClick}>
       <div className="flex flex-row justify-start ml-5 p-3 ">
         <Avatar>
-          <AvatarImage src="https://firebasestorage.googleapis.com/v0/b/snsproject-85107.appspot.com/o/images%2Fkuromi.jpg?alt=media&token=b82213e1-0e86-4146-b1f4-5454fcd6220e" />
+          <AvatarImage src={profileImage} />
           <AvatarFallback />
         </Avatar>
         <div className="flex flex-col ml-3">

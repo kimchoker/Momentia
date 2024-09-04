@@ -73,6 +73,7 @@ const Home = () => {
         {feeds.map(feed => (
           <FeedItem
             key={feed.postId}
+            profileImage={feed.profileImage}
             postId={feed.postId}
             nickname={feed.nickname}
             userId={feed.email}

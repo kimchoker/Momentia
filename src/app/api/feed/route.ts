@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "../../../firebase/firebase";
-import { collection, getDocs, query, where, orderBy, limit, startAfter, Timestamp } from 'firebase/firestore';
+import { collection, getDocs, query, where, orderBy, limit, startAfter, Timestamp, doc as firestoreDoc, getDoc } from 'firebase/firestore';  // doc을 firestoreDoc으로 변경
 import { post } from "../../../types/types";
 
 export async function POST(req: NextRequest) {
@@ -10,12 +10,12 @@ export async function POST(req: NextRequest) {
     const feedCollection = collection(db, 'Feed');
     let q;
 
+    // 페이지네이션 처리
     if (pageParam) {
-      // pageParam이 있을 때, 해당 시간 이후의 데이터를 가져옴 (무한스크롤)
       const lastVisibleTimestamp = Timestamp.fromDate(new Date(pageParam));
 
       if (email) {
-        // 특정 유저의 피드를 불러옴
+        // 특정 유저의 피드 불러오기
         q = query(
           feedCollection,
           where('email', '==', email),
@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
           limit(10)
         );
       } else {
-        // 전체 피드를 불러옴
+        // 전체 피드 불러오기
         q = query(
           feedCollection,
           orderBy('createdAt', 'desc'),
@@ -33,9 +33,9 @@ export async function POST(req: NextRequest) {
         );
       }
     } else {
-      // pageParam이 없을 때, 첫 페이지를 불러옴
+      // 첫 페이지 불러오기
       if (email) {
-        // 특정 유저의 피드를 불러옴
+        // 특정 유저의 피드 불러오기
         q = query(
           feedCollection,
           where('email', '==', email),
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
           limit(10)
         );
       } else {
-        // 전체 피드를 불러옴
+        // 전체 피드 불러오기
         q = query(
           feedCollection,
           orderBy('createdAt', 'desc'),
@@ -58,12 +58,28 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: '피드의 마지막입니다.' }, { status: 404 });
     }
 
-    const feeds: post[] = querySnapshot.docs.map((doc) => {
-      const data = doc.data() as post;
+    // 피드 데이터 처리
+    const feeds = await Promise.all(querySnapshot.docs.map(async (feedDoc) => {
+      const data = feedDoc.data() as post;
+      const userId = data.userId;
+
+      // 작성자의 유저 정보를 가져옴
+      const userDocRef = firestoreDoc(db, 'user', userId);  
+      const userDocSnap = await getDoc(userDocRef);
+
+      let nickname = '';
+      let profileImage = '';
+
+      if (userDocSnap.exists()) {
+        const userData = userDocSnap.data();
+        nickname = userData?.nickname || 'Unknown';
+        profileImage = userData?.profileImage || '';
+      }
 
       return {
-        postId: doc.id,
-        nickname: data.nickname,
+        postId: feedDoc.id,  // feedDoc으로 변경
+        nickname,
+        profileImage,
         email: data.email,
         userId: data.userId,
         content: data.content,
@@ -72,8 +88,9 @@ export async function POST(req: NextRequest) {
         commentCount: data.commentCount || 0,
         createdAt: (data.createdAt as Timestamp).toDate().toISOString(),
       };
-    });
+    }));
 
+    // 다음 페이지를 위한 커서 처리
     const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
     const lastVisibleData = lastVisible.data() as post;
     const nextCursor = lastVisibleData.createdAt instanceof Timestamp

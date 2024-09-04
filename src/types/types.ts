@@ -89,6 +89,7 @@ export interface post {
   email: string; // 이메일
   userId: string; // uid
   content: string; // 글 내용
+  profileImage :string;
   images: {
     fileName: string;
     url: string;

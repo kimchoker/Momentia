@@ -20,7 +20,7 @@ const MyPage = () => {
   const router = useRouter();
 
   const fetchFeeds = async ({ pageParam }) => {
-    const response = await fetch(`/api/myfeed`, {
+    const response = await fetch(`/api/feed`, {
       method: 'POST',  
       headers: {
         'Content-Type': 'application/json',
@@ -102,6 +102,7 @@ const MyPage = () => {
           {feeds.map(feed => (
             <FeedItem
               key={feed.postId}
+              profileImage={feed.profileImage}
               postId={feed.postId}
               nickname={feed.nickname}
               userId={feed.email}

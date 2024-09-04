@@ -8,7 +8,7 @@ import { FaHeart, FaComment } from 'react-icons/fa';
 import CommentComponent from './CommentComponent';
 import EditPostComponent from './feedEdit';
 
-const FeedDetail = ({ nickname, userId, content, images, postId, time, likes, commentsCount }) => {
+const FeedDetail = ({ nickname, userId, content, images, postId, time, likeCount, commentCount, profileImage }) => {
   const { closeModal } = useModalStore();
   const [isEditing, setIsEditing] = useState(false);
   const { email } = authStore();
@@ -93,7 +93,7 @@ const FeedDetail = ({ nickname, userId, content, images, postId, time, likes, co
 
       <div className="flex flex-row justify-start">
         <Avatar>
-          <AvatarImage src="https://firebasestorage.googleapis.com/v0/b/snsproject-85107.appspot.com/o/images%2Fkuromi.jpg?alt=media&token=b82213e1-0e86-4146-b1f4-5454fcd6220e" />
+          <AvatarImage src={profileImage} />
           <AvatarFallback />
         </Avatar>
         <div className="flex flex-col ml-3">
@@ -120,11 +120,11 @@ const FeedDetail = ({ nickname, userId, content, images, postId, time, likes, co
       <div className="flex items-center mt-4 text-gray-500">
         <div className="flex items-center mr-4">
           <FaHeart className="mr-1 text-red-500" />
-          <span>{likes}</span>
+          <span>{likeCount}</span>
         </div>
         <div className="flex items-center">
           <FaComment className="mr-1 text-black-500" />
-          <span>{commentsCount}</span>
+          <span>{commentCount}</span>
         </div>
       </div>
 

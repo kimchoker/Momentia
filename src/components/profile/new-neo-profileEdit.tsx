@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { profileEditStore, authStore } from '../../states/store';
 import { CirclePlus } from 'lucide-react';
 import { getAuth } from 'firebase/auth';
+import axios from 'axios'; // axios 추가
 
 interface ModalProps {
   isOpen: boolean;
@@ -65,27 +66,21 @@ const ProfileEdit: React.FC<ModalProps> = ({ isOpen }) => {
 
     if (hasChanges) {
       try {
-      
         const idToken = await auth.currentUser?.getIdToken();
 
-        const response = await fetch('/api/profile/update', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            idToken,
-            nickname: newNickname,
-            bio: newBio,
-            profileImage: newProfileImage,
-          }),
+        // 서버에 프로필 업데이트 요청
+        const response = await axios.post('/api/profile', {
+          idToken,
+          nickname: newNickname,
+          bio: newBio,
+          profileImage: newProfileImage,
         });
 
-        if (response.ok) {
-          const data = await response.json();
+        if (response.status === 200) {
+          const data = response.data;
           console.log('프로필 업데이트 성공:', data);
         } else {
-          console.error('프로필 업데이트 실패:', await response.json());
+          console.error('프로필 업데이트 실패:', response.statusText);
         }
 
         closeEdit(); // 변경사항이 있을 경우에만 모달을 닫음
@@ -98,8 +93,11 @@ const ProfileEdit: React.FC<ModalProps> = ({ isOpen }) => {
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setNewProfileImage(imageUrl);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setNewProfileImage(reader.result as string); // 이미지 데이터를 Base64로 변환
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -118,7 +116,7 @@ const ProfileEdit: React.FC<ModalProps> = ({ isOpen }) => {
               animate ? 'translate-y-0' : 'translate-y-full'
             }`}
           >
-            {/* 닫기 버튼 (왼쪽 상단) */}
+            {/* 닫기 버튼 */}
             <button
               onClick={closeEdit}
               className="absolute top-4 left-4 text-gray-500 hover:text-gray-700 hover:bg-gray-100 px-3 py-1 rounded-md"
@@ -126,7 +124,7 @@ const ProfileEdit: React.FC<ModalProps> = ({ isOpen }) => {
               닫기
             </button>
 
-            {/* 저장 버튼 (오른쪽 상단) */}
+            {/* 저장 버튼 */}
             <button
               onClick={handleSave}
               className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 hover:bg-gray-100 px-3 py-1 rounded-md"
@@ -146,7 +144,7 @@ const ProfileEdit: React.FC<ModalProps> = ({ isOpen }) => {
                 className="absolute w-24 h-24 flex items-center justify-center text-sm text-white opacity-0 hover:opacity-100 cursor-pointer rounded-full bg-black bg-opacity-50 transition-opacity"
                 style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
               >
-                <CirclePlus/>
+                <CirclePlus />
               </label>
               <input
                 id="profileImageUpload"
