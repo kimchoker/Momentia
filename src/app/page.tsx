@@ -11,7 +11,7 @@ const Home = () => {
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   const fetchFeeds = async ({ pageParam }) => {
-    const response = await fetch(`/api/allfeed`, {
+    const response = await fetch(`/api/feed`, {
       method: 'POST',  
       headers: {
         'Content-Type': 'application/json',

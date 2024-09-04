@@ -169,8 +169,8 @@ importers:
         specifier: ^3.4.9
         version: 3.4.9
       tsconfig-paths-webpack-plugin:
-        specifier: link:tsconfig-paths-webpack-plugin
-        version: link:tsconfig-paths-webpack-plugin
+        specifier: ^4.1.0
+        version: 4.1.0
       typescript:
         specifier: ^5.5.4
         version: 5.5.4

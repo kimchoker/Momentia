@@ -22,7 +22,7 @@
     "prettier-plugin-tailwindcss": "^0.6.6",
     "storybook": "^8.2.9",
     "tailwindcss": "^3.4.9",
-    "tsconfig-paths-webpack-plugin": "link:tsconfig-paths-webpack-plugin",
+    "tsconfig-paths-webpack-plugin": "^4.1.0",
     "typescript": "^5.5.4",
     "vite": "^5.4.0"
   },

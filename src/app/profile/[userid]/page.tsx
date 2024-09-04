@@ -44,6 +44,7 @@ const MyPage = () => {
     getNextPageParam: (lastPage) => {
       // 마지막 페이지의 feeds 배열에서 마지막 피드의 createdAt 값을 다음 pageParam으로 설정
       const lastFeed = lastPage.feeds[lastPage.feeds.length - 1];
+      console.log(lastFeed);
       return lastFeed ? lastFeed.createdAt : undefined;
     },
     initialPageParam: null,
@@ -65,6 +66,7 @@ const MyPage = () => {
     const observer = new IntersectionObserver(
       (entries) => {
         console.log('옵저버 작동', entries);
+        console.log(entries[0].isIntersecting, hasNextPage, isFetchingNextPage);
         if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
           fetchNextPage();  // 요소가 뷰포트에 들어올 때 데이터 가져오기
           

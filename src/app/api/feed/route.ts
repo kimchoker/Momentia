@@ -5,25 +5,51 @@ import { post } from "../../../types/types";
 
 export async function POST(req: NextRequest) {
   try {
-    const { pageParam } = await req.json();
- 
+    const { email, pageParam } = await req.json();
+    
     const feedCollection = collection(db, 'Feed');
     let q;
 
     if (pageParam) {
+      // pageParam이 있을 때, 해당 시간 이후의 데이터를 가져옴 (무한스크롤)
       const lastVisibleTimestamp = Timestamp.fromDate(new Date(pageParam));
-      q = query(
-        feedCollection,
-        orderBy('createdAt', 'desc'),
-        startAfter(lastVisibleTimestamp),
-        limit(10)
-      );
+
+      if (email) {
+        // 특정 유저의 피드를 불러옴
+        q = query(
+          feedCollection,
+          where('email', '==', email),
+          orderBy('createdAt', 'desc'),
+          startAfter(lastVisibleTimestamp),
+          limit(10)
+        );
+      } else {
+        // 전체 피드를 불러옴
+        q = query(
+          feedCollection,
+          orderBy('createdAt', 'desc'),
+          startAfter(lastVisibleTimestamp),
+          limit(10)
+        );
+      }
     } else {
-      q = query(
-        feedCollection,
-        orderBy('createdAt', 'desc'),
-        limit(10)
-      );
+      // pageParam이 없을 때, 첫 페이지를 불러옴
+      if (email) {
+        // 특정 유저의 피드를 불러옴
+        q = query(
+          feedCollection,
+          where('email', '==', email),
+          orderBy('createdAt', 'desc'),
+          limit(10)
+        );
+      } else {
+        // 전체 피드를 불러옴
+        q = query(
+          feedCollection,
+          orderBy('createdAt', 'desc'),
+          limit(10)
+        );
+      }
     }
 
     const querySnapshot = await getDocs(q);
@@ -49,7 +75,7 @@ export async function POST(req: NextRequest) {
     });
 
     const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
-    const lastVisibleData = lastVisible.data() as post; // 여기에 타입 캐스팅을 추가합니다.
+    const lastVisibleData = lastVisible.data() as post;
     const nextCursor = lastVisibleData.createdAt instanceof Timestamp
       ? lastVisibleData.createdAt.toDate().toISOString()
       : null;
