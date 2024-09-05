@@ -128,3 +128,13 @@ export interface comment {
   nickname: string;
   profileImage: string;
 }
+
+export interface Notification {
+  id: string;
+  type: "like" | "comment";
+  content: string;
+  user: string;
+  postId?: string;
+  commentId?: string;
+  createdAt: string;
+}

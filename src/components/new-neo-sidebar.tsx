@@ -53,6 +53,20 @@ const Sibar= () => {
 		}
 	};
 
+	const handleNotification = async () => {
+		
+		
+		const email = authStore.getState().email;
+		const isLoggedIn = authStore.getState().isLoggedIn;
+
+		if (email && isLoggedIn) {
+			router.push(`/notification`);
+		} else {
+			alert("로그인이 필요한 작업입니다.");
+			router.push("/login");
+		}
+	};
+
 	const handleNewPost = () => {
 		setModalContent(
 			<WritingComponent/>
@@ -126,7 +140,7 @@ const Sibar= () => {
 
 					<Button
 						variant="ghost"
-						onClick={openModal}
+						onClick={handleNotification}
 						className={`${isOpen ? "w-[248px]" : "w-[50px]"} justify-start h-10 mb-3`}
 					>
 						<span className={`${isOpen === false ? "" : "mr-4"}`}>
