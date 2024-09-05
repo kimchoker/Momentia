@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "../../../firebase/firebase";
-import { collection, getDocs, query, where, orderBy, limit, startAfter, Timestamp, doc as firestoreDoc, getDoc } from 'firebase/firestore';  // doc을 firestoreDoc으로 변경
+import { collection, getDocs, query, where, orderBy, limit, startAfter, Timestamp, doc as firestoreDoc, getDoc, getCountFromServer } from 'firebase/firestore';  // doc을 firestoreDoc으로 변경
 import { post } from "../../../types/types";
 
 export async function POST(req: NextRequest) {
@@ -8,6 +8,10 @@ export async function POST(req: NextRequest) {
     const { email, pageParam } = await req.json();
     
     const feedCollection = collection(db, 'Feed');
+
+    const totalFeedsSnapshot = await getCountFromServer(feedCollection);
+    const totalFeeds = totalFeedsSnapshot.data().count;
+
     let q;
 
     // 페이지네이션 처리
@@ -97,7 +101,7 @@ export async function POST(req: NextRequest) {
       ? lastVisibleData.createdAt.toDate().toISOString()
       : null;
 
-    return NextResponse.json({ feeds, nextCursor });
+    return NextResponse.json({ feeds, nextCursor, totalFeeds });
   } catch (error) {
     console.error('에러 발생:', error);
     return NextResponse.json({ message: '서버 오류 발생' }, { status: 500 });

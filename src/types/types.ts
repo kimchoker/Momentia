@@ -119,3 +119,12 @@ export interface UpdatePostData {
   content: string;
   images: { url: string; fileName: string }[];
 }
+
+export interface comment {
+  userId: string;
+  postId: string;
+  content: string;
+  createdAt: string | Timestamp;
+  nickname: string;
+  profileImage: string;
+}

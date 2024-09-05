@@ -1,60 +1,124 @@
-import React, { useState, useEffect } from 'react';
+'use client';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { useModalStore, authStore } from '../../states/store';
-import { X, ArrowUp } from 'lucide-react';
+import { X, Edit, Trash, ArrowUp } from 'lucide-react'; // 아이콘 추가
 import { deletePost } from '../../lib/api/feedApi';
 import { FaHeart, FaComment } from 'react-icons/fa';
 import CommentComponent from './CommentComponent';
 import EditPostComponent from './feedEdit';
+import { useQueryClient, useQuery, useMutation } from '@tanstack/react-query';
+
+// 댓글 가져오기 함수
+const fetchComments = async (postId) => {
+  const response = await axios.get(`/api/comments?postId=${postId}`);
+  return response.data;
+};
+
+// 댓글 작성 함수
+const createComment = async (newComment) => {
+  const response = await axios.post('/api/comments', newComment);
+  return response.data;
+};
+
+// 댓글 삭제 함수
+const deleteCommentApi = async ({ commentId, postId }) => {
+  return await axios.delete(`/api/comments?commentId=${commentId}&postId=${postId}`);
+};
+
+const CommentSection = ({ postId }) => {
+  const queryClient = useQueryClient();
+  const { email, isLoggedIn } = authStore();
+  const [commentText, setCommentText] = useState("");
+
+  // useQuery로 댓글 불러오기
+  const { data: comments = [], isLoading } = useQuery({
+    queryKey: ['comments', postId],
+    queryFn: () => fetchComments(postId),
+  });
+
+  // 댓글 작성 Mutation
+  const createCommentMutation = useMutation({
+    mutationFn: createComment,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['comments', postId] });
+    },
+  });
+
+  // 댓글 삭제 Mutation
+  const deleteCommentMutation = useMutation({
+    mutationFn: deleteCommentApi,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['comments', postId] });
+    },
+  });
+
+  // 댓글 저장 함수
+  const handleCommentSave = () => {
+    if (!commentText.trim()) return;
+    if (!isLoggedIn || !email) {
+      alert('로그인이 필요합니다.');
+      setCommentText("");
+      return;
+    }
+
+    const newComment = { postId, content: commentText, userId: email };
+    createCommentMutation.mutate(newComment);
+    setCommentText("");
+  };
+
+  if (isLoading) {
+    return <p>댓글을 불러오는 중...</p>;
+  }
+
+  return (
+    <div>
+      <div className="mt-4 flex items-center space-x-2 w-full"> {/* 댓글 입력 영역 너비 조정 */}
+        <input
+          type="text"
+          value={commentText}
+          onChange={(e) => setCommentText(e.target.value)}
+          placeholder="댓글을 입력하세요"
+          className="flex-grow p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full" // 너비 조정
+        />
+        <button
+          onClick={handleCommentSave}
+          className="px-1 py-1 bg-black text-white rounded-full transition-all hover:bg-[#d6d6d6]"
+        >
+          <ArrowUp />
+        </button>
+      </div>
+
+      <div className="comments-list mt-4">
+        {comments.map((comment) => (
+          <CommentComponent
+            key={comment.id}
+            profileImage={comment.profileImage}
+            commentId={comment.id}
+            postId={postId}
+            currentUserId={email}
+            userId={comment.userId}
+            nickname={comment.nickname}
+            comment={comment.content}
+            createdAt={comment.createdAt}
+            onDelete={() => deleteCommentMutation.mutate({ commentId: comment.id, postId })}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
 
 const FeedDetail = ({ nickname, userId, content, images, postId, time, likeCount, commentCount, profileImage }) => {
   const { closeModal } = useModalStore();
   const [isEditing, setIsEditing] = useState(false);
   const { email } = authStore();
-  const [commentText, setCommentText] = useState("");
-  const [comments, setComments] = useState([]);
 
-  useEffect(() => {
-    const fetchComments = async () => {
-      try {
-        const response = await axios.get(`/api/comments/${postId}`);
-        setComments(response.data);
-      } catch (error) {
-        console.error('댓글 불러오기 실패:', error);
-      }
-    };
+  // 글 수정 모드
+  const handleEdit = () => setIsEditing(true);
 
-    fetchComments();
-  }, [postId]);
-
-  const handleCommentSave = async () => {
-    if (!commentText.trim()) return;
-
-    const newComment = {
-      postId,
-      userId: email,
-      nickname,
-      text: commentText,
-      createdAt: new Date().toISOString(),
-    };
-
-    try {
-      const response = await axios.post('/api/comments', newComment);
-      setComments((prevComments) => [response.data, ...prevComments]);
-      setCommentText("");
-    } catch (error) {
-      console.error('댓글 저장 중 오류 발생:', error);
-    }
-  };
-
-  const createdAt = new Date(time);
-  const formattedCreatedAt = `${createdAt.getFullYear() % 100}년 ${createdAt.getMonth() + 1}월 ${createdAt.getDate()}일 ${createdAt.getHours()}시 ${createdAt.getMinutes()}분`;
-
-  const handleEdit = () => {
-    setIsEditing(true);
-  };
-
+  // 글 삭제
   const handleDelete = async () => {
     const confirmed = confirm("정말로 이 글을 삭제하시겠습니까?");
     if (!confirmed) return;
@@ -80,6 +144,10 @@ const FeedDetail = ({ nickname, userId, content, images, postId, time, likeCount
       </div>
     );
   }
+
+  // 글 작성 시간 포맷팅
+  const createdAt = new Date(time);
+  const formattedCreatedAt = `${createdAt.getFullYear() % 100}년 ${createdAt.getMonth() + 1}월 ${createdAt.getDate()}일 ${createdAt.getHours()}시 ${createdAt.getMinutes()}분`;
 
   return (
     <div className="relative p-3">
@@ -117,66 +185,36 @@ const FeedDetail = ({ nickname, userId, content, images, postId, time, likeCount
         </div>
       </div>
 
-      <div className="flex items-center mt-4 text-gray-500">
-        <div className="flex items-center mr-4">
+      <div className="flex items-center justify-between mt-4 text-gray-500">
+        <div className="flex items-center">
           <FaHeart className="mr-1 text-red-500" />
           <span>{likeCount}</span>
-        </div>
-        <div className="flex items-center">
-          <FaComment className="mr-1 text-black-500" />
+          <FaComment className="ml-4 mr-1 text-black-500" />
           <span>{commentCount}</span>
         </div>
+        {email === userId && (
+          <div className="flex space-x-2">
+            <button
+              onClick={handleEdit}
+              className="p-1 text-gray-500 hover:text-black"
+            >
+              <Edit className="w-5 h-5" />
+            </button>
+            <button
+              onClick={handleDelete}
+              className="p-1 text-gray-500 hover:text-red-500"
+            >
+              <Trash className="w-5 h-5" />
+            </button>
+          </div>
+        )}
       </div>
 
-      <hr className="my-4" />
+      {/* 회색 선 추가로 댓글과 본문 경계 구분 */}
+      <hr className="my-6 border-gray-300" />
 
-      <div className="mt-4 flex items-center space-x-2">
-        <input
-          type="text"
-          value={commentText}
-          onChange={(e) => setCommentText(e.target.value)}
-          className="flex-grow p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          placeholder="댓글을 입력하세요"
-        />
-        <button
-          onClick={handleCommentSave}
-          className="px-1 py-1 bg-black text-white rounded-full transition-all hover:bg-[#d6d6d6]"
-        >
-          <ArrowUp />
-        </button>
-      </div>
-
-      <div className="mt-4">
-        {comments.map((comment) => (
-          <CommentComponent
-            key={comment.id}
-            commentId={comment.id}
-            postId={postId}
-            currentUserId={email}
-            userId={comment.userId}
-            nickname={comment.nickname}
-            comment={comment.text}
-            createdAt={comment.createdAt}
-          />
-        ))}
-      </div>
-
-      {email === userId && (
-        <div className="flex justify-end space-x-2 mt-4">
-          <button 
-            onClick={handleEdit}
-            className="px-4 py-2 bg-white text-black rounded-md hover:bg-[#d6d6d6]"
-          >
-            수정
-          </button>
-          <button 
-            onClick={handleDelete}
-            className="px-4 py-2 bg-white text-black rounded-md hover:bg-[#d6d6d6]"
-          >
-            삭제
-          </button>
-        </div>
-      )}
+      {/* CommentSection 컴포넌트 */}
+      <CommentSection postId={postId} />
     </div>
   );
 };

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '../../../firebase/firebase';
-import { collection, getDocs, orderBy, query, doc, deleteDoc, updateDoc, increment, addDoc, Timestamp } from 'firebase/firestore';
+import { collection, getDocs, orderBy, query, doc, deleteDoc, updateDoc, increment, addDoc, Timestamp, where } from 'firebase/firestore';
+import { comment } from '../../../types/types';
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -12,18 +13,45 @@ export async function GET(req: NextRequest) {
 
   try {
     const commentsCollection = collection(db, 'Feed', postId, 'comment');
-    const commentsQuery = query(commentsCollection, orderBy('createdAt', 'desc'));
+    // 최신순 정렬을 위해 'createdAt'을 'desc'로 설정
+    const commentsQuery = query(commentsCollection, orderBy('createdAt', 'asc'));
     const commentsSnapshot = await getDocs(commentsQuery);
 
-    const comments = commentsSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+    const commentsWithProfile = await Promise.all(
+      commentsSnapshot.docs.map(async (commentDoc) => {
+        const commentData = commentDoc.data();
+        const userEmail = commentData.userId;
 
-    if (comments.length === 0) {
+        const usersCollection = collection(db, 'user');
+        const userQuery = query(usersCollection, where('email', '==', userEmail));
+        const userSnapshot = await getDocs(userQuery);
+
+        let nickname = 'Unknown';
+        let profileImage = '';
+
+        if (!userSnapshot.empty) {
+          const userDoc = userSnapshot.docs[0];
+          const userData = userDoc.data();
+          nickname = userData?.nickname || 'Unknown';
+          profileImage = userData?.profileImage || '';
+        }
+
+        return {
+          id: commentDoc.id,
+          postId: commentData.postId,
+          userId: commentData.userId,
+          content: commentData.content,
+          createdAt: (commentData.createdAt as Timestamp).toDate().toISOString(),
+          nickname,
+          profileImage,
+        };
+      })
+    );
+
+    if (commentsWithProfile.length === 0) {
       return NextResponse.json({ message: '댓글이 없습니다.' });
     } else {
-      return NextResponse.json(comments, { status: 200 });
+      return NextResponse.json(commentsWithProfile, { status: 200 });
     }
   } catch (error) {
     console.error('댓글을 가져오는 데 실패했습니다:', error);
@@ -31,34 +59,38 @@ export async function GET(req: NextRequest) {
   }
 }
 
+
 export async function POST(req: NextRequest) {
   try {
-    const { postId, userId, nickname, text } = await req.json();
+    const body = await req.json();
+    console.log('Request body:', body);  // 요청 본문 출력
 
-    if (!postId || !userId || !nickname || !text) {
+    const { postId, userId, content } = body;
+
+    // 필수 값이 없을 경우 400 응답
+    if (!postId || !userId || !content) {
       return NextResponse.json({ message: '필수 요소 중 없는 값이 있습니다.' }, { status: 400 });
     }
 
     const commentsCollection = collection(db, 'Feed', postId, 'comment');
 
+    // 새로운 댓글 생성
     const newComment = {
+      postId,
       userId,
-      nickname,
-      text,
+      content,
       createdAt: Timestamp.now(),
     };
 
-    await addDoc(commentsCollection, newComment);
+    const commentDoc = await addDoc(commentsCollection, newComment);
 
-    // 댓글 추가 후 원 글의 commentCount를 1 증가시킴
+    // 댓글 수 증가
     const postRef = doc(db, 'Feed', postId);
-    await updateDoc(postRef, {
-      commentCount: increment(1),
-    });
+    await updateDoc(postRef, { commentCount: increment(1) });
 
-    return NextResponse.json({ message: '댓글 저장이 완료되었습니다.' }, { status: 200 });
+    return NextResponse.json({ message: '댓글 저장이 완료되었습니다.', commentId: commentDoc.id }, { status: 200 });
   } catch (error) {
-    console.error('댓글 저장에 실패했습니다:', error);
+    console.error('댓글 저장 중 오류 발생:', error);  // 에러 로그
     return NextResponse.json({ message: '댓글 저장 중 문제가 발생했습니다.' }, { status: 500 });
   }
 }
@@ -74,13 +106,13 @@ export async function DELETE(req: NextRequest) {
 
   try {
     // 댓글 삭제
-    const commentRef = doc(db, 'Feed', postId, 'comments', commentId);
+    const commentRef = doc(db, 'Feed', postId, 'comment', commentId);
     await deleteDoc(commentRef);
 
     // 해당 게시물의 commentCount 감소
     const postRef = doc(db, 'Feed', postId);
     await updateDoc(postRef, {
-      commentCount: increment(-1), // commentCount 값을 1 감소
+      commentCount: increment(-1), // 댓글 수 감소
     });
 
     return NextResponse.json({ message: '댓글이 성공적으로 삭제되었습니다.' }, { status: 200 });

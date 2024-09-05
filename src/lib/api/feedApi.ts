@@ -81,4 +81,20 @@ const deletePost = async (postId: string) => {
   }
 };
 
-export { uploadImage, savePost, updatePost, deletePost };
+const deleteComment = async (commentId: string, postId: string) => {
+  try {
+    const response = await axios.delete(`/api/comments`, {
+      params: {
+        commentId: commentId, // 삭제할 댓글의 ID
+        postId: postId,       // 게시물의 ID
+      }
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error('댓글 삭제 중 오류 발생:', error);
+    throw new Error(error.response?.data?.message || '댓글 삭제 실패');
+  }
+};
+
+export { uploadImage, savePost, updatePost, deletePost, deleteComment };

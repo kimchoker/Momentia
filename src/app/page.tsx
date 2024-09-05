@@ -1,18 +1,20 @@
 "use client";
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import FeedItem from '../components/feed/feedItem';
 import { ScrollArea } from '../components/ui/scroll-area';
 import Sibar from '../components/new-neo-sidebar';
 import Spinner from '../components/ui/spinner';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 
 const Home = () => {
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const queryClient = useQueryClient();
+  const [totalFeeds, setTotalFeeds] = useState<number | null>(null); // 상태 추가
 
   const fetchFeeds = async ({ pageParam }) => {
     const response = await fetch(`/api/feed`, {
-      method: 'POST',  
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
@@ -33,44 +35,66 @@ const Home = () => {
     queryKey: ['feeds'],
     queryFn: ({ pageParam = null }) => fetchFeeds({ pageParam }),
     getNextPageParam: (lastPage) => {
-      // 마지막 페이지의 feeds 배열에서 마지막 피드의 createdAt 값을 다음 pageParam으로 설정
       const lastFeed = lastPage.feeds[lastPage.feeds.length - 1];
       return lastFeed ? lastFeed.createdAt : undefined;
     },
     initialPageParam: null,
   });
 
-  const feeds = data?.pages.flatMap(page => page.feeds) || [];
+  const feeds = data?.pages.flatMap((page) => page.feeds) || [];
+  const fetchedFeedsCount = feeds.length;
 
+  // 데이터가 변경될 때마다 totalFeeds 값을 업데이트하는 useEffect
+  useEffect(() => {
+    if (data?.pages[0]?.totalFeeds) {
+      setTotalFeeds(data.pages[0].totalFeeds);
+    }
+  }, [data]);
+
+  // Intersection Observer로 무한 스크롤 기능 설정
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
-          fetchNextPage();  // 요소가 뷰포트에 들어올 때 데이터 가져오기
+        if (
+          entries[0].isIntersecting &&
+          hasNextPage &&
+          !isFetchingNextPage &&
+          fetchedFeedsCount < totalFeeds // 불러온 피드 수와 총 피드 수를 비교
+        ) {
+          fetchNextPage();
         }
       },
       {
-        root: scrollRef.current, // ScrollArea를 root로 설정
+        root: scrollRef.current,
         rootMargin: '0px',
-        threshold: 0.1,  // 10%가 보이면 트리거
+        threshold: 0.1,
       }
     );
     if (loadMoreRef.current) {
-      observer.observe(loadMoreRef.current);  // 마지막 요소에 옵저버 붙이기
+      observer.observe(loadMoreRef.current);
     }
 
     return () => {
       if (loadMoreRef.current) {
-        observer.unobserve(loadMoreRef.current);  // 컴포넌트 언마운트 시 옵저버 해제
+        observer.unobserve(loadMoreRef.current);
       }
     };
-  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage, fetchedFeedsCount, totalFeeds]);
+
+  // 10초마다 최신 피드를 가져오는 기능
+  useEffect(() => {
+    const interval = setInterval(() => {
+      queryClient.invalidateQueries({ queryKey: ['feeds'] });
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, [queryClient]);
 
   return (
     <div className="flex justify-center items-center h-screen bg-[#ffffff] font-nanum-barun-gothic">
       <Sibar />
       <ScrollArea ref={scrollRef} className="w-[40%] h-[100%] overflow-y-auto">
-        {feeds.map(feed => (
+        {feeds.map((feed) => (
           <FeedItem
             key={feed.postId}
             profileImage={feed.profileImage}
@@ -89,7 +113,7 @@ const Home = () => {
             <Spinner />
           </div>
         )}
-        <div ref={loadMoreRef} className="h-1" />  {/* 옵저버를 붙일 더미 요소 */}
+        <div ref={loadMoreRef} className="h-1" />
       </ScrollArea>
     </div>
   );
