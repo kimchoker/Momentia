@@ -85,7 +85,7 @@ http://localhost:3000/
 <br/>  
 
 ## 🔫 트러블 슈팅
-- 
+- 무한스크롤 작동 시 마지막 글에 도달했음에도 계속 데이터 요청을 보내는 문제
 - 
 
 <br/>  
@@ -93,6 +93,7 @@ http://localhost:3000/
 ## 💭 기술적 의사결정
 - [패키지 매니저 pnpm 선택기](https://velog.io/@kimchoker/npm%EC%97%90%EC%84%9C-pnpm%EC%9C%BC%EB%A1%9C-%EC%98%AE%EA%B2%A8%EB%B3%B4%EC%9E%90)
 - [상태관리 툴 선택하기](https://velog.io/@kimchoker/%EC%83%81%ED%83%9C%EA%B4%80%EB%A6%AC-%ED%88%B4-%EB%B9%84%EA%B5%90%ED%95%B4%EB%B3%B4%EA%B8%B0)
+- 낙관적 업데이트를 이용한 좋아요 기능 구현하기
 
 <br/>
 
@@ -156,3 +157,4 @@ http://localhost:3000/
 | `src/styles`             | 전역 스타일 또는 각종 스타일 파일을 모아둔 폴더.                                                     |
 | `src/types`              | TypeScript에서 사용하는 커스텀 타입들을 정의한 폴더.                                                  |
 | `src/utils`              | 유틸리티 함수들이 정의된 폴더. 샤드(ui 라이브러리)의 설정값 등이 포함됨.                                |
+
