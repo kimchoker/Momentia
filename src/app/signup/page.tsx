@@ -1,12 +1,12 @@
 "use client"
 import React, { useState, useEffect } from "react";
-import { validateEmail, validatePassword } from "../../lib/validation";
+import { validateEmail, validatePassword } from "../../lib/validation/validation";
 import { BsEnvelope, BsFillLockFill } from "react-icons/bs";
 import { signUp, checkIDExists } from "../../lib/api/userApi";
-
+import { useRouter } from "next/navigation";
 
 const SignUp: React.FC = () => {
-
+  const router = useRouter();
 
   // ID 부분
   const [inputEmail, setInputEmail] = useState<string>("");
@@ -16,6 +16,12 @@ const SignUp: React.FC = () => {
   const onChangeEmail = (event: React.ChangeEvent<HTMLInputElement>) => {
     validateEmail(event.target.value, setInputEmail, setValidateID);
   };
+
+  const handleSignUp = async () => {
+    await signUp(inputEmail, inputPW, inputNickname);
+    alert("회원가입 완료");
+    router.push("/");
+  }
 
   useEffect(() => {
     if (inputEmail === "") {
@@ -86,6 +92,8 @@ const checkID = async (id :string) => {
       setButtonDisabled(true)
     }
   }, [validateID, validatePW, inputEmail, inputPW, inputNickname])
+
+  
 
 
 
@@ -226,7 +234,7 @@ const checkID = async (id :string) => {
                 ? "bg-[#C7C8CC] cursor-not-allowed"
                 : "hover:bg-gray-700"
             }`}
-            onClick={() => signUp(inputEmail, inputPW, inputNickname)}
+            onClick={handleSignUp}
           >
             <p className="text-white text-xs mr-2">회원가입</p>
             

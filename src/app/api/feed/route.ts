@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "../../../firebase/firebase";
+import { db } from "../../../services/firebase/firebase";
 import { collection, getDocs, query, where, orderBy, limit, startAfter, Timestamp, doc as firestoreDoc, getDoc, getCountFromServer } from 'firebase/firestore';  // doc을 firestoreDoc으로 변경
 import { post } from "../../../types/types";
 

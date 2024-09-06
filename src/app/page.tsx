@@ -2,7 +2,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import FeedItem from '../components/feed/feedItem';
 import { ScrollArea } from '../components/ui/scroll-area';
-import Sibar from '../components/new-neo-sidebar';
+import Sibar from '../components/sidebar/new-neo-sidebar';
 import Spinner from '../components/ui/spinner';
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 

@@ -2,13 +2,13 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Swords, SquarePen, Users, Settings, MessageSquare, Bell, ChevronLeft, LogIn, LogOut } from "lucide-react";
-import { Button } from "./ui/button";
-import { PostModalDialog, PostModalDialogContent } from "../components/feed/PostModal"
-import { useSidebarToggle, useModalStore, authStore } from "../states/store";
+import { Button } from "../ui/button";
+import { PostModalDialog, PostModalDialogContent } from "../../components/feed/PostModal"
+import { useSidebarToggle, useModalStore, authStore } from "../../states/store";
 import { useStore } from "zustand";
 import { usePathname } from "next/navigation";
-import { fetchProfile } from "../lib/api/userApi";
-import WritingComponent from "./feed/PostWriting";
+import { fetchProfile } from "../../lib/api/userApi";
+import WritingComponent from "../feed/PostWriting";
 import Link from "next/link";
 
 

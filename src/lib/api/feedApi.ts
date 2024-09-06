@@ -1,5 +1,5 @@
 import { collection, doc, addDoc, serverTimestamp, updateDoc } from "firebase/firestore";
-import { db, storage } from "../../firebase/firebase";
+import { db, storage } from "../../services/firebase/firebase";
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { PostData, UpdatePostData } from '../../types/types';
 import { getAuth } from "firebase/auth";

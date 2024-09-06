@@ -1,5 +1,5 @@
 import { collection, query, where, getDocs, setDoc, doc, Timestamp } from "firebase/firestore";
-import { db, auth } from "../../firebase/firebase";
+import { db, auth } from "../../services/firebase/firebase";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, User } from "firebase/auth";
 import { UserData } from '../../types/types';
 import Cookies from "js-cookie";
