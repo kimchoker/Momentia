@@ -3,12 +3,12 @@
 
 #### 프로젝트 소개
 
-하루에 단
+하루에 단 한번! 당신의 하루를 소개하세요
 
 
 #### 프로젝트 진행기간
 
-2024.04 ~ 2024.05 (4주)
+2024.08 ~ 2024.09 (4주)
 
 #### 프로젝트 배포링크
 [Momentia 배포링크](https://monentia.vercel.app/)
@@ -47,3 +47,33 @@ http://localhost:3000/
 <img src="https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=netlify&logoColor=white">
 
 <br/>
+
+## 폴더구조
+
+```
+📦 src
+ ┣ 📂app
+ ┃ ┣ 📂api
+ ┃ ┃ ┣ 📂comments
+ ┃ ┃ ┣ 📂feed
+ ┃ ┃ ┣ 📂post
+ ┃ ┃ ┣ 📂profile
+ ┃ ┃ ┗ 📂useruid
+ ┃ ┣ 📂dm
+ ┃ ┣ 📂login
+ ┃ ┣ 📂notification
+ ┃ ┣ 📂profile
+ ┃ ┗ 📂signup
+ ┣ 📂components
+ ┣ 📂constants
+ ┣ 📂containers
+ ┣ 📂firebase
+ ┣ 📂hooks
+ ┣ 📂lib
+ ┣ 📂services
+ ┣ 📂states
+ ┣ 📂stories
+ ┣ 📂styles
+ ┣ 📂types
+ ┗ 📂utils
+```
