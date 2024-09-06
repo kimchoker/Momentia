@@ -91,9 +91,8 @@ http://localhost:3000/
 <br/>  
 
 ## 💭 기술적 의사결정
-- [패키지 매니저 선택하기](https://velog.io/@kimchoker/npm%EC%97%90%EC%84%9C-pnpm%EC%9C%BC%EB%A1%9C-%EC%98%AE%EA%B2%A8%EB%B3%B4%EC%9E%90)
-
-- 
+- [패키지 매니저 pnpm 선택기](https://velog.io/@kimchoker/npm%EC%97%90%EC%84%9C-pnpm%EC%9C%BC%EB%A1%9C-%EC%98%AE%EA%B2%A8%EB%B3%B4%EC%9E%90)
+- [상태관리 툴 선택하기](https://velog.io/@kimchoker/%EC%83%81%ED%83%9C%EA%B4%80%EB%A6%AC-%ED%88%B4-%EB%B9%84%EA%B5%90%ED%95%B4%EB%B3%B4%EA%B8%B0)
 
 <br/>
 
@@ -119,15 +118,41 @@ http://localhost:3000/
  ┃ ┣ 📂profile
  ┃ ┗ 📂signup
  ┣ 📂components
+ ┃ ┣ 📂feed
+ ┃ ┣ 📂notification
+ ┃ ┣ 📂profile
+ ┃ ┣ 📂sidebar
+ ┃ ┗ 📂ui
  ┣ 📂constants
  ┣ 📂containers
- ┣ 📂firebase
  ┣ 📂hooks
  ┣ 📂lib
+ ┃ ┣ 📂api
+ ┃ ┗ 📂validation
  ┣ 📂services
+ ┃ ┗ 📂firebase
  ┣ 📂states
  ┣ 📂stories
  ┣ 📂styles
  ┣ 📂types
  ┗ 📂utils
+    ┗ 📂shadcn
+
 ```
+### 폴더 설명
+
+| 폴더 경로               | 설명                                                                                  |
+|-------------------------|---------------------------------------------------------------------------------------|
+| `src/app`                | 페이지 구현 관련 폴더. 각 페이지별로 폴더가 존재하며, 페이지와 관련된 컴포넌트 및 API 라우터가 정의됨. |
+| `src/app/api`            | 백엔드 API 라우터를 모아둔 폴더. 게시물, 댓글, 프로필 등 다양한 API 엔드포인트 정의.               |
+| `src/components`         | 각 페이지에서 사용되는 UI 컴포넌트들이 모여 있는 폴더. 재사용 가능한 컴포넌트들이 정의됨.               |
+| `src/constants`          | 어플리케이션 전반에 걸쳐 사용되는 상수 값을 모아둔 폴더. (예: 색상, URL 등)                         |
+| `src/containers`         | 페이지나 컴포넌트에서 사용되는 데이터 로직이 포함된 컨테이너 컴포넌트들이 위치한 폴더.                   |
+| `src/hooks`              | 커스텀 훅들을 모아둔 폴더. API 호출이나 전역 상태 관리 등의 재사용 가능한 로직이 포함됨.                 |
+| `src/lib`                | 클라이언트 측 API 호출과 validation에 필요한 정규식이 포함된 폴더.                               |
+| `src/services`           | Firebase 등 외부 라이브러리나 서비스 설정이 포함된 폴더. Firebase 설정이 여기에 포함됨.               |
+| `src/states`             | 전역 상태 관리를 위한 상태 저장소(Zustand)가 정의된 폴더.                                           |
+| `src/stories`            | Storybook과 관련된 컴포넌트 테스트용 폴더.                                                         |
+| `src/styles`             | 전역 스타일 또는 각종 스타일 파일을 모아둔 폴더.                                                     |
+| `src/types`              | TypeScript에서 사용하는 커스텀 타입들을 정의한 폴더.                                                  |
+| `src/utils`              | 유틸리티 함수들이 정의된 폴더. 샤드(ui 라이브러리)의 설정값 등이 포함됨.                                |
