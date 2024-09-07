@@ -66,7 +66,7 @@ http://localhost:3000/
 - 작성자인 경우 글 or 댓글 삭제 기능
 - 작성자 프로필 클릭하는 경우 작성자 프로필 페이지로 이동
 
-#### <details><summary>팔로우/팔로잉</summary><br/> <p>팔로우 및 팔로잉 기능</p> <img src="" width="600" /> <br/> <br/> <p>팔로우 창에서 바로 회원 프로필로 가는 기능</p> <img src="" width="600" /></details>
+#### <details><summary>팔로우/팔로잉</summary><br/> <p>팔로우 및 팔로잉 탭탭</p> <img src="" width="600" /> <br/> <br/> <p>팔로우 창에서 바로 회원 프로필로 가는 기능</p> <img src="" width="600" /></details>
 - 팔로우/팔로잉 탭 구현
 - 타 회원의 팔로우나 팔로잉 탭에서 팔로우/언팔로우 기능
 
