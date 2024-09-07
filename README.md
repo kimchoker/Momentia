@@ -51,29 +51,30 @@ http://localhost:3000/
 
 ## 📌 주요기능
 ##### 토글을 열면 시연영상을 확인하실 수 있습니다
-#### <details><summary>로그인 / 회원가입</summary> <br/> <p>로그인</p> <img src="https://github.com/wjstjdus96/byhand/assets/77755620/f12d75ce-d43a-4d36-9179-8dcee4e89a9f" width="600" /> <br/> <br/> <p>회원가입</p> <img src="https://github.com/wjstjdus96/byhand/assets/77755620/6f1fd225-d95f-4ba6-9c1a-2fffdd57cdae" width="600" /> <br/></details>
+#### <details><summary>로그인 / 회원가입</summary> <br/> <p>로그인</p> <img src="" width="600" /> <br/> <br/> <p>회원가입</p> <img src="" width="600" /> <br/></details>
 - 폼 유효성 검증
 - 로그인 후 전역상태로 회원정보 관리
-#### <details><summary>전체 상품 조회</summary> <br/> <p>전체상품 - 결과 필터링</p> <img src="https://github.com/wjstjdus96/byhand/assets/77755620/e9c5366a-fcf0-4115-b274-e91dd7707802" width="600" /> <br/> <br/> <p>전체상품 - 무한스크롤</p> <img src="https://github.com/wjstjdus96/byhand/assets/77755620/a6697ac9-49fc-4461-96aa-1cb8d1b92e12" width="600" /> <br/></details>
-- 카테고리, 검색어, 정렬옵션에 따른 조회 결과 필터링 기능
-- 무한스크롤을 활용한 페이지네이션
-#### <details><summary>상품 상세 조회</summary><br/> <p>상품 상세정보</p> <img src="https://github.com/wjstjdus96/byhand/assets/77755620/4e13159e-d267-43e9-b28e-f9bad1d0ddb4" width="600" /><br/></details>
-- 상품 수량 선택 -> 장바구니 추가 혹은 상품 주문
-- 이미지 캐러셀을 통한 다량의 상품 이미지 자동 전환
-#### <details><summary>[구매자] 장바구니</summary><br/> <p>장바구니 - 상품선택,수량변경</p> <img src="https://github.com/wjstjdus96/byhand/assets/77755620/ab88a2c2-2a66-4d6b-89e1-00f239aa64b5" width="600" /> <br/> <br/> <p>장바구니 - 부분삭제,부분결제</p> <img src="https://github.com/wjstjdus96/byhand/assets/77755620/7b7b9161-5ca3-4717-be6d-74492e897a8f" width="600" /></details>
-- 장바구니 상품 수량 수정 기능
-- 선택한 상품 금액 및 개수 계산
-- 상품 전체/부분선택 -> 부분적인 주문 및 삭제 기능
 
-#### <details><summary>[구매자] 선택 상품 주문</summary> <br/> <p>주문-배송정보입력</p> <img src="https://github.com/wjstjdus96/byhand/assets/77755620/4f5b4468-0edc-4aae-8dc1-20e5a2d4b015" width="600" />  <br/> <br/> <p>주문-결제</p> <img src="https://github.com/wjstjdus96/byhand/assets/77755620/50c1c1e2-74ce-4a49-aafa-3ded7825be24" width="600" /></details>
-- 카카오 우편번호 api를 활용한 배송 정보 입력 기능
-- 포트원 SDK를 활용한 결제 기능
-#### <details><summary>[구매자] 주문 내역 조회 및 주문 취소</summary><br/> <p>주문 정보 조회 및 주문 취소</p> <img src="https://github.com/wjstjdus96/byhand/assets/77755620/953a3f66-18f7-4dd8-8aa1-da815ccf1fab" width="600" /></details>
-- 날짜별 주문 내역 조회 기능
-- 상품별 주문 취소 기능
-#### <details><summary>[판매자] 판매상품관리</summary> <br/> <p>판매상품관리 - 상품 등록,수정</p> <img src="https://github.com/wjstjdus96/byhand/assets/77755620/42e80267-58e8-494c-8e95-9d58e6035ad9" width="600" />  <br/> <br/> <p>판매상품관리 - 상품 삭제</p> <img src="https://github.com/wjstjdus96/byhand/assets/77755620/c2b12fdf-3fd1-43a6-89b0-67059eff7fa3" width="600" /></details>
-- 판매 상품 조회, 등록, 수정, 삭제 기능
-- 등록 시 상품 이미지 개수 5개 제한
+#### <details><summary>전체 피드 조회 및 친구 피드</summary> <br/> <p>친구 피드 조회 기능</p> <img src="" width="600" /> <br/> <br/> <p>피드 - 무한스크롤</p> <img src="" width="600" /> <br/></details>
+- 전체 피드와 친구 피드를 탭으로 구현
+- 무한스크롤을 활용한 페이지네이션
+- 글마다 댓글과 좋아요 갯수 확인 기능
+
+#### <details><summary>상세 글 페이지 및 댓글</summary><br/> <p>상세 글 페이지</p> <img src="" width="600" /></details>
+- 좋아요 클릭 시 낙관적 업데이트를 통한 반영
+- 작성자인 경우 글 or 댓글 삭제 기능
+- 작성자 프로필 클릭하는 경우 작성자 프로필 페이지로 이동
+
+#### <details><summary>팔로우/팔로잉</summary><br/> <p>팔로우 및 팔로잉 기능</p> <img src="" width="600" /> <br/> <br/> <p>팔로우 창에서 바로 회원 프로필로 가는 기능</p> <img src="" width="600" /></details>
+- 팔로우/팔로잉 탭 구현
+- 타 회원의 팔로우나 팔로잉 탭에서 팔로우/언팔로우 기능
+
+#### <details><summary>알림</summary> <br/> <p>알림 페이지</p> <img src="" width="600" />  <br/> <br/> <p>알림 클릭 시 알림 온 글로 이동</p> <img src="" width="600" /></details>
+- firebase의 FCM을 이용한 알림 기능
+- 알림 올 시 사이드바 or 하단바에 알림이 표시됨
+- 데스크탑 버전일 경우 토스트로 우측 하단에 알림 생성
+  
+
 
 
 <br/>
