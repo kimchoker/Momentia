@@ -99,10 +99,6 @@ http://localhost:3000/
 
 <br/>
 
-## 🏗 아키텍쳐
-![Momentia architecture](https://github.com/user-attachments/assets/afb7c948-fe18-4eef-bb13-c1fdfd97595e)
-
-
 
 ## 폴더구조
 
