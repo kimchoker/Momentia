@@ -100,59 +100,25 @@ http://localhost:3000/
 <br/>
 
 
-## 폴더구조
+## 폴더구조 및 설명
 
 ```
-📦 src
- ┣ 📂app
- ┃ ┣ 📂api
- ┃ ┃ ┣ 📂comments
- ┃ ┃ ┣ 📂feed
- ┃ ┃ ┣ 📂post
- ┃ ┃ ┣ 📂profile
- ┃ ┃ ┗ 📂useruid
- ┃ ┣ 📂dm
- ┃ ┣ 📂login
- ┃ ┣ 📂notification
- ┃ ┣ 📂profile
- ┃ ┗ 📂signup
- ┣ 📂components
- ┃ ┣ 📂feed
- ┃ ┣ 📂notification
- ┃ ┣ 📂profile
- ┃ ┣ 📂sidebar
- ┃ ┗ 📂ui
- ┣ 📂constants
- ┣ 📂containers
- ┣ 📂hooks
- ┣ 📂lib
- ┃ ┣ 📂api
- ┃ ┗ 📂validation
- ┣ 📂services
- ┃ ┗ 📂firebase
- ┣ 📂states
- ┣ 📂stories
- ┣ 📂styles
- ┣ 📂types
- ┗ 📂utils
-    ┗ 📂shadcn
-
+src
+┣ 📂app                    // 페이지 구현 관련 폴더. 각 페이지별로 폴더가 존재하며, 페이지와 관련된 컴포넌트 및 API 라우터가 정의됨.
+┃ ┣ 📂api                 // 백엔드 API 라우터를 모아둔 폴더. 게시물, 댓글, 프로필 등 다양한 API 엔드포인트 정의.
+┃ ┣ 📂login               // 로그인 페이지 관련 폴더 (예시).
+┃ ┣ ...                  // 그 외 페이지 관련 폴더들 (DM, 알림, 프로필, 회원가입 등).
+┣ 📂components             // 각 페이지에서 사용되는 UI 컴포넌트들이 모여 있는 폴더.
+┃ ┣ 📂common              // 페이지에서 사용되는 재사용 가능한 컴포넌트들을 모은 폴더.
+┃ ┗ 📂ui                  // Shadcn UI 컴포넌트를 모아둔 폴더.
+┣ 📂config                 // 외부 서비스 또는 라이브러리 관련 설정을 모아둔 폴더.
+┃ ┣ 📂firebase            // Firebase 설정 관련 파일.
+┃ ┗ 📂shadcn              // Shadcn UI 라이브러리 설정 관련 파일.
+┣ 📂lib                    // 클라이언트 측 API 호출과 validation에 필요한 정규식 및 라이브러리 관련 파일들을 포함하는 폴더.
+┃ ┣ 📂api                 // 클라이언트 측 API 호출 관련 파일.
+┃ ┗ 📂validation          // 유효성 검사를 위한 정규식 또는 검증 로직이 포함된 파일들.
+┣ 📂store                  // 전역 상태 관리를 위한 상태 저장소 폴더.
+┣ 📂stories                // Storybook과 관련된 컴포넌트 테스트용 폴더.
+┣ 📂types                  // TypeScript에서 사용하는 커스텀 타입들을 정의한 폴더.
 ```
-### 폴더 설명
-
-| 폴더 경로               | 설명                                                                                  |
-|-------------------------|---------------------------------------------------------------------------------------|
-| `src/app`                | 페이지 구현 관련 폴더. 각 페이지별로 폴더가 존재하며, 페이지와 관련된 컴포넌트 및 API 라우터가 정의됨. |
-| `src/app/api`            | 백엔드 API 라우터를 모아둔 폴더. 게시물, 댓글, 프로필 등 다양한 API 엔드포인트 정의.               |
-| `src/components`         | 각 페이지에서 사용되는 UI 컴포넌트들이 모여 있는 폴더. 재사용 가능한 컴포넌트들이 정의됨.               |
-| `src/constants`          | 어플리케이션 전반에 걸쳐 사용되는 상수 값을 모아둔 폴더. (예: 색상, URL 등)                         |
-| `src/containers`         | 페이지나 컴포넌트에서 사용되는 데이터 로직이 포함된 컨테이너 컴포넌트들이 위치한 폴더.                   |
-| `src/hooks`              | 커스텀 훅들을 모아둔 폴더. API 호출이나 전역 상태 관리 등의 재사용 가능한 로직이 포함됨.                 |
-| `src/lib`                | 클라이언트 측 API 호출과 validation에 필요한 정규식이 포함된 폴더.                               |
-| `src/services`           | Firebase 등 외부 라이브러리나 서비스 설정이 포함된 폴더. Firebase 설정이 여기에 포함됨.               |
-| `src/states`             | 전역 상태 관리를 위한 상태 저장소(Zustand)가 정의된 폴더.                                           |
-| `src/stories`            | Storybook과 관련된 컴포넌트 테스트용 폴더.                                                         |
-| `src/styles`             | 전역 스타일 또는 각종 스타일 파일을 모아둔 폴더.                                                     |
-| `src/types`              | TypeScript에서 사용하는 커스텀 타입들을 정의한 폴더.                                                  |
-| `src/utils`              | 유틸리티 함수들이 정의된 폴더. 샤드(ui 라이브러리)의 설정값 등이 포함됨.                                |
 
