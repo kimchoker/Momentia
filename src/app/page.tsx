@@ -10,7 +10,7 @@ const Home = () => {
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
   const queryClient = useQueryClient();
-  const [totalFeeds, setTotalFeeds] = useState<number | null>(null); // 상태 추가
+  const [totalFeeds, setTotalFeeds] = useState<number | null>(null);
 
   const fetchFeeds = async ({ pageParam }) => {
     const response = await fetch(`/api/feed`, {
@@ -44,14 +44,13 @@ const Home = () => {
   const feeds = data?.pages.flatMap((page) => page.feeds) || [];
   const fetchedFeedsCount = feeds.length;
 
-  // 데이터가 변경될 때마다 totalFeeds 값을 업데이트하는 useEffect
   useEffect(() => {
     if (data?.pages[0]?.totalFeeds) {
       setTotalFeeds(data.pages[0].totalFeeds);
     }
   }, [data]);
 
-  // Intersection Observer로 무한 스크롤 기능 설정
+  // 무한 스크롤 설정
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -59,7 +58,7 @@ const Home = () => {
           entries[0].isIntersecting &&
           hasNextPage &&
           !isFetchingNextPage &&
-          fetchedFeedsCount < totalFeeds // 불러온 피드 수와 총 피드 수를 비교
+          fetchedFeedsCount < totalFeeds
         ) {
           fetchNextPage();
         }
@@ -81,33 +80,28 @@ const Home = () => {
     };
   }, [fetchNextPage, hasNextPage, isFetchingNextPage, fetchedFeedsCount, totalFeeds]);
 
-  // 10초마다 최신 피드를 가져오는 기능
-  useEffect(() => {
-    const interval = setInterval(() => {
-      queryClient.invalidateQueries({ queryKey: ['feeds'] });
-    }, 10000);
-
-    return () => clearInterval(interval);
-  }, [queryClient]);
-
   return (
-    <div className="flex justify-center items-center h-screen bg-[#ffffff] font-nanum-barun-gothic">
+    <div className="flex justify-center items-center h-screen bg-[#f0f4f8] font-sans">
       <Sibar />
-      <ScrollArea ref={scrollRef} className="w-[40%] h-[100%] overflow-y-auto">
-        {feeds.map((feed) => (
-          <FeedItem
-            key={feed.postId}
-            profileImage={feed.profileImage}
-            postId={feed.postId}
-            nickname={feed.nickname}
-            userId={feed.email}
-            content={feed.content}
-            images={feed.images}
-            time={feed.createdAt}
-            commentCount={feed.commentCount}
-            likeCount={feed.likeCount}
-          />
-        ))}
+      {/* ScrollArea 폭을 700px로 고정 */}
+      <ScrollArea ref={scrollRef} className="w-full max-w-[700px] h-[100%] overflow-y-visible overflow-visible m-2 p-2">
+        {/* 그리드 레이아웃: FeedItem 크기에 맞춰 배치 */}
+        <div className="grid grid-cols-1  sm:grid-cols-2 gap-4 ">
+          {feeds.map((feed) => (
+            <FeedItem
+              key={feed.postId}
+              profileImage={feed.profileImage}
+              postId={feed.postId}
+              nickname={feed.nickname}
+              userId={feed.email}
+              content={feed.content}
+              images={feed.images}
+              time={feed.createdAt}
+              commentCount={feed.commentCount}
+              likeCount={feed.likeCount}
+            />
+          ))}
+        </div>
         {isFetchingNextPage && (
           <div className="flex justify-center items-center p-10">
             <Spinner />
