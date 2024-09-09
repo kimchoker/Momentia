@@ -6,7 +6,7 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import MainProfile from '../../../components/profile/mainprofile';
 import ProfileEdit from '../../../components/profile/new-neo-profileEdit';
-import Sibar from '../../../components/new-neo-sidebar';
+import Sibar from '../../../components/sidebar/new-neo-sidebar';
 import FeedItem from '../../../components/feed/feedItem';
 import Spinner from '../../../components/ui/spinner';
 import Cookies from 'js-cookie';
