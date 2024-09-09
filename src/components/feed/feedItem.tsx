@@ -29,7 +29,7 @@ const FeedItem = ({ nickname, userId, content, images, postId, time, commentCoun
 
   return (
     <div
-      className="relative w-full sm:w-[90%] md:w-[90%] h-[400px] bg-white rounded-2xl shadow-lg overflow-hidden cursor-pointer transition-all duration-300 ease-in-out transform hover:scale-105 p-3"
+      className="relative w-full sm:w-[90%] md:w-[90%] h-[400px] bg-white rounded-2xl shadow-lg overflow-hidden cursor-pointer transition-all duration-300 ease-in-out transform hover:scale-105 ml-3 mt-3"
       onClick={handleClick}
       style={{
         backgroundImage: `url(${images[0]?.url})`,
@@ -54,8 +54,6 @@ const FeedItem = ({ nickname, userId, content, images, postId, time, commentCoun
 
       {/* 좋아요와 댓글 */}
       <div className="absolute top-3 right-3 flex items-center space-x-2 z-10 text-white">
-        <FaHeart className="text-red-500" />
-        <span>{likeCount}</span>
         <FaComment />
         <span>{commentCount}</span>
       </div>

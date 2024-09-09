@@ -27,10 +27,25 @@ const deleteCommentApi = async ({ commentId, postId }) => {
   return await axios.delete(`/api/comments?commentId=${commentId}&postId=${postId}`);
 };
 
+// 이미지 모달 컴포넌트
+const ImageModal = ({ imageUrl, onClose }) => (
+  <div className="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-50">
+    <div className="relative">
+      <button
+        className="absolute top-2 right-2 text-white"
+        onClick={onClose}
+      >
+        <X className="w-8 h-8" />
+      </button>
+      <img src={imageUrl} alt="Full size" className="max-w-full max-h-screen" />
+    </div>
+  </div>
+);
+
 const CommentSection = ({ postId }) => {
   const queryClient = useQueryClient();
   const { email, isLoggedIn } = authStore();
-  const [commentText, setCommentText] = useState("");
+  const [commentText, setCommentText] = useState('');
 
   // useQuery로 댓글 불러오기
   const { data: comments = [], isLoading } = useQuery({
@@ -59,13 +74,13 @@ const CommentSection = ({ postId }) => {
     if (!commentText.trim()) return;
     if (!isLoggedIn || !email) {
       alert('로그인이 필요합니다.');
-      setCommentText("");
+      setCommentText('');
       return;
     }
 
     const newComment = { postId, content: commentText, userId: email };
     createCommentMutation.mutate(newComment);
-    setCommentText("");
+    setCommentText('');
   };
 
   if (isLoading) {
@@ -91,20 +106,24 @@ const CommentSection = ({ postId }) => {
       </div>
 
       <div className="comments-list mt-4">
-        {comments.map((comment) => (
-          <CommentComponent
-            key={comment.id}
-            profileImage={comment.profileImage}
-            commentId={comment.id}
-            postId={postId}
-            currentUserId={email}
-            userId={comment.userId}
-            nickname={comment.nickname}
-            comment={comment.content}
-            createdAt={comment.createdAt}
-            onDelete={() => deleteCommentMutation.mutate({ commentId: comment.id, postId })}
-          />
-        ))}
+        {Array.isArray(comments) && comments.length > 0 ? (
+          comments.map((comment) => (
+            <CommentComponent
+              key={comment.id}
+              profileImage={comment.profileImage}
+              commentId={comment.id}
+              postId={postId}
+              currentUserId={email}
+              userId={comment.userId}
+              nickname={comment.nickname}
+              comment={comment.content}
+              createdAt={comment.createdAt}
+              onDelete={() => deleteCommentMutation.mutate({ commentId: comment.id, postId })}
+            />
+          ))
+        ) : (
+          <p className="text-gray-400 text-center">댓글이 없습니다.</p>
+        )}
       </div>
     </div>
   );
@@ -114,22 +133,28 @@ const FeedDetail = ({ nickname, userId, content, images, postId, time, likeCount
   const { closeModal } = useModalStore();
   const [isEditing, setIsEditing] = useState(false);
   const { email } = authStore();
+  const [selectedImage, setSelectedImage] = useState(null); // 이미지 클릭 시 모달 표시용 상태
 
   // 글 수정 모드
   const handleEdit = () => setIsEditing(true);
 
   // 글 삭제
   const handleDelete = async () => {
-    const confirmed = confirm("정말로 이 글을 삭제하시겠습니까?");
+    const confirmed = confirm('정말로 이 글을 삭제하시겠습니까?');
     if (!confirmed) return;
 
     try {
       await deletePost(postId);
-      alert("글이 성공적으로 삭제되었습니다.");
+      alert('글이 성공적으로 삭제되었습니다.');
       closeModal();
     } catch (error) {
-      alert("글 삭제 중 오류가 발생했습니다.");
+      alert('글 삭제 중 오류가 발생했습니다.');
     }
+  };
+
+  // 이미지 클릭 시 모달 표시
+  const handleImageClick = (imageUrl) => {
+    setSelectedImage(imageUrl);
   };
 
   if (isEditing) {
@@ -150,24 +175,39 @@ const FeedDetail = ({ nickname, userId, content, images, postId, time, likeCount
   const formattedCreatedAt = `${createdAt.getFullYear() % 100}년 ${createdAt.getMonth() + 1}월 ${createdAt.getDate()}일 ${createdAt.getHours()}시 ${createdAt.getMinutes()}분`;
 
   return (
-    <div className="relative p-3">
-      <button 
-        onClick={closeModal} 
-        className="absolute top-2 right-2 p-1 rounded-full transition-all hover:bg-gray-300"
-        aria-label="Close"
-      >
-        <X className="w-5 h-5" />
+    <div className="relative p-3 bg-white rounded-lg overflow-hidden w-full mx-auto"> {/* 가로 길이 확장 */}
+      <button onClick={closeModal}>
+        <X className="w-5 h-5 absolute top-2 right-2 z-25" />
       </button>
 
-      <div className="flex flex-row justify-start">
+
+      <div className="flex flex-row justify-start items-center relative">
         <Avatar>
           <AvatarImage src={profileImage} />
           <AvatarFallback />
         </Avatar>
-        <div className="flex flex-col ml-3">
+        <div className="flex flex-col ml-3 text-gray-700">
           <p className="font-bold">{nickname}</p>
           <p className="text-xs">{userId}</p>
           <p className="text-xs text-gray-400 mt-1">{formattedCreatedAt}</p>
+        </div>
+        <div className="absolute top-0 right-0 text-gray-600">
+          {email === userId && (
+            <div className="flex space-x-2">
+              <button
+                onClick={handleEdit}
+                className="p-1 text-gray-500 hover:text-black"
+              >
+                <Edit className="w-5 h-5" />
+              </button>
+              <button
+                onClick={handleDelete}
+                className="p-1 text-gray-500 hover:text-red-500"
+              >
+                <Trash className="w-5 h-5" />
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -179,7 +219,8 @@ const FeedDetail = ({ nickname, userId, content, images, postId, time, likeCount
               key={index}
               src={image.url}
               alt={image.fileName}
-              className="w-24 h-24 object-cover"
+              className="w-32 h-32 object-cover rounded-md cursor-pointer"
+              onClick={() => handleImageClick(image.url)} // 이미지 클릭 시 모달 열기
             />
           ))}
         </div>
@@ -192,22 +233,6 @@ const FeedDetail = ({ nickname, userId, content, images, postId, time, likeCount
           <FaComment className="ml-4 mr-1 text-black-500" />
           <span>{commentCount}</span>
         </div>
-        {email === userId && (
-          <div className="flex space-x-2">
-            <button
-              onClick={handleEdit}
-              className="p-1 text-gray-500 hover:text-black"
-            >
-              <Edit className="w-5 h-5" />
-            </button>
-            <button
-              onClick={handleDelete}
-              className="p-1 text-gray-500 hover:text-red-500"
-            >
-              <Trash className="w-5 h-5" />
-            </button>
-          </div>
-        )}
       </div>
 
       {/* 회색 선 추가로 댓글과 본문 경계 구분 */}
@@ -215,6 +240,9 @@ const FeedDetail = ({ nickname, userId, content, images, postId, time, likeCount
 
       {/* CommentSection 컴포넌트 */}
       <CommentSection postId={postId} />
+
+      {/* 이미지 모달 표시 */}
+      {selectedImage && <ImageModal imageUrl={selectedImage} onClose={() => setSelectedImage(null)} />}
     </div>
   );
 };

@@ -11,6 +11,8 @@ import { fetchProfile } from "../../lib/api/userApi";
 import WritingComponent from "./../feed/PostWriting";
 import Link from "next/link";
 import useMediaQuery from "../../hooks/useMediaQuery";
+import Logo from "../../../public/images/Logo.png"
+import Image from "next/image";
 
 
 const Sibar = () => {
@@ -112,7 +114,7 @@ const Sibar = () => {
         <PostModalDialog open={isModalOpen} onOpenChange={closeModal}>
           <PostModalDialogContent>{modalContent}</PostModalDialogContent>
         </PostModalDialog>
-        <div className="absolute top-[60px] -right-[0px] z-20">
+        <div className="absolute top-[10px] -right-[0px] z-20">
           <Button
             onClick={() => setIsOpen((prevState) => !prevState)}
             className="rounded-md w-8 h-8 border-none border-opacity-0"
@@ -123,16 +125,14 @@ const Sibar = () => {
           </Button>
         </div>
 
-        <Button className={`transition-transform ease-in-out duration-300 mb-8 ${isOpen ? "translate-x-1" : "translate-x-0"}`} variant="link" asChild>
+        <Button className={`transition-all ease-in-out duration-500 ${isOpen ? "mb-12 mt-8" : "mb-6 mt-8"} ${isOpen ? "translate-x-1" : "translate-x-0"}`} variant="link" asChild>
           <Link href="/" className="flex items-center gap-2">
-            <Swords className="w-6 h-6 mr-1" />
-            <h1
-              className={`first-line:font-bold text-lg whitespace-nowrap transition-[transform,opacity,display] ease-in-out duration-300", ${
-                isOpen === false ? "-translate-x-96 opacity-0 hidden" : "translate-x-0 opacity-100"
-              }`}
-            >
-              Lane
-            </h1>
+          <Image
+            src={isOpen ? "/images/Logo.png" : "/images/Logo2.png"} // isOpen에 따라 다른 이미지 로드
+            alt="Logo"
+            width={128} // 너비 설정
+            height={128} // 높이 설정
+          />
           </Link>
         </Button>
 

@@ -13,8 +13,8 @@ const ModalOpen = ({ closeModal }) => {
         <button onClick={closeModal}>Open Modal</button>
       </AlertDialogPrimitive.Trigger>
       <AlertDialogPrimitive.Portal>
-        <AlertDialogPrimitive.Overlay className={cn("fixed inset-0 z-50 bg-black/80")} />
-        <AlertDialogPrimitive.Content className={cn("fixed inset-0 z-50 bg-white p-4 m-auto max-w-md rounded")}>
+        <AlertDialogPrimitive.Overlay className={cn("fixed inset-0 z-50 bg-black/80  w-full sm:w-4/5 md:w-3/5 max-w-[60%]")} />
+        <AlertDialogPrimitive.Content className={cn("fixed inset-0 z-50 bg-white p-4 m-auto rounded w-full sm:w-4/5 md:w-3/5 max-w-[60%]")}>
           <AlertDialogPrimitive.Title>Modal Title</AlertDialogPrimitive.Title>
           <AlertDialogPrimitive.Description>
             
@@ -65,7 +65,7 @@ const PostModalDialogContent = React.forwardRef<
     <AlertDialogPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg",
+        "fixed left-[50%] top-[50%] z-50 grid w-full w-full sm:w-4/5 md:w-3/5 max-w-[50%] translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg",
         className
       )}
       {...props}

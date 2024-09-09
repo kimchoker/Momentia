@@ -84,7 +84,7 @@ const Home = () => {
     <div className="flex justify-center items-center h-screen bg-[#f0f4f8] font-sans">
       <Sibar />
       {/* ScrollArea 폭을 700px로 고정 */}
-      <ScrollArea ref={scrollRef} className="w-full max-w-[700px] h-[100%] overflow-y-visible overflow-visible m-2 p-2">
+      <ScrollArea ref={scrollRef} className="w-full max-w-[700px] h-[100%] overflow-y-visible overflow-visible">
         {/* 그리드 레이아웃: FeedItem 크기에 맞춰 배치 */}
         <div className="grid grid-cols-1  sm:grid-cols-2 gap-4 ">
           {feeds.map((feed) => (
