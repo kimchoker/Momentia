@@ -86,7 +86,7 @@ const Home = () => {
       {/* ScrollArea 폭을 700px로 고정 */}
       <ScrollArea ref={scrollRef} className="w-full max-w-[700px] h-[100%] overflow-y-visible overflow-visible">
         {/* 그리드 레이아웃: FeedItem 크기에 맞춰 배치 */}
-        <div className="grid grid-cols-1  sm:grid-cols-2 gap-4 ">
+        <div className="grid grid-cols-1  sm:grid-cols-2 gap-4 mr-5 ml-8 ">
           {feeds.map((feed) => (
             <FeedItem
               key={feed.postId}

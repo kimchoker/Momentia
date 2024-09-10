@@ -88,16 +88,27 @@ const WritingComponent = () => {
   }, [previewUrls]);
 
   return (
-    <div className="max-w-full p-1 bg-white rounded-lg">
+    <div className="max-w-full h-full p-1 bg-white rounded-lg overflow-auto">
       <textarea
-        className="w-[100%] h-56 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
-        placeholder="Please post a great article!"
+        className="w-[100%] p-3 border border-gray-300  min-h-40 h-[75%] rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+        placeholder="글을 작성해주세요."
         value={content}
         onChange={handleChange}
       />
-      <div>
-        <input type="file" accept="image/*" multiple onChange={handleImageChange} className="mb-2" />
+      <div className="mb-2">
+        <label htmlFor="file-upload" className="cursor-pointer inline-block px-4 py-2 bg-black transition-all 0.1s ease-in text-white rounded-md shadow-sm hover:bg-[#333333] focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          이미지 업로드
+        </label>
+        <input
+          id="file-upload"
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={handleImageChange}
+          className="hidden" // 숨겨진 인풋 필드
+        />
       </div>
+
       <div className="mt-4 flex flex-wrap">
         {previewUrls.map((url, index) => (
           <div key={index} className="relative w-20 h-20 border border-gray-300 rounded-lg overflow-hidden m-1">
@@ -112,11 +123,11 @@ const WritingComponent = () => {
           </div>
         ))}
       </div>
-      <div className="mt-4 flex flex-row justify-end">
+      <div className="mt-4 relative bottom-2 right-2 flex flex-row justify-end">
         <Button className="mr-3" onClick={handlePostSubmit}>
-          Write
+          글쓰기
         </Button>
-        <Button onClick={closeModal}>Cancel</Button>
+        <Button onClick={closeModal}>취소</Button>
       </div>
     </div>
   );

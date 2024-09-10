@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { adminAuth } from '../../../services/firebase/firebaseAdmin';
+import { adminAuth } from '../../../lib/firebase/firebaseAdmin';
 import { getFirestore } from 'firebase-admin/firestore';
 
 // Firestore 초기화

@@ -1,9 +1,99 @@
 "use client";
-import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { useRouter } from 'next/navigation';
-import { X } from 'lucide-react';
 import { deleteComment } from '../../lib/api/feedApi';
+import React, { useState } from 'react';
+import { authStore } from '../../states/store';
+import { X, ArrowUp } from 'lucide-react'; // 아이콘 추가
+import { fetchComments, createComment, deleteCommentApi } from '../../lib/api/feedApi';
+import { useQueryClient, useQuery, useMutation } from '@tanstack/react-query';
+
+const CommentSection = ({ postId }) => {
+  const queryClient = useQueryClient();
+  const { email, isLoggedIn } = authStore();
+  const [commentText, setCommentText] = useState('');
+
+  // useQuery로 댓글 불러오기
+  const { data: comments = [], isLoading } = useQuery({
+    queryKey: ['comments', postId],
+    queryFn: () => fetchComments(postId),
+  });
+
+  // 댓글 작성 Mutation
+  const createCommentMutation = useMutation({
+    mutationFn: createComment,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['comments', postId] });
+    },
+  });
+
+  // 댓글 삭제 Mutation
+  const deleteCommentMutation = useMutation({
+    mutationFn: deleteCommentApi,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['comments', postId] });
+    },
+  });
+
+  // 댓글 저장 함수
+  const handleCommentSave = () => {
+    if (!commentText.trim()) return;
+    if (!isLoggedIn || !email) {
+      alert('로그인이 필요합니다.');
+      setCommentText('');
+      return;
+    }
+
+    const newComment = { postId, content: commentText, userId: email };
+    createCommentMutation.mutate(newComment);
+    setCommentText('');
+  };
+
+  if (isLoading) {
+    return <p>댓글을 불러오는 중...</p>;
+  }
+
+  return (
+    <div>
+      <div className="mt-4 flex items-center space-x-2 w-full"> {/* 댓글 입력 영역 너비 조정 */}
+        <input
+          type="text"
+          value={commentText}
+          onChange={(e) => setCommentText(e.target.value)}
+          placeholder="댓글을 입력하세요"
+          className="flex-grow p-2 m-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full" // 너비 조정
+        />
+        <button
+          onClick={handleCommentSave}
+          className="px-1 py-1 w-6 h-6 bg-black text-white rounded-full transition-all hover:bg-[#d6d6d6] m-2"
+        >
+          <ArrowUp />
+        </button>
+      </div>
+
+      <div className="comments-list mt-4">
+        {Array.isArray(comments) && comments.length > 0 ? (
+          comments.map((comment) => (
+            <CommentComponent
+              key={comment.id}
+              profileImage={comment.profileImage}
+              commentId={comment.id}
+              postId={postId}
+              currentUserId={email}
+              userId={comment.userId}
+              nickname={comment.nickname}
+              comment={comment.content}
+              createdAt={comment.createdAt}
+              onDelete={() => deleteCommentMutation.mutate({ commentId: comment.id, postId })}
+            />
+          ))
+        ) : (
+          <p className="text-gray-400 text-center">댓글이 없습니다.</p>
+        )}
+      </div>
+    </div>
+  );
+};
 
 const CommentComponent = ({ postId, userId, nickname, currentUserId, comment, createdAt, profileImage, commentId, onDelete }) => {
   const router = useRouter();
@@ -52,4 +142,4 @@ const CommentComponent = ({ postId, userId, nickname, currentUserId, comment, cr
   );
 };
 
-export default CommentComponent;
+export { CommentComponent, CommentSection };

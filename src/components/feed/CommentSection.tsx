@@ -4,13 +4,15 @@ import { ArrowUp } from 'lucide-react';
 import { useQueryClient, useQuery, useMutation } from '@tanstack/react-query';
 import { ClipLoader } from 'react-spinners';
 import { authStore } from '../../states/store';
-import CommentComponent from './CommentComponent';
+import { CommentComponent } from './CommentComponent';
 import axios from 'axios';
 
 // 댓글 가져오기 함수
 const fetchComments = async (postId) => {
   const response = await axios.get(`/api/comments?postId=${postId}`);
-  return response.data;
+  
+  // comments가 배열인지 확인하고, 배열이 아니면 빈 배열을 반환
+  return Array.isArray(response.data) ? response.data : [];
 };
 
 // 댓글 작성 함수

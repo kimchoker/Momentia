@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { AuthState, ModalState, UserState } from "../types/types";
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { useSidebarToggleStore } from '../types/types';
-import { auth } from '../services/firebase/firebase';
+import { auth } from '../lib/firebase/firebase';
 import Cookies from 'js-cookie';
 import { DrawerState } from '../types/types';
 

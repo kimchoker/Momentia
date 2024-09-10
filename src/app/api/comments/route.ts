@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '../../../services/firebase/firebase';
+import { db } from '../../../lib/firebase/firebase';
 import { collection, getDocs, orderBy, query, doc, deleteDoc, updateDoc, increment, addDoc, Timestamp, where } from 'firebase/firestore';
 import { comment } from '../../../types/types';
 

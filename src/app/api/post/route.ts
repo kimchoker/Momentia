@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "../../../services/firebase/firebase";
+import { db } from "../../../lib/firebase/firebase";
 import { doc, getDoc, deleteDoc } from "firebase/firestore";
-import { adminAuth, adminStorage } from "../../../services/firebase/firebaseAdmin"; // Firebase Admin SDK 사용
+import { adminAuth, adminStorage } from "../../../lib/firebase/firebaseAdmin"; // Firebase Admin SDK 사용
 
 export async function POST(req: NextRequest) {
   try {

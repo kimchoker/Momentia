@@ -1,5 +1,5 @@
 import { collection, doc, addDoc, serverTimestamp, updateDoc } from "firebase/firestore";
-import { db, storage } from "../../services/firebase/firebase";
+import { db, storage } from "../firebase/firebase";
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { PostData, UpdatePostData } from '../../types/types';
 import { getAuth } from "firebase/auth";
@@ -97,4 +97,33 @@ const deleteComment = async (commentId: string, postId: string) => {
   }
 };
 
-export { uploadImage, savePost, updatePost, deletePost, deleteComment };
+// 댓글 가져오기 함수
+const fetchComments = async (postId) => {
+  const response = await axios.get(`/api/comments?postId=${postId}`);
+  return response.data;
+};
+
+// 댓글 작성 함수
+const createComment = async (newComment) => {
+  const response = await axios.post('/api/comments', newComment);
+  return response.data;
+};
+
+// 댓글 삭제 함수
+const deleteCommentApi = async ({ commentId, postId }) => {
+  return await axios.delete(`/api/comments?commentId=${commentId}&postId=${postId}`);
+};
+
+// 좋아요
+const likePost = async (postId: string) => {
+  const response = await axios.post(`/api/like/${postId}`); 
+  return response.data;
+};
+
+// 좋아요 취소
+const unlikePost = async (postId: string) => {
+  const response = await axios.delete(`/api/like/${postId}`); 
+  return response.data;
+};
+
+export { uploadImage, savePost, updatePost, deletePost, deleteComment, likePost, unlikePost, fetchComments, createComment, deleteCommentApi };
