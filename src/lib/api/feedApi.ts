@@ -114,16 +114,25 @@ const deleteCommentApi = async ({ commentId, postId }) => {
   return await axios.delete(`/api/comments?commentId=${commentId}&postId=${postId}`);
 };
 
-// 좋아요
-const likePost = async (postId: string) => {
-  const response = await axios.post(`/api/like/${postId}`); 
+// 좋아요 추가
+const likePost = async (postId: string, email: string) => {
+  console.log(postId, email);
+  const response = await axios.post("/api/like", {
+    postId,
+    email, // 요청 바디에 email 포함
+  });
   return response.data;
 };
 
 // 좋아요 취소
-const unlikePost = async (postId: string) => {
-  const response = await axios.delete(`/api/like/${postId}`); 
+const unlikePost = async (postId: string, email: string) => {
+  console.log(postId, email);
+  const response = await axios.delete("/api/like", {
+    data: {
+      postId,
+      email, // 요청 바디에 email 포함
+    },
+  });
   return response.data;
 };
-
 export { uploadImage, savePost, updatePost, deletePost, deleteComment, likePost, unlikePost, fetchComments, createComment, deleteCommentApi };

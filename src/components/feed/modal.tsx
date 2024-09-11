@@ -1,19 +1,35 @@
-'use client'
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import ReactDOM from "react-dom";
 
 const Modal = ({ isOpen, onClose, title, children }) => {
-  if (!isOpen) return null;
+  const [shouldRender, setShouldRender] = useState(isOpen); // 렌더링 여부 상태 관리
+  const [animationClass, setAnimationClass] = useState(""); // 애니메이션 클래스를 관리하는 상태
 
-  return (
+  // 모달이 열리고 닫힐 때 애니메이션 설정
+  useEffect(() => {
+    if (isOpen) {
+      setShouldRender(true); // 모달을 렌더링
+      setTimeout(() => setAnimationClass("animate-modal-in"), 0); // 약간의 지연 후에 애니메이션 시작
+    } else {
+      setAnimationClass("animate-modal-out");
+      setTimeout(() => setShouldRender(false), 300); // 닫히는 애니메이션이 끝난 후 DOM에서 제거
+    }
+  }, [isOpen]);
+
+  if (!shouldRender) return null; // 모달이 닫힌 후 DOM에서 제거
+
+  return ReactDOM.createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* 배경 오버레이 */}
       <div
-        className="fixed inset-0 bg-black opacity-50"
+        className="fixed inset-0 bg-black opacity-50 transition-opacity duration-300"
         onClick={onClose}
       ></div>
 
       {/* 모달 콘텐츠 */}
-      <div className="relative bg-white rounded-lg shadow-lg w-[90%] h-[90%] sm:w-[90%] md:w-3/5 p-6 animate-fade-in">
+      <div
+        className={`relative bg-white rounded-lg shadow-lg w-[90%] h-[90%] sm:w-[90%] md:w-3/5 p-6 transition-all duration-300 ${animationClass}`}
+      >
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-semibold">{title}</h2>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
@@ -21,21 +37,10 @@ const Modal = ({ isOpen, onClose, title, children }) => {
           </button>
         </div>
         <div className="overflow-auto h-[80%]">{children}</div>
-        <div className="flex justify-end mt-4 space-x-2">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 bg-gray-200 text-black rounded hover:bg-gray-300"
-          >
-            Cancel
-          </button>
-          <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-            Confirm
-          </button>
-        </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
-
 
 export default Modal;

@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { SquarePen, Users, Settings, MessageSquare, Bell, ChevronLeft, LogIn, LogOut, Home } from "lucide-react";
 import { Button } from "../ui/button";
-import { PostModalDialog, PostModalDialogContent } from "../../components/feed/PostModal"
 import { useSidebarToggle, useModalStore, authStore } from "../../states/store";
 import { useStore } from "zustand";
 import { usePathname } from "next/navigation";
@@ -12,17 +11,17 @@ import WritingComponent from "./../feed/PostWriting";
 import Link from "next/link";
 import useMediaQuery from "../../hooks/useMediaQuery";
 import Image from "next/image";
-import Modal from "../feed/modal";
+import Modal from "../feed/modal";  // 모달 컴포넌트 임포트
 
 const Sibar = () => {
   const currentPath = usePathname();
   const [isOpen, setIsOpen] = useState(false);
-  const { isModalOpen, closeModal, openModal, modalContent, setModalContent } = useModalStore();
+  const { isModalOpen, closeModal, openModal, modalContent, setModalContent, setModalTitle, modalTitle } = useModalStore();
   const sidebar = useStore(useSidebarToggle, (state) => state);
   const invisibleRoutes = ["/login", "/signup"];
   const showSidebar = !invisibleRoutes.includes(currentPath);
   const router = useRouter();
-  const isMobile = useMediaQuery("(max-width: 768px)");  // 모바일 화면 감지
+  const isMobile = useMediaQuery("(max-width: 768px)");
 
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
   const { isLoggedIn: storeIsLoggedIn } = useStore(authStore);
@@ -62,18 +61,17 @@ const Sibar = () => {
     }
   };
 
+  // 글쓰기 버튼을 클릭했을 때 모달 열고, 콘텐츠 설정
   const handleNewPost = () => {
-    setModalContent(<WritingComponent />);
-    openModal();
+    setModalContent(<WritingComponent />);  // 글쓰기 컴포넌트를 모달에 넣음
+    setModalTitle('글쓰기');
+    openModal();  // 모달 열기
   };
-
-  const openModalex = () => setIsOpen(true);
-  const closeModalex = () => setIsOpen(false);
 
   if (!sidebar || !showSidebar) return null;
 
   return isMobile ? (
-    // 모바일 화면에서의 하단바
+    // 모바일 화면 하단바
     <div className="fixed bottom-0 left-0 z-20 w-full bg-white shadow-lg flex justify-between items-center p-4">
       <Button variant="ghost" onClick={() => router.push("/")} className="flex flex-col items-center text-[#414868]">
         <Home size={24} className="text-[#414868]" />
@@ -91,7 +89,7 @@ const Sibar = () => {
         <Settings size={24} className="text-[#414868]" />
       </Button>
 
-      {/* 글쓰기 버튼 (우측 상단 고정, 검정색 원형) */}
+      {/* 글쓰기 버튼 */}
       <Button
         onClick={handleNewPost}
         className="fixed right-5 bottom-24 bg-black text-white rounded-full w-14 h-14 p-3 text-[#414868]"
@@ -101,9 +99,9 @@ const Sibar = () => {
       </Button>
 
       {/* 모달 */}
-      <PostModalDialog open={isModalOpen} onOpenChange={closeModal}>
-        <PostModalDialogContent>{modalContent}</PostModalDialogContent>
-      </PostModalDialog>
+      <Modal isOpen={isModalOpen} onClose={closeModal} title={modalTitle}>
+        {modalContent}
+      </Modal>
     </div>
   ) : (
     // 데스크탑에서의 사이드바
@@ -113,12 +111,9 @@ const Sibar = () => {
       }`}
     >
       <div className="relative h-full flex flex-col px-3 py-4 overflow-y-auto shadow-md dark:shadow-zinc-800 border-none overflow-x-hidden justify-start">
-        <PostModalDialog open={isModalOpen} onOpenChange={closeModal}>
-          <PostModalDialogContent>{modalContent}</PostModalDialogContent>
-        </PostModalDialog>
-
-        <Modal isOpen={isOpen} onClose={closeModal} title="Modal Title">
-        <p>This is the modal content area. You can put anything here.</p>
+        {/* 모달 설정 */}
+        <Modal isOpen={isModalOpen} onClose={closeModal} title={modalTitle}>
+          {modalContent}
         </Modal>
 
         <div className="absolute top-[10px] -right-[0px] z-20">

@@ -59,10 +59,12 @@ export interface LayoutProps {
 // 글쓰기/수정 모달 상태 관리용
 export interface ModalState {
   isModalOpen: boolean;
-  modalContent: ReactNode | null;  // modalContent를 ReactNode로 정의
+  modalContent: ReactNode | null;
+  modalTitle: string;
   openModal: () => void;
   closeModal: () => void;
   setModalContent: (content: ReactNode) => void;
+  setModalTitle: (title: string) => void;
 }
 
 export interface DrawerState {

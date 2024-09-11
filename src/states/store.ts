@@ -93,9 +93,11 @@ const useSidebarToggle = create(
 const useModalStore = create<ModalState>((set) => ({
   isModalOpen: false,
   modalContent: null,
+  modalTitle: '',  // 추가: 모달 제목 상태
   openModal: () => set({ isModalOpen: true }),
   closeModal: () => set({ isModalOpen: false }),
   setModalContent: (content) => set({ modalContent: content }),
+  setModalTitle: (title: string) => set({ modalTitle: title }),  // 추가: 모달 제목 설정 함수
 }));
 
 

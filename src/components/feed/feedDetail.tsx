@@ -19,73 +19,78 @@ const FeedDetail = ({ nickname, userId, content, images, postId, time, likeCount
   const [isEditing, setIsEditing] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [hasLiked, setHasLiked] = useState(false); // 좋아요 여부 상태
+  const [currentLikeCount, setCurrentLikeCount] = useState(likeCount); // likeCount 상태로 관리
 
-    // 좋아요 추가 Mutation
-    const likeMutation = useMutation({
-      mutationFn: likePost,
-      onMutate: async () => {
-        // 기존 데이터를 백업
-        await queryClient.cancelQueries({ queryKey: ['post', postId] });
+  // 좋아요 추가 Mutation
+  const likeMutation = useMutation({
+    mutationFn: () => likePost(postId, email),
+    onMutate: async () => {
+      // 기존 데이터를 백업
+      await queryClient.cancelQueries({ queryKey: ['post', postId] });
   
-        const previousPost = queryClient.getQueryData(['post', postId]);
-  
-        // 낙관적 업데이트: 캐시에서 likeCount를 증가
-        queryClient.setQueryData(['post', postId], (oldData: any) => {
-          if (oldData && typeof oldData === 'object' && 'likeCount' in oldData) {
-            return {
-              ...oldData,
-              likeCount: (oldData as { likeCount: number }).likeCount + 1,
-            };
-          }
-          return oldData;
-        });
-  
-        setHasLiked(true); // UI에서 좋아요 표시를 변경
-  
-        return { previousPost }; // 에러 발생 시 복원할 데이터
-      },
-      onError: (error, variables, context) => {
-        // 에러 발생 시, 캐시 복원
-        queryClient.setQueryData(['post', postId], context.previousPost);
-        setHasLiked(false); // UI 상태도 복원
-      },
-      onSettled: () => {
-        // 성공/실패에 관계없이 데이터를 다시 가져옴
-        queryClient.invalidateQueries({ queryKey: ['post', postId] });
-      },
-    });
-  
-    // 좋아요 취소 Mutation
-    const unlikeMutation = useMutation({
-      mutationFn: unlikePost,
-      onMutate: async () => {
-        await queryClient.cancelQueries({ queryKey: ['post', postId] });
-  
-        const previousPost = queryClient.getQueryData(['post', postId]);
-  
-        queryClient.setQueryData(['post', postId], (oldData: any) => {
-          if (oldData && typeof oldData === 'object' && 'likeCount' in oldData) {
-            return {
-              ...oldData,
-              likeCount: (oldData as { likeCount: number }).likeCount - 1,
-            };
-          }
-          return oldData;
-        });
-  
-        setHasLiked(false);
-  
-        return { previousPost };
-      },
-      onError: (error, variables, context) => {
-        queryClient.setQueryData(['post', postId], context.previousPost);
-        setHasLiked(true);
-      },
-      onSettled: () => {
-        queryClient.invalidateQueries({ queryKey: ['post', postId] });
-      },
-    });
-  
+      const previousPost = queryClient.getQueryData(['post', postId]);
+
+      // 낙관적 업데이트: 캐시에서 likeCount를 증가
+      queryClient.setQueryData(['post', postId], (oldData: any) => {
+        if (oldData && typeof oldData === 'object' && 'likeCount' in oldData) {
+          return {
+            ...oldData,
+            likeCount: oldData.likeCount + 1,
+          };
+        }
+        return oldData;
+      });
+
+      setHasLiked(true); // 좋아요 상태 변경
+      setCurrentLikeCount((prevCount) => prevCount + 1);  // 상태 업데이트
+
+      return { previousPost }; // 에러 발생 시 복원할 데이터
+    },
+    onError: (error, variables, context) => {
+      // 에러 발생 시, 캐시 복원
+      queryClient.setQueryData(['post', postId], context.previousPost);
+      setHasLiked(false); // 좋아요 상태 복원
+      setCurrentLikeCount((prevCount) => prevCount - 1);  // 상태 복원
+    },
+    onSettled: () => {
+      // 성공/실패에 관계없이 데이터를 다시 가져옴
+      queryClient.invalidateQueries({ queryKey: ['post', postId] });
+    },
+  });
+
+  // 좋아요 취소 Mutation
+  const unlikeMutation = useMutation({
+    mutationFn: () => unlikePost(postId, email),
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: ['post', postId] });
+
+      const previousPost = queryClient.getQueryData(['post', postId]);
+
+      queryClient.setQueryData(['post', postId], (oldData: any) => {
+        if (oldData && typeof oldData === 'object' && 'likeCount' in oldData) {
+          return {
+            ...oldData,
+            likeCount: oldData.likeCount - 1,
+          };
+        }
+        return oldData;
+      });
+
+      setHasLiked(false); // 좋아요 취소
+      setCurrentLikeCount((prevCount) => prevCount - 1);  // 상태 업데이트
+
+      return { previousPost };
+    },
+    onError: (error, variables, context) => {
+      queryClient.setQueryData(['post', postId], context.previousPost);
+      setHasLiked(true); // 좋아요 상태 복원
+      setCurrentLikeCount((prevCount) => prevCount + 1);  // 상태 복원
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['post', postId] });
+    },
+  });
+
   // 좋아요 버튼 클릭 핸들러
   const handleLikeClick = () => {
     if (!email) {
@@ -148,8 +153,6 @@ const FeedDetail = ({ nickname, userId, content, images, postId, time, likeCount
       </button>
     <ScrollArea>
       <div className="relative p-3 bg-white rounded-lg overflow-hidden w-full mx-auto"> {/* 가로 길이 확장 */}
-      
-
 
       <div className="flex flex-row justify-start items-center relative">
         <Avatar>
@@ -197,27 +200,26 @@ const FeedDetail = ({ nickname, userId, content, images, postId, time, likeCount
       </div>
 
       <div className="flex items-center justify-between mt-4 text-gray-500">
-        <div className="flex items-center">
-          <button onClick={handleLikeClick} className="focus:outline-none">
-            <FaHeart className={`mr-1 ${hasLiked ? 'text-red-500' : 'text-gray-500'}`} />
+        <div className="flex items-center justify-start">
+          <button onClick={handleLikeClick} className="focus:outline-none flex flex-row">
+            <FaHeart className={`m-2 ${hasLiked ? 'text-red-500' : 'text-gray-500'}`} />
+            <span className='mt-1'>{currentLikeCount}</span>  {/* 상태를 사용 */}
           </button>
-          <span>{commentCount}</span>
+          <div className='flex flex-row'>
+            <FaComment className={`m-2 text-gray-500'`} />
+            <span className='mt-1'>{commentCount}</span>
+          </div>
         </div>
       </div>
 
-      {/* 회색 선 추가로 댓글과 본문 경계 구분 */}
       <hr className="my-6 border-gray-300" />
 
-      {/* CommentSection 컴포넌트 */}
       <CommentSection postId={postId} />
 
-      {/* 이미지 모달 표시 */}
       {selectedImage && <ImageModal imageUrl={selectedImage} onClose={() => setSelectedImage(null)} />}
     </div>
     </ScrollArea>
-    
     </>
-    
   );
 };
 
