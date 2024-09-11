@@ -8,7 +8,7 @@ const FeedItem = ({ nickname, userId, content, images, postId, time, commentCoun
   const createdAt = new Date(time);
   const formattedCreatedAt = `${createdAt.getFullYear()}년 ${createdAt.getMonth() + 1}월 ${createdAt.getDate()}일`;
 
-  const { openModal, setModalContent } = useModalStore();
+  const { openModal, setModalContent, setModalTitle } = useModalStore();
 
   const handleClick = () => {
     setModalContent(
@@ -24,6 +24,7 @@ const FeedItem = ({ nickname, userId, content, images, postId, time, commentCoun
         likeCount={likeCount}
       />
     );
+    setModalTitle("글 상세 페이지")
     openModal();
   };
 

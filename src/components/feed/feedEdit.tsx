@@ -17,7 +17,7 @@ const EditPostComponent: React.FC<EditPostComponentProps> = ({ initialContent, i
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>(initialImages.map(image => image.url));
   const [uploadedImages, setUploadedImages] = useState<{ url: string; fileName: string }[]>(initialImages);
-  const { closeModal } = useModalStore();
+  const { closeModal, setModalTitle } = useModalStore();
 
   // 텍스트 입력 핸들러
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -116,7 +116,7 @@ const EditPostComponent: React.FC<EditPostComponentProps> = ({ initialContent, i
 
       <div className='mt-4 flex flex-row justify-end'>
         <Button className='mr-3' onClick={handlePostSubmit}>Save</Button>
-        <Button onClick={() => setIsEditing(false)}>Cancel</Button> {/* isEditing을 false로 설정 */}
+        <Button onClick={() => {setIsEditing(false); setModalTitle("글 상세 페이지");}}>Cancel</Button> {/* isEditing을 false로 설정 */}
       </div>
     </div>
   );

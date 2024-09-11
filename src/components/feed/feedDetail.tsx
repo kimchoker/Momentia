@@ -14,7 +14,7 @@ import { likePost, unlikePost } from '../../lib/api/feedApi';
 
 const FeedDetail = ({ nickname, userId, content, images, postId, time, likeCount, commentCount, profileImage }) => {
   const queryClient = useQueryClient();
-  const { closeModal } = useModalStore();
+  const { closeModal, setModalTitle } = useModalStore();
   const { email } = authStore();
   const [isEditing, setIsEditing] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
@@ -108,7 +108,10 @@ const FeedDetail = ({ nickname, userId, content, images, postId, time, likeCount
   };
 
   // 글 수정 모드
-  const handleEdit = () => setIsEditing(true);
+  const handleEdit = () => {
+    setIsEditing(true);
+    setModalTitle("글 수정하기");
+  };
 
   // 글 삭제
   const handleDelete = async () => {
