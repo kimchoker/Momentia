@@ -116,7 +116,7 @@ const EditPostComponent: React.FC<EditPostComponentProps> = ({ initialContent, i
 
       <div className='mt-4 flex flex-row justify-end'>
         <Button className='mr-3' onClick={handlePostSubmit}>Save</Button>
-        <Button onClick={() => {setIsEditing(false); setModalTitle("글 상세 페이지");}}>Cancel</Button> {/* isEditing을 false로 설정 */}
+        <Button onClick={() => {setIsEditing(false); setModalTitle("글 상세 페이지");}}>Cancel</Button>
       </div>
     </div>
   );
