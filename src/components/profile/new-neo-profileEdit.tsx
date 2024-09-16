@@ -1,16 +1,18 @@
-"use client"
-import React, { useEffect, useState } from 'react';
-import { profileEditStore, authStore } from '../../states/store';
-import { CirclePlus } from 'lucide-react';
-import { getAuth } from 'firebase/auth';
-import axios from 'axios'; // axios 추가
+'use client';
+
+import React, { useEffect, useState } from "react";
+import { profileEditStore, authStore } from "../../states/store";
+import { CirclePlus } from "lucide-react";
+import axios from "axios";
 
 interface ModalProps {
   isOpen: boolean;
 }
 
 const ProfileEdit: React.FC<ModalProps> = ({ isOpen }) => {
-  const { closeEdit } = profileEditStore();
+  const { closeEdit } = profileEditStore((state) => ({
+    closeEdit: state.closeEdit,
+  }));
   const {
     email,
     nickname: initialNickname,
@@ -19,7 +21,7 @@ const ProfileEdit: React.FC<ModalProps> = ({ isOpen }) => {
     setNickname,
     setBio,
     setProfileImage,
-  } = authStore(state => ({
+  } = authStore((state) => ({
     email: state.email,
     nickname: state.nickname,
     bio: state.bio,
@@ -35,15 +37,13 @@ const ProfileEdit: React.FC<ModalProps> = ({ isOpen }) => {
   const [visible, setVisible] = useState(false);
   const [animate, setAnimate] = useState(false);
 
-  const auth = getAuth();
-
   useEffect(() => {
     if (isOpen) {
       setVisible(true);
-      setTimeout(() => setAnimate(true), 10); // 애니메이션을 위해 약간의 딜레이 추가
+      setTimeout(() => setAnimate(true), 10); // 애니메이션을 위해 딜레이 추가
     } else {
       setAnimate(false);
-      const timer = setTimeout(() => setVisible(false), 300); // 트랜지션 시간 후에 모달을 숨김
+      const timer = setTimeout(() => setVisible(false), 300); // 트랜지션 시간 후 모달 숨김
       return () => clearTimeout(timer);
     }
   }, [isOpen]);
@@ -66,10 +66,8 @@ const ProfileEdit: React.FC<ModalProps> = ({ isOpen }) => {
 
     if (hasChanges) {
       try {
-        const idToken = await auth.currentUser?.getIdToken();
-
-        // 서버에 프로필 업데이트 요청
-        const response = await axios.post('/api/profile', {
+        const idToken = await authStore.getState().token; // authStore에서 토큰 가져오기
+        const response = await axios.post("/api/profile", {
           idToken,
           nickname: newNickname,
           bio: newBio,
@@ -77,15 +75,14 @@ const ProfileEdit: React.FC<ModalProps> = ({ isOpen }) => {
         });
 
         if (response.status === 200) {
-          const data = response.data;
-          console.log('프로필 업데이트 성공:', data);
+          console.log("프로필 업데이트 성공:", response.data);
         } else {
-          console.error('프로필 업데이트 실패:', response.statusText);
+          console.error("프로필 업데이트 실패:", response.statusText);
         }
 
-        closeEdit(); // 변경사항이 있을 경우에만 모달을 닫음
+        closeEdit(); // 변경사항이 있을 경우에만 모달 닫기
       } catch (error) {
-        console.error('프로필 업데이트 중 오류 발생:', error);
+        console.error("프로필 업데이트 중 오류 발생:", error);
       }
     }
   };
@@ -107,13 +104,13 @@ const ProfileEdit: React.FC<ModalProps> = ({ isOpen }) => {
         <div className="fixed inset-0 z-50 flex items-end justify-center">
           <div
             className={`absolute inset-0 transition-opacity duration-300 ${
-              animate ? 'opacity-50 bg-black' : 'opacity-0 bg-black'
+              animate ? "opacity-50 bg-black" : "opacity-0 bg-black"
             }`}
-            onClick={closeEdit} 
+            onClick={closeEdit}
           />
           <div
             className={`relative w-[500px] h-2/5 p-6 bg-white rounded-t-lg transform transition-transform duration-300 ease-in-out ${
-              animate ? 'translate-y-0' : 'translate-y-full'
+              animate ? "translate-y-0" : "translate-y-full"
             }`}
           >
             {/* 닫기 버튼 */}
@@ -142,7 +139,7 @@ const ProfileEdit: React.FC<ModalProps> = ({ isOpen }) => {
               <label
                 htmlFor="profileImageUpload"
                 className="absolute w-24 h-24 flex items-center justify-center text-sm text-white opacity-0 hover:opacity-100 cursor-pointer rounded-full bg-black bg-opacity-50 transition-opacity"
-                style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}
+                style={{ top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}
               >
                 <CirclePlus />
               </label>
