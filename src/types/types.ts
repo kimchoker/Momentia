@@ -140,3 +140,14 @@ export interface Notification {
   commentId?: string;
   createdAt: string;
 }
+
+// 프로필 관련
+export interface MainProfileProps {
+  email: string;             
+  nickname: string;        
+  bio?: string;               
+  follower?: number;       
+  following?: number;         
+  profileImage?: string;      
+  isCurrentUser: boolean;     
+};

@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import React, { useRef, useEffect, useState } from 'react';
 import FeedItem from '../components/feed/feedItem';
 import { ScrollArea } from '../components/ui/scroll-area';
@@ -10,6 +10,8 @@ const Home = () => {
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
   const queryClient = useQueryClient();
+  
+  const [selectedTab, setSelectedTab] = useState('all');
   const [totalFeeds, setTotalFeeds] = useState<number | null>(null);
 
   const fetchFeeds = async ({ pageParam }) => {
@@ -18,7 +20,10 @@ const Home = () => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ pageParam: pageParam }),
+      body: JSON.stringify({ 
+        pageParam: pageParam,
+        type: selectedTab === 'following' ? 'following' : 'all' 
+      }),
     });
     if (!response.ok) {
       throw new Error("서버에서 피드를 불러오는 데 실패했습니다.");
@@ -32,7 +37,7 @@ const Home = () => {
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: ['feeds'],
+    queryKey: ['feeds', selectedTab],  
     queryFn: ({ pageParam = null }) => fetchFeeds({ pageParam }),
     getNextPageParam: (lastPage) => {
       const lastFeed = lastPage.feeds[lastPage.feeds.length - 1];
@@ -50,7 +55,6 @@ const Home = () => {
     }
   }, [data]);
 
-  // 무한 스크롤 설정
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -83,32 +87,54 @@ const Home = () => {
   return (
     <div className="flex justify-center items-center h-screen bg-[#f0f4f8] font-sans">
       <Sibar />
-      {/* ScrollArea 폭을 700px로 고정 */}
-      <ScrollArea ref={scrollRef} className="w-full max-w-[700px] h-[100%] overflow-y-visible overflow-visible">
-        {/* 그리드 레이아웃: FeedItem 크기에 맞춰 배치 */}
-        <div className="grid grid-cols-1  sm:grid-cols-2 gap-4 mr-5 ml-8 ">
-          {feeds.map((feed) => (
-            <FeedItem
-              key={feed.postId}
-              profileImage={feed.profileImage}
-              postId={feed.postId}
-              nickname={feed.nickname}
-              userId={feed.email}
-              content={feed.content}
-              images={feed.images}
-              time={feed.createdAt}
-              commentCount={feed.commentCount}
-              likeCount={feed.likeCount}
-            />
-          ))}
+      
+      <div className="flex flex-col w-full max-w-[700px] h-[100%] overflow-y-visible overflow-visible">
+        
+        {/* 탭 UI: 전체 피드와 팔로우한 사람들의 피드를 선택하는 버튼 */}
+        <div className="flex w-full justify-between bg-white rounded-xl shadow-md">
+          <button
+            className={`flex-grow py-4 flex items-center justify-center font-semibold transition duration-300 
+            ${selectedTab === 'all' ? 'bg-gradient-to-r from-blue-400 to-blue-600 text-white shadow-lg' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+            onClick={() => setSelectedTab('all')}
+          >
+            전체 피드
+          </button>
+          <button
+            className={`flex-grow py-4 flex items-center justify-center font-semibold transition duration-300
+            ${selectedTab === 'following' ? 'bg-gradient-to-r from-blue-400 to-blue-600 text-white shadow-lg' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+            onClick={() => setSelectedTab('following')}
+          >
+            팔로잉 피드
+          </button>
         </div>
-        {isFetchingNextPage && (
-          <div className="flex justify-center items-center p-10">
-            <Spinner />
+
+        <ScrollArea ref={scrollRef} className="w-full mt-5">
+          {/* 그리드 레이아웃: FeedItem 크기에 맞춰 배치 */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mr-5 ml-8 ">
+            {feeds.map((feed) => (
+              <FeedItem
+                key={feed.postId}
+                profileImage={feed.profileImage}
+                postId={feed.postId}
+                nickname={feed.nickname}
+                userId={feed.email}
+                content={feed.content}
+                images={feed.images}
+                time={feed.createdAt}
+                commentCount={feed.commentCount}
+                likeCount={feed.likeCount}
+              />
+            ))}
           </div>
-        )}
-        <div ref={loadMoreRef} className="h-1" />
-      </ScrollArea>
+          
+          {isFetchingNextPage && (
+            <div className="flex justify-center items-center p-10">
+              <Spinner />
+            </div>
+          )}
+          <div ref={loadMoreRef} className="h-1" />
+        </ScrollArea>
+      </div>
     </div>
   );
 };

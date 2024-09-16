@@ -42,7 +42,7 @@ const Sibar = () => {
     await fetchProfile();
     const email = authStore.getState().email;
     if (email) {
-      router.push(`/profile/${email}`);
+      router.push(`/myprofile`);
     } else {
       alert("로그인이 필요한 작업입니다.");
       router.push("/login");

@@ -1,56 +1,61 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "../../../lib/firebase/firebase";
-import { collection, getDocs, query, where, orderBy, limit, startAfter, Timestamp, doc as firestoreDoc, getDoc, getCountFromServer } from 'firebase/firestore';  // doc을 firestoreDoc으로 변경
+import { collection, getDocs, query, where, orderBy, limit, startAfter, Timestamp, doc as firestoreDoc, getDoc, getCountFromServer } from 'firebase/firestore';  
 import { post } from "../../../types/types";
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, pageParam } = await req.json();
+    const { email, pageParam, type } = await req.json();
     
     const feedCollection = collection(db, 'Feed');
-
     const totalFeedsSnapshot = await getCountFromServer(feedCollection);
     const totalFeeds = totalFeedsSnapshot.data().count;
 
     let q;
 
-    // 페이지네이션 처리
-    if (pageParam) {
-      const lastVisibleTimestamp = Timestamp.fromDate(new Date(pageParam));
+    if (type === 'following' && email) {
+      // 팔로우한 유저들의 피드 가져오기
+      const userDocRef = firestoreDoc(db, 'user', email); // 현재 유저의 정보 가져오기
+      const userDocSnap = await getDoc(userDocRef);
+
+      if (!userDocSnap.exists()) {
+        throw new Error('유저 정보를 찾을 수 없습니다.');
+      }
+
+      const userData = userDocSnap.data();
+      const followingList = userData?.following || [];
+
+      if (followingList.length === 0) {
+        return NextResponse.json({ feeds: [], nextCursor: null, totalFeeds: 0 });
+      }
+
+      // 페이지네이션 처리
+      const lastVisibleTimestamp = pageParam ? Timestamp.fromDate(new Date(pageParam)) : null;
+
+      q = query(
+        feedCollection,
+        where('email', 'in', followingList), // 팔로우한 유저들의 피드 가져오기
+        orderBy('createdAt', 'desc'),
+        ...(lastVisibleTimestamp ? [startAfter(lastVisibleTimestamp)] : []),
+        limit(10)
+      );
+    } else {
+      // 전체 피드 또는 특정 유저의 피드 가져오기
+      const lastVisibleTimestamp = pageParam ? Timestamp.fromDate(new Date(pageParam)) : null;
 
       if (email) {
-        // 특정 유저의 피드 불러오기
         q = query(
           feedCollection,
           where('email', '==', email),
           orderBy('createdAt', 'desc'),
-          startAfter(lastVisibleTimestamp),
+          ...(lastVisibleTimestamp ? [startAfter(lastVisibleTimestamp)] : []),
           limit(10)
         );
       } else {
-        // 전체 피드 불러오기
         q = query(
           feedCollection,
           orderBy('createdAt', 'desc'),
-          startAfter(lastVisibleTimestamp),
-          limit(10)
-        );
-      }
-    } else {
-      // 첫 페이지 불러오기
-      if (email) {
-        // 특정 유저의 피드 불러오기
-        q = query(
-          feedCollection,
-          where('email', '==', email),
-          orderBy('createdAt', 'desc'),
-          limit(10)
-        );
-      } else {
-        // 전체 피드 불러오기
-        q = query(
-          feedCollection,
-          orderBy('createdAt', 'desc'),
+          ...(lastVisibleTimestamp ? [startAfter(lastVisibleTimestamp)] : []),
           limit(10)
         );
       }
@@ -81,7 +86,7 @@ export async function POST(req: NextRequest) {
       }
 
       return {
-        postId: feedDoc.id,  // feedDoc으로 변경
+        postId: feedDoc.id,
         nickname,
         profileImage,
         email: data.email,

@@ -1,23 +1,24 @@
-"use client"
+'use client'
 import { Profile, ProfileFallback, ProfileImage } from "../ui/profile";
 import { Button } from "../ui/button";
-import { authStore } from "../../states/store";
 import { profileEditStore } from "../../states/store";
+import { MainProfileProps } from "../../types/types";
 
-const MainProfile = () => {
-  const { email, nickname, bio, follower, following, profileImage } = authStore(state => ({
-    email: state.email,
-    nickname: state.nickname,
-    bio: state.bio,
-    follower: state.follower,
-    following: state.following,
-    profileImage: state.profileImage,
-  }));
 
- 
+const MainProfile: React.FC<MainProfileProps> = ({
+  email,
+  nickname,
+  bio,
+  follower,
+  following,
+  profileImage,
+  isCurrentUser,
+}) => {
+  
+  // 프로필 수정 핸들러
   const handleEdit = () => {
     profileEditStore.getState().openEdit();
-  }
+  };
 
   return (
     <div className="bg-white p-5 border-b-1 border-[#d6d6d6] z-10 flex flex-row justify-evenly">
@@ -32,26 +33,24 @@ const MainProfile = () => {
           <div className="flex flex-col ml-3">
             <div className="flex flex-row ">
               <p className="font-bold text-xl">{nickname}</p>
-              
             </div>
-
             <p className="text-s">{email}</p>
             {/* 상태메시지 */}
             <div className="mt-3 mb-5">
-              <p className="text-s">
-                {bio || ''}
-              </p>
+              <p className="text-s">{bio || ''}</p>
             </div>
             <div className='flex flex-row mb-2 text-m font-bold'>
               <p className='mr-[60px]'>팔로잉 {following || 0}</p>
               <p>팔로워 {follower || 0}</p>
             </div>
           </div>
-          
         </div>
-        
       </div>
-      <Button variant="outline" onClick={handleEdit} >프로필 수정</Button>
+      
+      {/* 프로필 수정 버튼은 내 프로필일 때만 표시 */}
+      {isCurrentUser && (
+        <Button variant="outline" onClick={handleEdit}>프로필 수정</Button>
+      )}
     </div>
   );
 };

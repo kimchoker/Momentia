@@ -1,16 +1,55 @@
-import React, { useState, useEffect } from 'react';
-import { uploadImage, savePost } from '../../lib/api/feedApi'; // 기존 API 함수
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { uploadImage, savePost } from '../../lib/api/feedApi';
 import { useModalStore } from '../../states/store';
 import { Button } from '../ui/button';
 import { authStore } from '../../states/store';
 import { CircleX } from 'lucide-react';
-import { useQueryClient, useMutation } from '@tanstack/react-query'; // react-query 추가
+import { useQueryClient, useMutation } from '@tanstack/react-query';
+import { useDrag, useDrop, DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+
+const ItemType = 'IMAGE'; // 드래그 가능한 아이템 타입
+
+// 이미지 썸네일 컴포넌트
+const DraggableImage = ({ url, index, moveImage, handleImageDelete }: any) => {
+  const ref = useRef<HTMLDivElement>(null); // useRef로 ref 생성
+
+  const [, drag] = useDrag({
+    type: ItemType,
+    item: { index },
+  });
+
+  const [, drop] = useDrop({
+    accept: ItemType,
+    hover: (item: any) => {
+      if (item.index !== index) {
+        moveImage(item.index, index);
+        item.index = index;
+      }
+    },
+  });
+
+  drag(drop(ref)); // drag와 drop을 결합
+
+  return (
+    <div ref={ref} className="relative w-20 h-20 border border-gray-300 rounded-lg overflow-hidden m-1">
+      <img src={url} alt={`Preview ${index}`} className="w-full h-full object-cover" />
+      <button
+        type="button"
+        onClick={() => handleImageDelete(index)}
+        className="absolute top-1 right-1 bg-transparent text-white rounded-full hover:bg-red-600"
+      >
+        <CircleX />
+      </button>
+    </div>
+  );
+};
 
 const WritingComponent = () => {
   const [content, setContent] = useState<string>('');
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
-  const queryClient = useQueryClient(); // useQueryClient로 queryClient 가져오기
+  const queryClient = useQueryClient();
   const { closeModal } = useModalStore();
   const { uid, email, nickname } = authStore();
 
@@ -19,17 +58,42 @@ const WritingComponent = () => {
     setContent(e.target.value);
   };
 
-  // 이미지 선택 핸들러
+  // 이미지 선택 핸들러 (최대 5장 제한)
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files) {
       const newImages = Array.from(files);
+      const totalImages = selectedImages.length + newImages.length;
+
+      if (totalImages > 5) {
+        alert('이미지는 최대 5장까지 업로드할 수 있습니다.');
+        return;
+      }
+
       setSelectedImages([...selectedImages, ...newImages]);
 
       const newPreviewUrls = newImages.map(image => URL.createObjectURL(image));
       setPreviewUrls([...previewUrls, ...newPreviewUrls]);
     }
   };
+
+  // 이미지 순서 변경 핸들러
+  const moveImage = useCallback(
+    (dragIndex: number, hoverIndex: number) => {
+      const newPreviewUrls = [...previewUrls];
+      const draggedUrl = newPreviewUrls[dragIndex];
+      newPreviewUrls.splice(dragIndex, 1);
+      newPreviewUrls.splice(hoverIndex, 0, draggedUrl);
+      setPreviewUrls(newPreviewUrls);
+
+      const newSelectedImages = [...selectedImages];
+      const draggedImage = newSelectedImages[dragIndex];
+      newSelectedImages.splice(dragIndex, 1);
+      newSelectedImages.splice(hoverIndex, 0, draggedImage);
+      setSelectedImages(newSelectedImages);
+    },
+    [previewUrls, selectedImages]
+  );
 
   // 이미지 삭제 핸들러
   const handleImageDelete = (index: number) => {
@@ -62,74 +126,75 @@ const WritingComponent = () => {
       await savePost(postData);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['feeds'] }); // queryKey를 객체 형태로 전달
-      closeModal(); // 모달 닫기
+      queryClient.invalidateQueries({ queryKey: ['feeds'] });
+      closeModal();
     },
-    
     onError: (error) => {
-      console.error("글 작성 중 오류:", error);
+      console.error('글 작성 중 오류:', error);
     },
   });
 
   // 글 저장 핸들러
   const handlePostSubmit = async () => {
     if (!content.trim()) {
-      alert("글 내용을 입력하세요.");
+      alert('글 내용을 입력하세요.');
       return;
     }
 
-    postMutation.mutate(); // 글 작성 mutation 실행
+    postMutation.mutate();
   };
 
   useEffect(() => {
     return () => {
-      previewUrls.forEach((url) => URL.revokeObjectURL(url));
+      previewUrls.forEach(url => URL.revokeObjectURL(url));
     };
   }, [previewUrls]);
 
   return (
-    <div className="max-w-full h-full p-1 bg-white rounded-lg overflow-auto">
-      <textarea
-        className="w-[100%] p-3 border border-gray-300  min-h-40 h-[75%] rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
-        placeholder="글을 작성해주세요."
-        value={content}
-        onChange={handleChange}
-      />
-      <div className="mb-2">
-        <label htmlFor="file-upload" className="cursor-pointer inline-block px-4 py-2 bg-black transition-all 0.1s ease-in text-white rounded-md shadow-sm hover:bg-[#333333] focus:outline-none focus:ring-2 focus:ring-indigo-500">
-          이미지 업로드
-        </label>
-        <input
-          id="file-upload"
-          type="file"
-          accept="image/*"
-          multiple
-          onChange={handleImageChange}
-          className="hidden" // 숨겨진 인풋 필드
+    <DndProvider backend={HTML5Backend}>
+      <div className="max-w-full h-full p-1 bg-white rounded-lg overflow-auto">
+        <textarea
+          className="w-[100%] p-3 border border-gray-300 min-h-40 h-[75%] rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+          placeholder="글을 작성해주세요."
+          value={content}
+          onChange={handleChange}
         />
-      </div>
+        <div className="mb-2">
+          <label
+            htmlFor="file-upload"
+            className="cursor-pointer inline-block px-4 py-2 bg-black transition-all 0.1s ease-in text-white rounded-md shadow-sm hover:bg-[#333333] focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          >
+            이미지 업로드
+          </label>
+          <input
+            id="file-upload"
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handleImageChange}
+            className="hidden"
+          />
+        </div>
 
-      <div className="mt-4 flex flex-wrap">
-        {previewUrls.map((url, index) => (
-          <div key={index} className="relative w-20 h-20 border border-gray-300 rounded-lg overflow-hidden m-1">
-            <img src={url} alt={`Preview ${index}`} className="w-full h-full object-cover" />
-            <button
-              type="button"
-              onClick={() => handleImageDelete(index)}
-              className="absolute top-1 right-1 bg-transparent text-white rounded-full hover:bg-red-600"
-            >
-              <CircleX />
-            </button>
-          </div>
-        ))}
+        <div className="mt-4 flex flex-wrap">
+          {previewUrls.map((url, index) => (
+            <DraggableImage
+              key={index}
+              url={url}
+              index={index}
+              moveImage={moveImage}
+              handleImageDelete={handleImageDelete}
+            />
+          ))}
+        </div>
+        <div className="mt-4 relative bottom-2 right-2 flex flex-row justify-end">
+          <Button className="mr-3" onClick={handlePostSubmit}>
+            글쓰기
+          </Button>
+          <Button onClick={closeModal}>취소</Button>
+        </div>
       </div>
-      <div className="mt-4 relative bottom-2 right-2 flex flex-row justify-end">
-        <Button className="mr-3" onClick={handlePostSubmit}>
-          글쓰기
-        </Button>
-        <Button onClick={closeModal}>취소</Button>
-      </div>
-    </div>
+    </DndProvider>
   );
 };
 

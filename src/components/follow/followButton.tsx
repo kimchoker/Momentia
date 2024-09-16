@@ -65,11 +65,11 @@ const FollowButton: React.FC<FollowButtonProps> = ({ targetUserId, isFollowing }
   return (
     <button
       onClick={handleFollowClick}
-      className={`px-4 py-2 text-white rounded ${
-        following ? 'bg-red-500 hover:bg-red-600' : 'bg-blue-500 hover:bg-blue-600'
+      className={`px-4 py-2 rounded ${
+        following ? 'bg-black hover:bg-#333333 text-white border border-white' : 'bg-white hover:bg-#d6d6d6 text-black border border-black'
       }`}
     >
-      {following ? '언팔로우' : '팔로우'}
+      {following ? '팔로잉' : '팔로우'}
     </button>
   );
 };
