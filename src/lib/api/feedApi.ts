@@ -3,15 +3,21 @@ import { db, storage } from "../firebase/firebase";
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { PostData, UpdatePostData } from '../../types/types';
 import { getAuth } from "firebase/auth";
+import { convertToWebp } from "../imageResize/imageResizing";
 import axios from 'axios';
 
 // 이미지 업로드
 const uploadImage = async (file: File): Promise<{ url: string, fileName: string }> => {
   try {
-    const uploadedFileName = `${Date.now()}_${file.name}`;
+    // 이미지를 WebP로 변환
+    const webpBlob = await convertToWebp(file);
+    const uploadedFileName = `${Date.now()}_${file.name.replace(/\.[^/.]+$/, ".webp")}`;
+    
+    // Firebase에 업로드
     const storageRef = ref(storage, `images/${uploadedFileName}`);
-    const snapshot = await uploadBytes(storageRef, file);
+    const snapshot = await uploadBytes(storageRef, webpBlob);
     const url = await getDownloadURL(snapshot.ref);
+    
     return { url, fileName: uploadedFileName };
   } catch (error) {
     console.error('Upload failed:', error);
@@ -19,7 +25,6 @@ const uploadImage = async (file: File): Promise<{ url: string, fileName: string 
     throw new Error('Image upload failed');
   }
 };
-
 // 글 업로드
 const savePost = async (postData: PostData) => {
   try {

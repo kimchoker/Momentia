@@ -5,6 +5,7 @@ import { ScrollArea } from '../components/ui/scroll-area';
 import Sibar from '../components/sidebar/new-neo-sidebar';
 import Spinner from '../components/ui/spinner';
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios'; // Axios 임포트
 
 const Home = () => {
   const scrollRef = useRef<HTMLDivElement | null>(null);
@@ -15,20 +16,16 @@ const Home = () => {
   const [totalFeeds, setTotalFeeds] = useState<number | null>(null);
 
   const fetchFeeds = async ({ pageParam }) => {
-    const response = await fetch(`/api/feed`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ 
+    try {
+      const response = await axios.post('/api/feed', {
         pageParam: pageParam,
-        type: selectedTab === 'following' ? 'following' : 'all' 
-      }),
-    });
-    if (!response.ok) {
+        type: selectedTab === 'following' ? 'following' : 'all'
+      });
+
+      return response.data;
+    } catch (error) {
       throw new Error("서버에서 피드를 불러오는 데 실패했습니다.");
     }
-    return response.json();
   };
 
   const {

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import ImageModal from './imageModal';
 import EditPostComponent from './feedEdit';
 import CommentSection from './CommentSection';
-import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
+import AvatarProfile from '../profile/AvatarProfile'; // AvatarProfile 임포트
 import { useModalStore, authStore } from '../../states/store';
 import { X, Edit, Trash } from 'lucide-react'; // 아이콘 추가
 import { deletePost } from '../../lib/api/feedApi';
@@ -25,12 +25,9 @@ const FeedDetail = ({ nickname, userId, content, images, postId, time, likeCount
   const likeMutation = useMutation({
     mutationFn: () => likePost(postId, email),
     onMutate: async () => {
-      // 기존 데이터를 백업
       await queryClient.cancelQueries({ queryKey: ['post', postId] });
-  
       const previousPost = queryClient.getQueryData(['post', postId]);
 
-      // 낙관적 업데이트: 캐시에서 likeCount를 증가
       queryClient.setQueryData(['post', postId], (oldData: any) => {
         if (oldData && typeof oldData === 'object' && 'likeCount' in oldData) {
           return {
@@ -41,19 +38,17 @@ const FeedDetail = ({ nickname, userId, content, images, postId, time, likeCount
         return oldData;
       });
 
-      setHasLiked(true); // 좋아요 상태 변경
-      setCurrentLikeCount((prevCount) => prevCount + 1);  // 상태 업데이트
+      setHasLiked(true);
+      setCurrentLikeCount((prevCount) => prevCount + 1);
 
-      return { previousPost }; // 에러 발생 시 복원할 데이터
+      return { previousPost };
     },
     onError: (error, variables, context) => {
-      // 에러 발생 시, 캐시 복원
       queryClient.setQueryData(['post', postId], context.previousPost);
-      setHasLiked(false); // 좋아요 상태 복원
-      setCurrentLikeCount((prevCount) => prevCount - 1);  // 상태 복원
+      setHasLiked(false);
+      setCurrentLikeCount((prevCount) => prevCount - 1);
     },
     onSettled: () => {
-      // 성공/실패에 관계없이 데이터를 다시 가져옴
       queryClient.invalidateQueries({ queryKey: ['post', postId] });
     },
   });
@@ -63,7 +58,6 @@ const FeedDetail = ({ nickname, userId, content, images, postId, time, likeCount
     mutationFn: () => unlikePost(postId, email),
     onMutate: async () => {
       await queryClient.cancelQueries({ queryKey: ['post', postId] });
-
       const previousPost = queryClient.getQueryData(['post', postId]);
 
       queryClient.setQueryData(['post', postId], (oldData: any) => {
@@ -76,15 +70,15 @@ const FeedDetail = ({ nickname, userId, content, images, postId, time, likeCount
         return oldData;
       });
 
-      setHasLiked(false); // 좋아요 취소
-      setCurrentLikeCount((prevCount) => prevCount - 1);  // 상태 업데이트
+      setHasLiked(false);
+      setCurrentLikeCount((prevCount) => prevCount - 1);
 
       return { previousPost };
     },
     onError: (error, variables, context) => {
       queryClient.setQueryData(['post', postId], context.previousPost);
-      setHasLiked(true); // 좋아요 상태 복원
-      setCurrentLikeCount((prevCount) => prevCount + 1);  // 상태 복원
+      setHasLiked(true);
+      setCurrentLikeCount((prevCount) => prevCount + 1);
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['post', postId] });
@@ -99,10 +93,8 @@ const FeedDetail = ({ nickname, userId, content, images, postId, time, likeCount
     }
 
     if (hasLiked) {
-      // 좋아요 취소
       unlikeMutation.mutate(postId); 
     } else {
-      // 좋아요 추가
       likeMutation.mutate(postId); 
     }
   };
@@ -145,83 +137,79 @@ const FeedDetail = ({ nickname, userId, content, images, postId, time, likeCount
     );
   }
 
-  // 글 작성 시간 포맷팅
   const createdAt = new Date(time);
   const formattedCreatedAt = `${createdAt.getFullYear() % 100}년 ${createdAt.getMonth() + 1}월 ${createdAt.getDate()}일 ${createdAt.getHours()}시 ${createdAt.getMinutes()}분`;
 
   return (
     <>
-    <button className='w-5 h-5' onClick={closeModal}>
+      <button className='w-5 h-5' onClick={closeModal}>
         <X className="w-5 h-5 absolute top-5 right-5 z-25" />
       </button>
-    <ScrollArea>
-      <div className="relative p-3 bg-white rounded-lg overflow-hidden w-full mx-auto"> {/* 가로 길이 확장 */}
-
-      <div className="flex flex-row justify-start items-center relative">
-        <Avatar>
-          <AvatarImage src={profileImage} />
-          <AvatarFallback />
-        </Avatar>
-        <div className="flex flex-col ml-3 text-gray-700">
-          <p className="font-bold">{nickname}</p>
-          <p className="text-xs">{userId}</p>
-          <p className="text-xs text-gray-400 mt-1">{formattedCreatedAt}</p>
-        </div>
-        <div className="absolute top-0 right-0 text-gray-600">
-          {email === userId && (
-            <div className="flex space-x-2">
-              <button
-                onClick={handleEdit}
-                className="p-1 text-gray-500 hover:text-black"
-              >
-                <Edit className="w-5 h-5" />
-              </button>
-              <button
-                onClick={handleDelete}
-                className="p-1 text-gray-500 hover:text-red-500"
-              >
-                <Trash className="w-5 h-5" />
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-
-      <div className="mt-4">
-        <p>{content}</p>
-        <div className="flex gap-2 overflow-x-auto mt-2">
-          {images && images.map((image, index) => (
-            <img
-              key={index}
-              src={image.url}
-              alt={image.fileName}
-              className="w-32 h-32 object-cover rounded-md cursor-pointer"
-              onClick={() => handleImageClick(image.url)} // 이미지 클릭 시 모달 열기
-            />
-          ))}
-        </div>
-      </div>
-
-      <div className="flex items-center justify-between mt-4 text-gray-500">
-        <div className="flex items-center justify-start">
-          <button onClick={handleLikeClick} className="focus:outline-none flex flex-row">
-            <FaHeart className={`m-2 ${hasLiked ? 'text-red-500' : 'text-gray-500'}`} />
-            <span className='mt-1'>{currentLikeCount}</span>  {/* 상태를 사용 */}
-          </button>
-          <div className='flex flex-row'>
-            <FaComment className={`m-2 text-gray-500'`} />
-            <span className='mt-1'>{commentCount}</span>
+      <ScrollArea>
+        <div className="relative p-3 bg-white rounded-lg overflow-hidden w-full mx-auto"> {/* 가로 길이 확장 */}  
+          
+          {/* 프로필과 작성 시간을 같은 줄에 배치 */}
+          <div className="flex justify-between items-center mb-4">
+            <AvatarProfile nickname={nickname} userId={userId} profileImage={profileImage} />
+            <p className="text-gray-500 text-sm">{formattedCreatedAt}</p>
           </div>
+
+          {/* 글 내용 표시 */}
+          <div className="mt-4">
+            <p>{content}</p>
+            <div className="flex gap-2 overflow-x-auto mt-2">
+              {images && images.map((image, index) => (
+                <img
+                  key={index}
+                  src={image.url}
+                  alt={image.fileName}
+                  className="w-32 h-32 object-cover rounded-md cursor-pointer"
+                  onClick={() => handleImageClick(image.url)} // 이미지 클릭 시 모달 열기
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* 좋아요/댓글수와 수정/삭제 버튼을 같은 줄에 배치 */}
+          <div className="flex items-center justify-between mt-4 text-gray-500">
+            <div className="flex items-center justify-start">
+              <button onClick={handleLikeClick} className="focus:outline-none flex flex-row">
+                <FaHeart className={`m-2 ${hasLiked ? 'text-red-500' : 'text-gray-500'}`} />
+                <span className='mt-1'>{currentLikeCount}</span>  {/* 상태를 사용 */}
+              </button>
+              <div className='flex flex-row'>
+                <FaComment className={`m-2 text-gray-500'`} />
+                <span className='mt-1'>{commentCount}</span>
+              </div>
+            </div>
+            
+            {email === userId && (
+              <div className="flex space-x-2">
+                <button
+                  onClick={handleEdit}
+                  className="p-1 text-gray-500 hover:text-black"
+                >
+                  <Edit className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={handleDelete}
+                  className="p-1 text-gray-500 hover:text-red-500"
+                >
+                  <Trash className="w-5 h-5" />
+                </button>
+              </div>
+            )}
+          </div>
+
+          <hr className="my-6 border-gray-300" />
+
+          {/* 댓글 섹션 */}
+          <CommentSection postId={postId} />
+
+          {/* 이미지 모달 */}
+          {selectedImage && <ImageModal imageUrl={selectedImage} onClose={() => setSelectedImage(null)} />}
         </div>
-      </div>
-
-      <hr className="my-6 border-gray-300" />
-
-      <CommentSection postId={postId} />
-
-      {selectedImage && <ImageModal imageUrl={selectedImage} onClose={() => setSelectedImage(null)} />}
-    </div>
-    </ScrollArea>
+      </ScrollArea>
     </>
   );
 };

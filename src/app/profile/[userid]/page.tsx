@@ -1,37 +1,25 @@
 'use client';
-
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
+import axios from 'axios';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import MainProfile from '../../../components/profile/mainprofile';
 import FeedItem from '../../../components/feed/feedItem';
 import { ScrollArea } from '../../../components/ui/feed-scroll-area';
 import Sibar from '../../../components/sidebar/new-neo-sidebar';
 import Spinner from '../../../components/ui/spinner';
-import { authStore } from '../../../states/store';
+import { useParams } from 'next/navigation';
 
 // 유저 피드를 가져오는 API 요청
-const fetchUserFeeds = async (userId: string, { pageParam }) => {
-  const response = await fetch(`/api/feed`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ email: userId, pageParam }),
+const fetchUserFeeds = async (userid: string, { pageParam }) => {
+  const response = await axios.post('/api/feed/user', {
+    email: userid,
+    pageParam,
   });
-  if (!response.ok) {
-    throw new Error('피드를 불러오는 데 실패했습니다.');
-  }
-  return response.json();
+  return response.data;
 };
 
 const UserProfilePage = () => {
-  const { email, nickname, bio, profileImage } = authStore((state) => ({
-    email: state.email,
-    nickname: state.nickname,
-    bio: state.bio,
-    profileImage: state.profileImage,
-  })); // zustand에서 유저 정보 가져오기
-
+  const { userid } = useParams();
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
@@ -42,20 +30,20 @@ const UserProfilePage = () => {
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: ['feeds', email],
-    queryFn: ({ pageParam = null }) => fetchUserFeeds(email as string, { pageParam }),
+    queryKey: ['feeds', userid],  // userId를 기반으로 데이터 가져오기
+    queryFn: ({ pageParam = null }) => fetchUserFeeds(userid as string, { pageParam }),
     getNextPageParam: (lastPage) => {
       const lastFeed = lastPage.feeds[lastPage.feeds.length - 1];
       return lastFeed ? lastFeed.createdAt : undefined;
     },
-    enabled: !!email,
+    enabled: !!userid,
     initialPageParam: null,
   });
 
   const feeds = feedData?.pages.flatMap(page => page.feeds) || [];
 
   useEffect(() => {
-    if (!email) return;
+    if (!userid) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -78,10 +66,28 @@ const UserProfilePage = () => {
         observer.unobserve(loadMoreRef.current);
       }
     };
-  }, [fetchNextPage, hasNextPage, isFetchingNextPage, email]);
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage, userid]);
 
-  // 유저 정보가 없을 때 처리
-  if (!email || !nickname || !bio || !profileImage) return <p>유저 정보를 가져오는 중 오류가 발생했습니다.</p>;
+  // API로부터 유저 정보도 가져오는 로직이 필요함
+  const [userProfile, setUserProfile] = useState(null);
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const response = await axios.get(`/api/user/${userid}`);
+        console.log('프로필 데이터:', response.data);
+        setUserProfile(response.data);
+      } catch (error) {
+        console.error('유저 정보를 가져오는 중 오류 발생:', error);
+      }
+    };
+
+    if (userid) {
+      fetchUserProfile();
+    }
+  }, [userid]);
+
+  if (!userProfile) return <p>유저 정보를 가져오는 중입니다...</p>;
 
   return (
     <div className="flex justify-center items-center h-screen font-nanum-barun-gothic p-0 mt-0 mb-0">
@@ -90,13 +96,13 @@ const UserProfilePage = () => {
 
         {/* 프로필 정보 표시 */}
         <MainProfile
-          email={email}
-          nickname={nickname || ''}
-          bio={bio || ''}
-          follower={0}  // 팔로워, 팔로잉 정보가 없다면 기본값으로 0 설정
-          following={0}
-          profileImage={profileImage || ''}
-          isCurrentUser={true} // 현재 로그인한 유저인지 확인
+          email={userProfile.email || ""}
+          nickname={userProfile.nickname || ''}
+          bio={userProfile.bio || ''}
+          follower={userProfile.follower || 0}  // 팔로워 정보
+          following={userProfile.following || 0}  // 팔로잉 정보
+          profileImage={userProfile.profileImage || ''}
+          isCurrentUser={userProfile.email === userid}  // 현재 로그인한 유저인지 확인
         />
 
         {/* 유저의 피드 표시 */}

@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { Profile, ProfileFallback, ProfileImage } from "../ui/profile";
 import { Button } from "../ui/button";
 import { profileEditStore, authStore } from "../../states/store";
@@ -26,7 +27,7 @@ const MainProfile: React.FC<MainProfileProps> = ({
   };
 
   return (
-    <div className="bg-white p-5 border-b-1 border-[#d6d6d6] z-10 flex flex-row justify-evenly">
+    <div className="bg-white p-5 border-b border-[#d6d6d6] z-10 flex flex-row justify-between">
       <div className="flex flex-row">
         {/* 프로필 이미지 */}
         <Profile>
@@ -39,20 +40,23 @@ const MainProfile: React.FC<MainProfileProps> = ({
           <ProfileFallback />
         </Profile>
         {/* 닉네임/아이디 */}
-        <div className="flex flex-row ml-5 justify-evenly">
-          <div className="flex flex-col ml-3">
-            <div className="flex flex-row ">
-              <p className="font-bold text-xl">{nickname}</p>
-            </div>
-            <p className="text-s">{email}</p>
-            {/* 상태메시지 */}
-            <div className="mt-3 mb-5">
-              <p className="text-s">{bio || ""}</p>
-            </div>
-            <div className="flex flex-row mb-2 text-m font-bold">
-              <p className="mr-[60px]">팔로잉 {following || 0}</p>
-              <p>팔로워 {follower || 0}</p>
-            </div>
+        <div className="flex flex-col ml-5 justify-evenly">
+          <div className="flex flex-row">
+            <p className="font-bold text-xl">{nickname}</p>
+          </div>
+          <p className="text-s">{email}</p>
+          {/* 상태 메시지 */}
+          <div className="mt-3 mb-5">
+            <p className="text-s">{bio || ""}</p>
+          </div>
+          {/* 팔로우/팔로잉 정보 */}
+          <div className="flex flex-row mb-2 text-m font-bold">
+            <Link href={`/profile/${email}/following`} className="mr-[60px] hover:underline">
+              팔로잉 {following || 0}
+            </Link>
+            <Link href={`/profile/${email}/followers`} className="hover:underline">
+              팔로워 {follower || 0}
+            </Link>
           </div>
         </div>
       </div>
