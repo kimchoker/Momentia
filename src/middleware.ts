@@ -1,26 +1,30 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-// NextRequest: Next.js에서 들어오는 http 요청
-// NextResponse: 미들웨어에서 다시 보내는 응답 -> 리디렉션, 요청 계속 등
+import { NextRequest, NextResponse } from 'next/server';
 
-export const middleware = (req: NextRequest) => {
-  // const { pathname } = req.nextUrl;
-  // const loginNecessary = ["/profile", "/notification", "/dm"];
-	
-	// console.log('Current Pathname:', pathname);
-  // console.log('Auth Cookie:', req.cookies.get('auth'));
+// 로그인 상태를 확인하는 미들웨어
+export function middleware(req: NextRequest) {
+  // const token = req.cookies.get('token'); // 쿠키에 저장된 로그인 토큰 가져오기
+  
+  // const url = req.nextUrl.clone();
 
-  // // auth 쿠키가 없으면
-  // if (!req.cookies.get('auth')) {
-  //   // .some() -> JS 의 배열 메소드 배열의 요소 중 최소 하나가 콜백함수에 정의된 조건에 해당하는지 확인
-  //   if (loginNecessary.some((path) => pathname.startsWith(path))) {
-  //     return NextResponse.redirect(new URL('/login', req.url));
+  // if (!token) {
+  //   // 로그인되지 않은 상태: /beforeLogin 페이지로 리디렉션
+  //   if (url.pathname === '/') {
+  //     url.pathname = '/beforeLogin'; // 'beforeLogin' 페이지로 재작성
+  //     return NextResponse.rewrite(url);
+  //   }
+  // } else {
+  //   // 로그인된 상태: /afterLogin 페이지로 리디렉션
+  //   if (url.pathname === '/') {
+  //     url.pathname = '/afterLogin'; // 'afterLogin' 페이지로 재작성
+  //     return NextResponse.rewrite(url);
   //   }
   // }
+
+  // // 그 외의 요청은 원래대로 처리
   // return NextResponse.next();
 }
 
+// 미들웨어가 적용될 경로 설정
 export const config = {
-  matcher: ['/profile/:path*', '/notification/:path*', '/dm/:path*'],
+  matcher: ['/', '/beforeLogin', '/afterLogin'], // 적용 경로 설정
 };
-

@@ -25,6 +25,34 @@ const uploadImage = async (file: File): Promise<{ url: string, fileName: string 
     throw new Error('Image upload failed');
   }
 };
+
+// 전체 피드 글 불러오기
+const fetchFeeds = async (selectedTab: string, pageParam: string | null) => {
+  try {
+    const response = await axios.post('/api/feed', {
+      pageParam: pageParam,
+      type: selectedTab === 'following' ? 'following' : 'all',
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error('서버에서 피드를 불러오는 데 실패했습니다.');
+  }
+};
+
+
+// 특정 유저 피드 글 불러오기
+const fetchUserFeeds = async (userId: string, pageParam: string | null) => {
+  try {
+    const response = await axios.post('/api/feed/user', {
+      email: userId,
+      pageParam,
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error('유저 피드를 불러오는 데 실패했습니다.');
+  }
+};
+
 // 글 업로드
 const savePost = async (postData: PostData) => {
   try {
@@ -140,4 +168,4 @@ const unlikePost = async (postId: string, email: string) => {
   });
   return response.data;
 };
-export { uploadImage, savePost, updatePost, deletePost, deleteComment, likePost, unlikePost, fetchComments, createComment, deleteCommentApi };
+export { uploadImage, savePost, updatePost, deletePost, deleteComment, likePost, unlikePost, fetchComments, createComment, deleteCommentApi, fetchUserFeeds, fetchFeeds };

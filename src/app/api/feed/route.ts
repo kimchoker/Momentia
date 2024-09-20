@@ -5,8 +5,8 @@ import { post } from "../../../types/types";
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, pageParam, type } = await req.json();
-    
+    const { email, pageParam, type } = await req.json(); // 현재 유저의 이메일 받아옴
+
     const feedCollection = collection(db, 'Feed');
     const totalFeedsSnapshot = await getCountFromServer(feedCollection);
     const totalFeeds = totalFeedsSnapshot.data().count;
@@ -14,27 +14,32 @@ export async function POST(req: NextRequest) {
     let q;
 
     if (type === 'following' && email) {
-      // 팔로우한 유저들의 피드 가져오기
-      const userDocRef = firestoreDoc(db, 'user', email); // 현재 유저의 정보 가져오기
-      const userDocSnap = await getDoc(userDocRef);
+      // 현재 유저가 팔로우한 유저들의 피드를 가져오기 위해 Follow 컬렉션을 먼저 조회
+      const followCollection = collection(db, 'Follow');
+      const followQuery = query(
+        followCollection,
+        where('FollowerUserId', '==', email) // 현재 유저가 팔로우한 사람들 조회
+      );
 
-      if (!userDocSnap.exists()) {
-        throw new Error('유저 정보를 찾을 수 없습니다.');
+      const followSnapshot = await getDocs(followQuery);
+
+      if (followSnapshot.empty) {
+        return NextResponse.json({ feeds: [], nextCursor: null, totalFeeds: 0 });
       }
 
-      const userData = userDocSnap.data();
-      const followingList = userData?.following || [];
+      const followingUserIds = followSnapshot.docs.map(doc => doc.data().followingUserId);
 
-      if (followingList.length === 0) {
+      if (followingUserIds.length === 0) {
         return NextResponse.json({ feeds: [], nextCursor: null, totalFeeds: 0 });
       }
 
       // 페이지네이션 처리
       const lastVisibleTimestamp = pageParam ? Timestamp.fromDate(new Date(pageParam)) : null;
 
+      // 팔로잉한 유저들의 피드 가져오기
       q = query(
         feedCollection,
-        where('email', 'in', followingList), // 팔로우한 유저들의 피드 가져오기
+        where('email', 'in', followingUserIds), // 팔로우한 유저들의 이메일을 기준으로 필터
         orderBy('createdAt', 'desc'),
         ...(lastVisibleTimestamp ? [startAfter(lastVisibleTimestamp)] : []),
         limit(10)

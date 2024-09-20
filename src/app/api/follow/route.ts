@@ -5,8 +5,21 @@ import { adminDB } from '../../../lib/firebase/firebaseAdmin'; // Firebase Admin
 export async function POST(req: NextRequest) {
   try {
     const { followingUserID, followerUserID } = await req.json();
+
+    // 요청에 필요한 값이 없을 경우
     if (!followingUserID || !followerUserID) {
       return NextResponse.json({ message: 'Invalid request' }, { status: 400 });
+    }
+
+    // 이미 팔로우했는지 확인 (중복 팔로우 방지)
+    const followRef = adminDB.collection('follows')
+      .where('followingUserID', '==', followingUserID)
+      .where('followerUserID', '==', followerUserID);
+
+    const snapshot = await followRef.get();
+    
+    if (!snapshot.empty) {
+      return NextResponse.json({ message: 'Already following' }, { status: 409 }); // 이미 팔로우된 경우
     }
 
     // 팔로우 데이터 Firestore에 추가
@@ -26,18 +39,21 @@ export async function POST(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   try {
     const { followingUserID, followerUserID } = await req.json();
+
+    // 요청에 필요한 값이 없을 경우
     if (!followingUserID || !followerUserID) {
       return NextResponse.json({ message: 'Invalid request' }, { status: 400 });
     }
 
-    // Firestore에서 팔로우 데이터 삭제
+    // 팔로우 데이터 삭제
     const followRef = adminDB.collection('follows')
       .where('followingUserID', '==', followingUserID)
       .where('followerUserID', '==', followerUserID);
 
     const snapshot = await followRef.get();
+
     if (snapshot.empty) {
-      return NextResponse.json({ message: 'Follow not found' }, { status: 404 });
+      return NextResponse.json({ message: 'Follow not found' }, { status: 404 }); // 팔로우 관계가 없을 때
     }
 
     // 문서 삭제

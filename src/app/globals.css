@@ -128,3 +128,9 @@ input:-webkit-autofill {
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .skeleton {
+    @apply animate-shimmer bg-gradient-custom bg-custom;
+  }
+}

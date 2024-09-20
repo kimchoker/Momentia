@@ -149,5 +149,5 @@ export interface MainProfileProps {
   follower?: number;       
   following?: number;         
   profileImage?: string;      
-  isCurrentUser: boolean;     
+  isCurrentUser: boolean;   
 };

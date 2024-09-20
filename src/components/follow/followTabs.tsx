@@ -1,4 +1,4 @@
-"use client"
+'use client';
 import React, { useState } from 'react';
 import FollowerList from './followerList';
 import FollowingList from './followingList';

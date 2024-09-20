@@ -81,12 +81,24 @@ const config: Config = {
           '0%': { opacity: "1", transform: 'scale(1)' },    
           '100%': { opacity:"0", transform: 'scale(0.95)' }, 
         },
-      },
+        'shimmer': {
+          '0%': { backgroundPosition: '200%' },
+          '100%': { backgroundPosition: '-200%' },
+          },
+        },
+        backgroundImage: {
+          'gradient-custom': 'linear-gradient(to right, #D9D9D9 0%, #EDEEF1 50%, #D9D9D9 100%)',
+        },
+        backgroundSize: {
+          custom: '300% 100%',
+        },
+      
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         'modal-in': 'modal-fade-in 0.3s ease-out',   
         'modal-out': 'modal-fade-out 0.3s ease-in',
+        "shimmer": 'shimmer 1.5s infinite linear',
       },
     },
   },

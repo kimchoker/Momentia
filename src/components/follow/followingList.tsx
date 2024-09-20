@@ -1,4 +1,4 @@
-"use client"
+'use client';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import ProfileCard from './ProfileCard'; // 프로필 카드 컴포넌트 import
@@ -7,7 +7,6 @@ const FollowingList = () => {
   const [following, setFollowing] = useState([]);
 
   useEffect(() => {
-    // API 호출로 팔로잉 목록 가져오기
     const fetchFollowing = async () => {
       const response = await axios.get('/api/following');
       setFollowing(response.data);

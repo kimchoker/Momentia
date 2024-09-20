@@ -1,11 +1,12 @@
 'use client';
+
 import React, { useRef, useEffect, useState } from 'react';
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import FeedItem from '../components/feed/feedItem';
 import { ScrollArea } from '../components/ui/scroll-area';
 import Sibar from '../components/sidebar/new-neo-sidebar';
 import Spinner from '../components/ui/spinner';
-import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
-import axios from 'axios'; // Axios 임포트
+import { fetchFeeds } from '../lib/api/feedApi';
 
 const Home = () => {
   const scrollRef = useRef<HTMLDivElement | null>(null);
@@ -15,27 +16,14 @@ const Home = () => {
   const [selectedTab, setSelectedTab] = useState('all');
   const [totalFeeds, setTotalFeeds] = useState<number | null>(null);
 
-  const fetchFeeds = async ({ pageParam }) => {
-    try {
-      const response = await axios.post('/api/feed', {
-        pageParam: pageParam,
-        type: selectedTab === 'following' ? 'following' : 'all'
-      });
-
-      return response.data;
-    } catch (error) {
-      throw new Error("서버에서 피드를 불러오는 데 실패했습니다.");
-    }
-  };
-
   const {
     data,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: ['feeds', selectedTab],  
-    queryFn: ({ pageParam = null }) => fetchFeeds({ pageParam }),
+    queryKey: ['feeds', selectedTab],
+    queryFn: ({ pageParam = null }) => fetchFeeds(selectedTab, pageParam), // 분리한 fetchFeeds 함수 사용
     getNextPageParam: (lastPage) => {
       const lastFeed = lastPage.feeds[lastPage.feeds.length - 1];
       return lastFeed ? lastFeed.createdAt : undefined;
