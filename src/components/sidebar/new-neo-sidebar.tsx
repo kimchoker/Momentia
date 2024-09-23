@@ -39,7 +39,6 @@ const Sibar = () => {
   };
 
   const handleProfile = async () => {
-    await fetchProfile();
     const email = authStore.getState().email;
     if (email) {
       router.push(`/myprofile`);
@@ -73,7 +72,7 @@ const Sibar = () => {
   return isMobile ? (
     // 모바일 화면 하단바
     <div className="fixed bottom-0 left-0 z-20 w-full bg-white shadow-lg flex justify-between items-center p-4">
-      <Button variant="ghost" onClick={() => router.push("/")} className="flex flex-col items-center text-[#414868]">
+      <Button variant="ghost" onClick={() => router.push("/main")} className="flex flex-col items-center text-[#414868]">
         <Home size={24} className="text-[#414868]" />
       </Button>
 
@@ -128,7 +127,7 @@ const Sibar = () => {
         </div>
 
         <Button className={`transition-all ease-in-out duration-500 text-[#414868] ${isOpen ? "mb-12 mt-8" : "mb-6 mt-8"} ${isOpen ? "translate-x-1" : "translate-x-0"}`} variant="link" asChild>
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/main" className="flex items-center gap-2">
             <Image
               src={isOpen ? "/images/Logo.png" : "/images/Logo2.png"} // isOpen에 따라 다른 이미지 로드
               alt="Logo"

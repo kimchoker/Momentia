@@ -1,127 +1,48 @@
 'use client';
+import React from 'react';
+import { useRouter } from 'next/navigation';
+import { Button } from '../components/ui/button';
+import Image from 'next/image';
+import logo from "../../public/images/Logo.png";
 
-import React, { useRef, useEffect, useState } from 'react';
-import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
-import FeedItem from '../components/feed/feedItem';
-import { ScrollArea } from '../components/ui/scroll-area';
-import Sibar from '../components/sidebar/new-neo-sidebar';
-import Spinner from '../components/ui/spinner';
-import { fetchFeeds } from '../lib/api/feedApi';
-
-const Home = () => {
-  const scrollRef = useRef<HTMLDivElement | null>(null);
-  const loadMoreRef = useRef<HTMLDivElement | null>(null);
-  const queryClient = useQueryClient();
-  
-  const [selectedTab, setSelectedTab] = useState('all');
-  const [totalFeeds, setTotalFeeds] = useState<number | null>(null);
-
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useInfiniteQuery({
-    queryKey: ['feeds', selectedTab],
-    queryFn: ({ pageParam = null }) => fetchFeeds(selectedTab, pageParam), // 분리한 fetchFeeds 함수 사용
-    getNextPageParam: (lastPage) => {
-      const lastFeed = lastPage.feeds[lastPage.feeds.length - 1];
-      return lastFeed ? lastFeed.createdAt : undefined;
-    },
-    initialPageParam: null,
-  });
-
-  const feeds = data?.pages.flatMap((page) => page.feeds) || [];
-  const fetchedFeedsCount = feeds.length;
-
-  useEffect(() => {
-    if (data?.pages[0]?.totalFeeds) {
-      setTotalFeeds(data.pages[0].totalFeeds);
-    }
-  }, [data]);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (
-          entries[0].isIntersecting &&
-          hasNextPage &&
-          !isFetchingNextPage &&
-          fetchedFeedsCount < totalFeeds
-        ) {
-          fetchNextPage();
-        }
-      },
-      {
-        root: scrollRef.current,
-        rootMargin: '0px',
-        threshold: 0.1,
-      }
-    );
-    if (loadMoreRef.current) {
-      observer.observe(loadMoreRef.current);
-    }
-
-    return () => {
-      if (loadMoreRef.current) {
-        observer.unobserve(loadMoreRef.current);
-      }
-    };
-  }, [fetchNextPage, hasNextPage, isFetchingNextPage, fetchedFeedsCount, totalFeeds]);
+const MainPage: React.FC = () => {
+  const router = useRouter();
 
   return (
-    <div className="flex justify-center items-center h-screen bg-[#f0f4f8] font-sans">
-      <Sibar />
-      
-      <div className="flex flex-col w-full max-w-[700px] h-[100%] overflow-y-visible overflow-visible">
-        
-        {/* 탭 UI: 전체 피드와 팔로우한 사람들의 피드를 선택하는 버튼 */}
-        <div className="flex w-full justify-between bg-white rounded-xl shadow-md">
-          <button
-            className={`flex-grow py-4 flex items-center justify-center font-semibold transition duration-300 
-            ${selectedTab === 'all' ? 'bg-gradient-to-r from-blue-400 to-blue-600 text-white shadow-lg' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
-            onClick={() => setSelectedTab('all')}
-          >
-            전체 피드
-          </button>
-          <button
-            className={`flex-grow py-4 flex items-center justify-center font-semibold transition duration-300
-            ${selectedTab === 'following' ? 'bg-gradient-to-r from-blue-400 to-blue-600 text-white shadow-lg' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
-            onClick={() => setSelectedTab('following')}
-          >
-            팔로잉 피드
-          </button>
-        </div>
+    <div className="flex flex-col items-center justify-between min-h-screen bg-[#EEEDEB] py-40">
+      {/* 로고 이미지 */}
+      <div className="flex flex-col items-center">
+        <Image src={logo} alt="서비스 로고" width={200} height={200} className="mb-4" />
+      </div>
 
-        <ScrollArea ref={scrollRef} className="w-full mt-5">
-          {/* 그리드 레이아웃: FeedItem 크기에 맞춰 배치 */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mr-5 ml-8 ">
-            {feeds.map((feed) => (
-              <FeedItem
-                key={feed.postId}
-                profileImage={feed.profileImage}
-                postId={feed.postId}
-                nickname={feed.nickname}
-                userId={feed.email}
-                content={feed.content}
-                images={feed.images}
-                time={feed.createdAt}
-                commentCount={feed.commentCount}
-                likeCount={feed.likeCount}
-              />
-            ))}
-          </div>
-          
-          {isFetchingNextPage && (
-            <div className="flex justify-center items-center p-10">
-              <Spinner />
-            </div>
-          )}
-          <div ref={loadMoreRef} className="h-1" />
-        </ScrollArea>
+      {/* 서비스 소개 */}
+      <div className="text-center max-w-lg px-4">
+        <h2 className="text-2xl font-semibold text-black mb-4 leading-relaxed">
+          하루에 한 번, 순간을 기록하다.
+        </h2>
+        <p className="text-base text-gray-700 leading-relaxed">
+          Momentia는 하루에 딱 한 번, 최대 4장의 사진으로 당신의 특별한 순간을 기록할 수 있는 마이크로 SNS입니다. 간결한 기록으로 더 의미 있는 하루를 만들어보세요.
+        </p>
+      </div>
+
+      {/* 로그인/회원가입 버튼 */}
+      <div className="flex flex-col space-y-4 w-full max-w-sm mt-8">
+        <Button
+          onClick={() => router.push('/login')}
+          className="bg-black text-white px-6 py-3 rounded-lg text-lg shadow-md hover:shadow-xl transition-shadow duration-300"
+        >
+          로그인
+        </Button>
+
+        <Button
+          onClick={() => router.push('/signup')}
+          className="bg-white border border-black text-black px-6 py-3 rounded-lg text-lg shadow-md hover:shadow-xl transition-shadow duration-300"
+        >
+          회원가입
+        </Button>
       </div>
     </div>
   );
 };
 
-export default Home;
+export default MainPage;

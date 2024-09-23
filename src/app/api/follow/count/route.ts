@@ -1,7 +1,7 @@
+// api/follow/count.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { adminDB } from '../../../../lib/firebase/firebaseAdmin'; // Firebase Admin 초기화 코드
+import { adminDB } from '../../../../lib/firebase/firebaseAdmin';
 
-// GET 요청으로 팔로워 및 팔로잉 수를 가져옴
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const email = searchParams.get('email');
@@ -13,15 +13,15 @@ export async function GET(req: NextRequest) {
   try {
     // 팔로워 수 가져오기
     const followersSnapshot = await adminDB
-      .collection('follows')
-      .where('followingUserID', '==', email)
+      .collection('Follow')
+      .where('followingUserId', '==', email)
       .get();
     const followerCount = followersSnapshot.size;
 
     // 팔로잉 수 가져오기
     const followingSnapshot = await adminDB
-      .collection('follows')
-      .where('followerUserID', '==', email)
+      .collection('Follow')
+      .where('followerUserId', '==', email)
       .get();
     const followingCount = followingSnapshot.size;
 

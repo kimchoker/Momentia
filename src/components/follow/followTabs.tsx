@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import FollowerList from './followerList';
 import FollowingList from './followingList';
 
-const FollowTabs = () => {
+const FollowTabs = ({ email }) => {
   const [activeTab, setActiveTab] = useState<'followers' | 'following'>('followers');
 
   return (
@@ -23,7 +23,7 @@ const FollowTabs = () => {
         </button>
       </div>
       <div>
-        {activeTab === 'followers' ? <FollowerList /> : <FollowingList />}
+        {activeTab === 'followers' ? <FollowerList email={email} /> : <FollowingList email={email} />}
       </div>
     </div>
   );

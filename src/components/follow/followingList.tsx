@@ -3,16 +3,16 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import ProfileCard from './ProfileCard'; // 프로필 카드 컴포넌트 import
 
-const FollowingList = () => {
+const FollowingList = ({ email }) => {
   const [following, setFollowing] = useState([]);
 
   useEffect(() => {
     const fetchFollowing = async () => {
-      const response = await axios.get('/api/following');
+      const response = await axios.get(`/api/follow/list?email=${email}&type=following`);
       setFollowing(response.data);
     };
     fetchFollowing();
-  }, []);
+  }, [email]);
 
   return (
     <div className="flex flex-col items-center">
@@ -22,8 +22,8 @@ const FollowingList = () => {
             key={user.id}
             profileImage={user.profileImage}
             nickname={user.nickname}
-            isFollowing={user.isFollowing}
-            userId={user.id}
+            isFollowing={true} // 팔로잉 리스트이므로 기본적으로 팔로잉 상태
+            userId={user.followingUserId} // followingUserId 사용
           />
         ))
       ) : (

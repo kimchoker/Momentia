@@ -56,10 +56,7 @@ const MainProfile: React.FC<MainProfileProps> = ({
         {/* 프로필 이미지 */}
         <Profile>
           <ProfileImage
-            src={
-              profileImage ||
-              "https://firebasestorage.googleapis.com/v0/b/snsproject-85107.appspot.com/o/images%2Fvecteezy_user-profile-vector-flat-illustration-avatar-person-icon_37336395.jpg?alt=media&token=15901e92-e23a-4295-9b6d-c8e5715100e0"
-            }
+            src={profileImage}
           />
           <ProfileFallback />
         </Profile>
@@ -75,10 +72,10 @@ const MainProfile: React.FC<MainProfileProps> = ({
           </div>
           {/* 팔로우/팔로잉 정보 */}
           <div className="flex flex-row mb-2 text-m font-bold">
-            <Link href={`/profile/${email}/following`} className="mr-[60px] hover:underline">
+            <Link href={`/follow/${email}`} className="mr-[60px] hover:underline">
               팔로잉 {following || 0}
             </Link>
-            <Link href={`/profile/${email}/followers`} className="hover:underline">
+            <Link href={`/follow/${email}`} className="hover:underline">
               팔로워 {follower || 0}
             </Link>
           </div>

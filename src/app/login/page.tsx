@@ -48,7 +48,7 @@ const Login: React.FC = () => {
             authStore.getState().setUser(userData); // 받아온 사용자 정보 저장
           }
   
-          router.push('/');
+          router.push('/main');
         } else {
           alert("이메일 혹은 비밀번호가 일치하지 않습니다.")
         }

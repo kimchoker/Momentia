@@ -1,12 +1,16 @@
 "use client"
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { useRouter } from 'next/navigation';
+import { useModalStore } from '../../states/store';
+import { useStore } from 'zustand';
 
 const AvatarProfile = ({ nickname, userId, profileImage }) => {
   const router = useRouter();
+  const { closeModal } = useStore(useModalStore); 
 
   const handleProfileClick = () => {
     router.push(`/profile/${userId}`);
+    closeModal();
   };
 
   return (
