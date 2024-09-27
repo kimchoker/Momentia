@@ -5,19 +5,26 @@ import { collection, getDocs, query, where, orderBy, limit, startAfter, Timestam
 export async function POST(req: NextRequest) {
   try {
     const { email, pageParam } = await req.json();
-    
+    console.log('Received email:', email, 'PageParam:', pageParam);
+
     if (!email) {
       return NextResponse.json({ message: '이메일이 필요합니다.' }, { status: 400 });
     }
 
     const feedCollection = collection(db, 'Feed');
 
-    // 피드의 전체 갯수를 가져오기
-    const totalFeedsSnapshot = await getCountFromServer(feedCollection);
+    // 피드의 전체 갯수를 가져오기 (특정 유저가 작성한 피드만 카운트)
+    const totalFeedsSnapshot = await getCountFromServer(query(feedCollection, where('email', '==', email)));
     const totalFeeds = totalFeedsSnapshot.data().count;
+    
+    if (totalFeeds === 0) {
+      return NextResponse.json({ feeds: [], nextCursor: null, totalFeeds: 0 });
+    }
 
+    // 페이지네이션 처리
     const lastVisibleTimestamp = pageParam ? Timestamp.fromDate(new Date(pageParam)) : null;
 
+    // 특정 유저의 피드만 가져오기
     const q = query(
       feedCollection,
       where('email', '==', email),  // 특정 유저의 피드만 가져옴
@@ -28,13 +35,15 @@ export async function POST(req: NextRequest) {
 
     const querySnapshot = await getDocs(q);
 
+    // 데이터가 없을 때 처리
     if (querySnapshot.empty) {
-      return NextResponse.json({ message: '피드의 마지막입니다.' }, { status: 404 });
+      return NextResponse.json({ message: '피드의 마지막입니다.', feeds: [], nextCursor: null }, { status: 404 });
     }
 
     // 피드 데이터 처리
     const feeds = querySnapshot.docs.map((feedDoc) => {
       const data = feedDoc.data();
+      console.log(data);
       return {
         postId: feedDoc.id,
         email: data.email,
@@ -47,6 +56,7 @@ export async function POST(req: NextRequest) {
       };
     });
 
+    // 다음 페이지 커서
     const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
     const nextCursor = lastVisible.data().createdAt instanceof Timestamp
       ? lastVisible.data().createdAt.toDate().toISOString()

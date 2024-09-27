@@ -16,7 +16,7 @@ const MainPage: React.FC = () => {
       </div>
 
       {/* 서비스 소개 */}
-      <div className="text-center max-w-lg px-4">
+      <div className="text-center max-w-2xl px-4">
         <h2 className="text-2xl font-semibold text-black mb-4 leading-relaxed">
           하루에 한 번, 순간을 기록하다.
         </h2>

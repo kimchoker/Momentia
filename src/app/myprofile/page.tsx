@@ -6,7 +6,6 @@ import { authStore } from '../../states/store';
 import { fetchFollowCounts } from '../../lib/api/followApi';
 import { ScrollArea } from '../../components/ui/feed-scroll-area';
 import { fetchUserFeeds } from '../../lib/api/feedApi';
-import ProfileInfo from '../../components/profile/feedprofile';
 import FeedItem from '../../components/feed/feedItem';
 import Sibar from '../../components/sidebar/new-neo-sidebar';
 import Spinner from '../../components/ui/spinner';
@@ -138,7 +137,7 @@ const MyProfilePage = () => {
           profileImage={profileImage}
           isCurrentUser={true}
         />
-        <ScrollArea ref={scrollRef} className="w-full min-w-[500px] h-[calc(100vh-160px)] overflow-auto">
+        <ScrollArea ref={scrollRef} className="w-full bg-black min-w-[500px] h-[calc(100vh-160px)] overflow-auto">
           {feeds.map((feed) => (
             <FeedItem
               key={feed.postId}

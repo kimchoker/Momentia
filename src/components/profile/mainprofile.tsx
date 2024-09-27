@@ -27,7 +27,6 @@ const MainProfile: React.FC<MainProfileProps> = ({
   const isCurrentUser = email === loggedInUserEmail;
 
   useEffect(() => {
-    // 팔로우 상태를 서버에서 가져옴
     if (!isCurrentUser) {
       const checkFollowStatus = async () => {
         try {
@@ -35,16 +34,17 @@ const MainProfile: React.FC<MainProfileProps> = ({
             loggedInUserEmail,
             targetUserEmail: email,
           });
-
+  
           setIsFollowing(response.data.isFollowing);
         } catch (error) {
           console.error('팔로우 상태를 확인하는 중 오류 발생:', error);
         }
       };
-
+  
       checkFollowStatus();
     }
   }, [loggedInUserEmail, email, isCurrentUser]);
+  
 
   const handleEdit = () => {
     openEdit(); // 프로필 수정 열기

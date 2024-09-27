@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     let q;
 
     if (type === 'following' && email) {
-      // 현재 유저가 팔로우한 유저들의 피드를 가져오기 위해 Follow 컬렉션을 먼저 조회
+      // 팔로우한 유저들의 피드를 가져오기 위해 Follow 컬렉션을 먼저 조회
       const followCollection = collection(db, 'Follow');
       const followQuery = query(
         followCollection,
@@ -23,11 +23,11 @@ export async function POST(req: NextRequest) {
 
       const followSnapshot = await getDocs(followQuery);
 
-      if (followSnapshot.empty) {
-        return NextResponse.json({ feeds: [], nextCursor: null, totalFeeds: 0 });
-      }
-
+      // 팔로우한 유저들의 ID 목록을 만듦
       const followingUserIds = followSnapshot.docs.map(doc => doc.data().followingUserId);
+
+      // 자신의 이메일을 팔로우한 유저 ID 리스트에 추가
+      followingUserIds.push(email);
 
       if (followingUserIds.length === 0) {
         return NextResponse.json({ feeds: [], nextCursor: null, totalFeeds: 0 });
@@ -36,10 +36,10 @@ export async function POST(req: NextRequest) {
       // 페이지네이션 처리
       const lastVisibleTimestamp = pageParam ? Timestamp.fromDate(new Date(pageParam)) : null;
 
-      // 팔로잉한 유저들의 피드 가져오기
+      // 팔로잉한 유저들과 자신의 피드 가져오기
       q = query(
         feedCollection,
-        where('email', 'in', followingUserIds), // 팔로우한 유저들의 이메일을 기준으로 필터
+        where('email', 'in', followingUserIds), // 팔로우한 유저들과 자신의 이메일을 기준으로 필터
         orderBy('createdAt', 'desc'),
         ...(lastVisibleTimestamp ? [startAfter(lastVisibleTimestamp)] : []),
         limit(10)
@@ -48,22 +48,12 @@ export async function POST(req: NextRequest) {
       // 전체 피드 또는 특정 유저의 피드 가져오기
       const lastVisibleTimestamp = pageParam ? Timestamp.fromDate(new Date(pageParam)) : null;
 
-      if (email) {
-        q = query(
-          feedCollection,
-          where('email', '==', email),
-          orderBy('createdAt', 'desc'),
-          ...(lastVisibleTimestamp ? [startAfter(lastVisibleTimestamp)] : []),
-          limit(10)
-        );
-      } else {
-        q = query(
-          feedCollection,
-          orderBy('createdAt', 'desc'),
-          ...(lastVisibleTimestamp ? [startAfter(lastVisibleTimestamp)] : []),
-          limit(10)
-        );
-      }
+      q = query(
+        feedCollection,
+        orderBy('createdAt', 'desc'),
+        ...(lastVisibleTimestamp ? [startAfter(lastVisibleTimestamp)] : []),
+        limit(10)
+      );
     }
 
     const querySnapshot = await getDocs(q);
@@ -78,7 +68,7 @@ export async function POST(req: NextRequest) {
       const userId = data.userId;
 
       // 작성자의 유저 정보를 가져옴
-      const userDocRef = firestoreDoc(db, 'user', userId);  
+      const userDocRef = firestoreDoc(db, 'user', userId);
       const userDocSnap = await getDoc(userDocRef);
 
       let nickname = '';

@@ -27,26 +27,38 @@ const uploadImage = async (file: File): Promise<{ url: string, fileName: string 
 };
 
 // 전체 피드 글 불러오기
-const fetchFeeds = async (selectedTab: string, pageParam: string | null) => {
-  try {
-    const response = await axios.post('/api/feed', {
-      pageParam: pageParam,
-      type: selectedTab === 'following' ? 'following' : 'all',
-    });
-    return response.data;
-  } catch (error) {
-    throw new Error('서버에서 피드를 불러오는 데 실패했습니다.');
+const fetchFeeds = async ({ email, pageParam, type }) => {
+
+  const response = await fetch('/api/feed', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      email,
+      pageParam,
+      type,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error('피드를 불러오는 데 실패했습니다.');
   }
+
+  return response.json();
 };
+
 
 
 // 특정 유저 피드 글 불러오기
 const fetchUserFeeds = async (userId: string, pageParam: string | null) => {
+  console.log(userId, pageParam)
   try {
     const response = await axios.post('/api/feed/user', {
       email: userId,
       pageParam,
     });
+    console.log(response.data);
     return response.data;
   } catch (error) {
     throw new Error('유저 피드를 불러오는 데 실패했습니다.');

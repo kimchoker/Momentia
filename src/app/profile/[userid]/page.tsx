@@ -1,66 +1,57 @@
 'use client';
 
 import React, { useRef, useEffect, useState } from 'react';
-import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query'; // useQueryClient import
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query'; 
 import MainProfile from '../../../components/profile/mainprofile';
 import FeedItem from '../../../components/feed/feedItem';
 import { ScrollArea } from '../../../components/ui/feed-scroll-area';
 import Sibar from '../../../components/sidebar/new-neo-sidebar';
 import Spinner from '../../../components/ui/spinner';
 import { useParams } from 'next/navigation';
-import { fetchUserFeeds } from '../../../lib/api/feedApi'; // API 함수 import
-import { fetchUserProfile } from '../../../lib/api/userApi'; // API 함수 import
+import { fetchUserFeeds } from '../../../lib/api/feedApi'; 
+import { fetchUserProfile } from '../../../lib/api/userApi';
 
-// Skeleton 컴포넌트: Shimmer 효과를 적용한 Skeleton UI
 const Skeleton = () => (
   <div className="animate-shimmer bg-gradient-custom bg-custom h-12 w-full rounded-md mb-4"></div>
 );
 
 const UserProfilePage = () => {
   const { userid } = useParams();
+  const decodedUserid = decodeURIComponent(userid as string);
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
-  const queryClient = useQueryClient(); // useQueryClient 추가
-  const [totalFeeds, setTotalFeeds] = useState<number | null>(null); // 최대 피드 수 상태 추가
+  const queryClient = useQueryClient(); 
+  const [totalFeeds, setTotalFeeds] = useState<number | null>(null); 
 
   // 피드 가져오기
-  const {
-    data: feedData,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    refetch, // refetch 추가
-  } = useInfiniteQuery({
-    queryKey: ['feeds', userid],
-    queryFn: ({ pageParam = null }) => fetchUserFeeds(userid as string, pageParam),
+  const { data: feedData, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } = useInfiniteQuery({
+    queryKey: ['feeds', decodedUserid],
+    queryFn: ({ pageParam = null }) => fetchUserFeeds(decodedUserid, pageParam),
     getNextPageParam: (lastPage) => {
       const lastFeed = lastPage.feeds[lastPage.feeds.length - 1];
       return lastFeed ? lastFeed.createdAt : undefined;
     },
-    enabled: !!userid,
+    enabled: !!decodedUserid,
     initialPageParam: null,
   });
 
   const feeds = feedData?.pages.flatMap(page => page.feeds) || [];
   const fetchedFeedsCount = feeds.length;
 
-  // 전체 피드의 최대 갯수 받아오기
   useEffect(() => {
     if (feedData?.pages[0]?.totalFeeds) {
-      setTotalFeeds(feedData.pages[0].totalFeeds); // 전체 피드의 최대 갯수 설정
+      setTotalFeeds(feedData.pages[0].totalFeeds); 
     }
   }, [feedData]);
 
-  // 피드가 업데이트될 때마다 refetch하도록 설정
   useEffect(() => {
     const handleNewPost = async () => {
-      await refetch(); // 새 글 작성 후 피드를 다시 가져옴
+      await refetch(); 
     };
     // 새 글이 추가되었을 때 refetch 호출하는 로직 추가 필요
     // handleNewPost를 글 작성 후 호출하는 방식을 추가할 수 있음
   }, [refetch]);
 
-  // IntersectionObserver로 스크롤 감지 및 다음 페이지 로드
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -68,7 +59,7 @@ const UserProfilePage = () => {
           entries[0].isIntersecting &&
           hasNextPage &&
           !isFetchingNextPage &&
-          fetchedFeedsCount < totalFeeds // 현재 로딩된 피드 수가 최대 피드 수보다 작을 때만 추가 요청
+          fetchedFeedsCount < (totalFeeds || 0) // totalFeeds가 있을 때만 작동
         ) {
           fetchNextPage();
         }
@@ -97,7 +88,7 @@ const UserProfilePage = () => {
   useEffect(() => {
     const loadUserProfile = async () => {
       try {
-        const profileData = await fetchUserProfile(userid as string);
+        const profileData = await fetchUserProfile(decodedUserid);
         setUserProfile(profileData);
       } catch (error) {
         console.error('유저 정보를 가져오는 중 오류 발생:', error);
@@ -106,10 +97,10 @@ const UserProfilePage = () => {
       }
     };
 
-    if (userid) {
+    if (decodedUserid) {
       loadUserProfile();
     }
-  }, [userid]);
+  }, [decodedUserid]);
 
   // 전체 로딩 중일 때 Skeleton UI 적용
   if (isLoadingProfile) {
@@ -153,7 +144,7 @@ const UserProfilePage = () => {
           follower={userProfile?.follower || 0}  // 팔로워 정보
           following={userProfile?.following || 0}  // 팔로잉 정보
           profileImage={userProfile?.profileImage || ''}
-          isCurrentUser={userProfile?.email === userid}  // 현재 로그인한 유저인지 확인
+          isCurrentUser={userProfile?.email === decodedUserid}  // 현재 로그인한 유저인지 확인
         />
 
         {/* 유저의 피드 표시 */}
