@@ -23,16 +23,32 @@ const SkeletonProfileInfo = () => (
 );
 
 const SkeletonFeedItem = () => (
-  <div className="p-4 bg-white rounded-lg shadow-md mb-4">
-    <div className="flex items-center mb-2">
-      <div className="w-10 h-10 bg-gradient-custom bg-custom rounded-full animate-shimmer"></div>
-      <div className="ml-4">
-        <div className="w-24 h-6 bg-gradient-custom bg-custom animate-shimmer rounded-md"></div>
+  <div
+    className="relative w-full sm:w-[90%] md:w-[90%] h-[400px] bg-gray-200 rounded-2xl shadow-lg overflow-hidden ml-3 mt-3"
+  >
+    {/* Overlay for shimmer effect */}
+    <div className="absolute inset-0 bg-gray-300 animate-pulse"></div>
+
+    {/* User profile and time skeleton */}
+    <div className="absolute top-3 left-3 flex items-center space-x-2 z-10">
+      <div className="w-10 h-10 bg-gray-400 rounded-full animate-pulse"></div>
+      <div>
+        <div className="w-24 h-4 bg-gray-400 rounded-md animate-pulse mb-1"></div>
+        <div className="w-16 h-3 bg-gray-400 rounded-md animate-pulse"></div>
       </div>
     </div>
-    <div className="w-full h-4 bg-gradient-custom bg-custom animate-shimmer mb-2"></div>
-    <div className="w-full h-4 bg-gradient-custom bg-custom animate-shimmer mb-2"></div>
-    <div className="w-full h-24 bg-gradient-custom bg-custom animate-shimmer rounded-md"></div>
+
+    {/* Comments and likes skeleton */}
+    <div className="absolute top-3 right-3 flex items-center space-x-2 z-10 text-gray-400">
+      <div className="w-4 h-4 bg-gray-400 rounded-full animate-pulse"></div>
+      <div className="w-6 h-4 bg-gray-400 rounded-md animate-pulse"></div>
+    </div>
+
+    {/* Content skeleton */}
+    <div className="absolute bottom-10 left-3 text-white z-10">
+      <div className="w-[200px] h-6 bg-gray-400 rounded-md animate-pulse mb-2"></div>
+      <div className="w-[150px] h-6 bg-gray-400 rounded-md animate-pulse"></div>
+    </div>
   </div>
 );
 
@@ -137,7 +153,7 @@ const MyProfilePage = () => {
           profileImage={profileImage}
           isCurrentUser={true}
         />
-        <ScrollArea ref={scrollRef} className="w-full bg-black min-w-[500px] h-[calc(100vh-160px)] overflow-auto">
+        <ScrollArea ref={scrollRef} className="w-full min-w-[500px] h-[calc(100vh-160px)] overflow-auto">
           {feeds.map((feed) => (
             <FeedItem
               key={feed.postId}

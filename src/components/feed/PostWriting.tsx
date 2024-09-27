@@ -115,7 +115,6 @@ const WritingComponent = () => {
       const postData = {
         userId: uid,
         email: email,
-        nickname: nickname,
         content,
         likeCount: 0,
         commentCount: 0,

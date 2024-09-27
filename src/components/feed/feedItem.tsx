@@ -2,12 +2,12 @@
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { useModalStore } from '../../states/store';
 import FeedDetail from './feedDetail';
-import { FaHeart, FaComment } from 'react-icons/fa';
+import { FaComment } from 'react-icons/fa';
 
 const FeedItem = ({ nickname, userId, content, images, postId, time, commentCount, likeCount, profileImage }) => {
   const createdAt = new Date(time);
   const formattedCreatedAt = `${createdAt.getFullYear()}년 ${createdAt.getMonth() + 1}월 ${createdAt.getDate()}일`;
-
+  console.log(nickname)
   const { openModal, setModalContent, setModalTitle } = useModalStore();
 
   const handleClick = () => {

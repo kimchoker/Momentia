@@ -78,7 +78,6 @@ export interface DrawerState {
 export interface PostData {
   userId: string; // uid
   email: string; // 이메일
-  nickname: string; // 닉네임
   content: string; // 글 내용
   images: { url: string; fileName: string }[]; // 첨부 이미지 
   likeCount: number;
