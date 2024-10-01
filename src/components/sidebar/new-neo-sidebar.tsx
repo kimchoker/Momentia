@@ -165,7 +165,7 @@ const Sibar = () => {
           <p className={`max-w-[200px] truncate text-[#414868] ${!isOpen ? "-translate-x-96 opacity-0" : "translate-x-0 opacity-100"}`}>프로필</p>
         </Button>
 
-        <Button variant="ghost" onClick={openModal} className={`${isOpen ? "w-[248px]" : "w-[50px]"} justify-start h-10 mb-3 text-[#414868]`}>
+        <Button variant="ghost" onClick={() => router.push('/account')} className={`${isOpen ? "w-[248px]" : "w-[50px]"} justify-start h-10 mb-3 text-[#414868]`}>
           <span className={`${isOpen === false ? "" : "mr-4"}`}>
             <Settings size={18} className="text-[#414868]" />
           </span>
