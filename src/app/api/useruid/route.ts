@@ -8,11 +8,17 @@ const db = getFirestore();
 // POST 메서드 처리 함수
 export async function POST(req: NextRequest) {
   try {
-    const { idToken } = await req.json();
+    // Authorization 헤더에서 토큰 추출
+    const authorizationHeader = req.headers.get('authorization');
+    if (!authorizationHeader || !authorizationHeader.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Authorization 헤더가 없습니다.' }, { status: 401 });
+    }
+
+    const idToken = authorizationHeader.split('Bearer ')[1];
     console.log(`백엔드로 들어온 토큰: ${idToken}`);
 
-    // idToken이 문자열인지 확인
-    if (typeof idToken !== 'string') {
+    // 토큰이 문자열인지 확인
+    if (typeof idToken !== 'string' || !idToken) {
       return NextResponse.json({ error: '토큰 형식이 올바르지 않습니다.' }, { status: 400 });
     }
 
@@ -29,7 +35,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: '유저 정보를 찾을 수 없습니다.' }, { status: 404 });
     }
 
-    // 유저 정보에서 email과 nickname 추출
+    // 유저 정보에서 필요한 데이터 추출
     const userData = userDocSnap.data();
     const email = userData?.email;
     const nickname = userData?.nickname;

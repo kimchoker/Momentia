@@ -1,12 +1,11 @@
-"use client"
+'use client'
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { SquarePen, Users, Settings, MessageSquare, Bell, ChevronLeft, LogIn, LogOut, Home } from "lucide-react";
 import { Button } from "../ui/button";
-import { useSidebarToggle, useModalStore, authStore } from "../../states/store";
+import { useSidebarToggle, useModalStore } from "../../states/store";
 import { useStore } from "zustand";
 import { usePathname } from "next/navigation";
-import { fetchProfile } from "../../lib/api/userApi";
 import WritingComponent from "./../feed/PostWriting";
 import Link from "next/link";
 import useMediaQuery from "../../hooks/useMediaQuery";
@@ -23,24 +22,35 @@ const Sibar = () => {
   const router = useRouter();
   const isMobile = useMediaQuery("(max-width: 768px)");
 
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
-  const { isLoggedIn: storeIsLoggedIn } = useStore(authStore);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(false); // 로그인 상태 관리
+  const [userData, setUserData] = useState<any>(null); // 사용자 데이터 관리
 
   useEffect(() => {
-    setIsLoggedIn(storeIsLoggedIn);
-  }, [storeIsLoggedIn]);
+    // 세션 스토리지에서 사용자 데이터 가져오기
+    const storedUserData = sessionStorage.getItem('userData');
+    if (storedUserData) {
+      const parsedUserData = JSON.parse(storedUserData);
+      setUserData(parsedUserData);
+      setIsLoggedIn(true); // 로그인 상태 설정
+    } else {
+      setIsLoggedIn(false);
+    }
+  }, []);
 
   const handleLogin = () => {
     if (isLoggedIn) {
-      authStore.getState().logout();
+      // 로그아웃: 세션 스토리지에서 데이터 제거
+      sessionStorage.removeItem('userData');
+      setIsLoggedIn(false);
+      setUserData(null);
+      router.push("/login");
     } else {
       router.push("/login");
     }
   };
 
   const handleProfile = async () => {
-    const email = authStore.getState().email;
-    if (email) {
+    if (userData && userData.email) {
       router.push(`/myprofile`);
     } else {
       alert("로그인이 필요한 작업입니다.");
@@ -49,10 +59,7 @@ const Sibar = () => {
   };
 
   const handleNotification = async () => {
-    const email = authStore.getState().email;
-    const isLoggedIn = authStore.getState().isLoggedIn;
-
-    if (email && isLoggedIn) {
+    if (userData && isLoggedIn) {
       router.push(`/notification`);
     } else {
       alert("로그인이 필요한 작업입니다.");

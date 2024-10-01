@@ -11,6 +11,7 @@ const Login: React.FC = () => {
   const [inputEmail, setInputEmail] = useState<string>("");
   const [inputPW, setInputPW] = useState<string>("");
   const [validate, setValidate] = useState<boolean>(true);
+  const [errorMessage, setErrorMessage] = useState<string>(""); 
 
   const onChangeEmail = (event: React.ChangeEvent<HTMLInputElement>) => {
     validateEmail(event.target.value, setInputEmail, setValidate);
@@ -30,34 +31,36 @@ const Login: React.FC = () => {
     event: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>
   ) => {
     event.preventDefault();
-    if (!inputEmail) {
-      alert("이메일을 입력해 주세요.");
-    } else if (!inputPW) {
-      alert("비밀번호를 입력해 주세요.");
-    } else {
-      try {
-        const user = await login(inputEmail, inputPW);
+    if (!inputEmail || !inputPW) {
+      setErrorMessage("이메일을 입력해 주세요.");
+      return;
+    }
   
-        if (user) {
-          // user 객체를 받아와서 토큰을 추출한 다음 세션 스토리지에 저장
-          const token = await user.getIdToken();
-          console.log("로그인 성공", token);
-          sessionStorage.setItem('token', token);
-  
-          const userData = await fetchUserInfo();
-          console.log(userData);
-          if (userData) {
-            // 받아온 사용자 정보를 세션 스토리지에 저장
-            sessionStorage.setItem('userData', JSON.stringify(userData));
-          }
-          
+    try {
+      const user = await login(inputEmail, inputPW);
+      console.log(user)
+      if (user) {
+        // 새로운 토큰 발급 및 세션 스토리지에 저장
+        const token = await user.getIdToken(true);
+        console.log("로그인 성공, 토큰:", token);
+        sessionStorage.setItem('token', token);
+        
+        // 토큰을 fetchUserInfo 함수에 전달
+        const userData = await fetchUserInfo(token); // 사용자 정보 가져오기
+        console.log(userData);
+        
+        if (userData) {
+          sessionStorage.setItem('userData', JSON.stringify(userData));
           router.push('/main');
         } else {
-          alert("이메일 혹은 비밀번호가 일치하지 않습니다.");
+          setErrorMessage("사용자 정보를 가져오는 중 오류가 발생했습니다.");
         }
-      } catch (error) {
-        console.error("로그인 실패:", error.message);
+      } else {
+        setErrorMessage("이메일 또는 비밀번호가 일치하지 않습니다.");
       }
+    } catch (error: any) {
+      console.error("로그인 실패:", error);
+      setErrorMessage("로그인 중 오류가 발생했습니다. 다시 시도해 주세요.");
     }
   };
   
@@ -71,6 +74,13 @@ const Login: React.FC = () => {
         <div className="w-4/5 flex flex-col">
           <h5 className="font-bold text-lg">로그인</h5>
           <hr />
+
+          {/* 오류 메시지 출력 */}
+          {errorMessage && (
+            <div className="text-red-500 text-sm mb-4">
+              {errorMessage}
+            </div>
+          )}
 
           {/* form 요소 추가 */}
           <form onSubmit={handleLogin} className="contents">

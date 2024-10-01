@@ -4,6 +4,7 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword, User } from
 import { UserData } from '../../types/types';
 import Cookies from "js-cookie";
 import axios from "axios";
+import axiosInstance from './axiosInstance';
 
 // 아이디 중복확인
 const checkIDExists = async (id: string) => {
@@ -53,16 +54,20 @@ const login = async (email: string, password: string): Promise<User> => {
 };
 
 // 글 작성을 위한 유저 정보 받아오기
-const fetchUserInfo = async () => {
+const fetchUserInfo = async (token: string) => {
   try {
-    const token = Cookies.get('token');
-    if (!token) throw new Error('토큰이 없음');
+    if (!token) throw new Error('토큰이 없습니다. 로그인이 필요합니다.');
 
-    const response = await axios.post("/api/useruid", { idToken: token });
+    const response = await axios.post("/api/useruid", {}, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
 
     return response.data;
-  } catch (e) {
-    console.error("뭔가 오류가 있음:", e);
+  } catch (error) {
+    console.error("유저 정보 가져오기 실패:", error);
+    throw error;
   }
 };
 
