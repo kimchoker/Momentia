@@ -1,14 +1,11 @@
-'use client'
+'use client';
 import React, { useEffect, useRef, useState } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { fetchFeeds } from '../../lib/api/feedApi';
-import { useStore } from 'zustand';
-import { authStore } from '../../states/store';
 import { ScrollArea } from '../../components/ui/scroll-area';
-import FeedItem from '../../components/feed/feedItem';
+import FeedItem from  '../../components/feed/feedItem'; 
 import Sibar from '../../components/sidebar/new-neo-sidebar';
 import Spinner from '../../components/ui/spinner';
-
 
 const Home = () => {
   const scrollRef = useRef<HTMLDivElement | null>(null);
@@ -16,7 +13,16 @@ const Home = () => {
 
   const [selectedTab, setSelectedTab] = useState('all');
   const [totalFeeds, setTotalFeeds] = useState<number | null>(null);
-  const { email } = useStore(authStore);
+  const [userData, setUserData] = useState<any>(null); // 상태로 userData 관리
+
+  useEffect(() => {
+    const storedUserData = sessionStorage.getItem('userData');
+    if (storedUserData) {
+      setUserData(JSON.parse(storedUserData));
+    } else {
+      alert('로그인이 필요합니다.');
+    }
+  }, []);
 
   const {
     data,
@@ -27,7 +33,7 @@ const Home = () => {
     queryKey: ['feeds', selectedTab],
     queryFn: ({ pageParam = null }) =>
       fetchFeeds({
-        email: email, // 현재 로그인한 유저의 이메일을 추가
+        email: userData?.email, // userData에서 이메일 사용 (초기값이 없을 경우를 대비)
         pageParam,
         type: selectedTab, // 탭 정보를 POST 요청의 body에 포함
       }),
@@ -36,6 +42,7 @@ const Home = () => {
       return lastFeed ? lastFeed.createdAt : undefined;
     },
     initialPageParam: null,
+    enabled: !!userData, // userData가 있을 때만 요청 수행
   });
 
   const feeds = data?.pages.flatMap((page) => page.feeds) || [];
@@ -79,6 +86,11 @@ const Home = () => {
   const handleTabChange = (tab: string) => {
     setSelectedTab(tab); // 탭 변경 시 상태 업데이트
   };
+
+  // userData가 로드되기 전에는 로딩 상태를 표시
+  if (!userData) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="flex justify-center items-center h-screen bg-[#f0f4f8] font-sans">

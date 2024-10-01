@@ -1,8 +1,6 @@
 'use client';
 import React, { useRef, useEffect, useState } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { useStore } from 'zustand';
-import { authStore } from '../../states/store';
 import { fetchFollowCounts } from '../../lib/api/followApi';
 import { ScrollArea } from '../../components/ui/feed-scroll-area';
 import { fetchUserFeeds } from '../../lib/api/feedApi';
@@ -53,10 +51,22 @@ const SkeletonFeedItem = () => (
 );
 
 const MyProfilePage = () => {
-  const { email, nickname, bio, profileImage } = useStore(authStore);
   const [followerCount, setFollowerCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
   const [isLoadingProfile, setIsLoadingProfile] = useState(true); // 프로필 로딩 상태
+  const [userData, setUserData] = useState(null);
+
+  useEffect(() => {
+    const storedUserData = sessionStorage.getItem('userData');
+    if (storedUserData) {
+      const parsedUserData = JSON.parse(storedUserData);
+      setUserData(parsedUserData);
+    } else {
+      alert('로그인이 필요합니다.');
+      // 필요하다면 로그인 페이지로 리다이렉트
+      // router.push('/login');
+    }
+  }, []);
 
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
@@ -65,8 +75,8 @@ const MyProfilePage = () => {
   useEffect(() => {
     const fetchCounts = async () => {
       try {
-        if (email) {
-          const { followerCount, followingCount } = await fetchFollowCounts(email);
+        if (userData.email) {
+          const { followerCount, followingCount } = await fetchFollowCounts(userData.email);
           setFollowerCount(followerCount);
           setFollowingCount(followingCount);
           console.log('팔로우 불러오기 작업 실행됨')
@@ -78,27 +88,27 @@ const MyProfilePage = () => {
       }
     };
 
-    if (email) {
+    if (userData.email) {
       fetchCounts();
     }
-  }, [email]);
+  }, [userData.email]);
 
   // 유저 피드 데이터 불러오기
   const { data: feedData, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
-    queryKey: ['feeds', email],
-    queryFn: ({ pageParam = null }) => fetchUserFeeds(email as string, pageParam),
+    queryKey: ['feeds', userData.email],
+    queryFn: ({ pageParam = null }) => fetchUserFeeds(userData.email as string, pageParam),
     getNextPageParam: (lastPage) => {
       const lastFeed = lastPage.feeds[lastPage.feeds.length - 1];
       return lastFeed ? lastFeed.createdAt : undefined;
     },
-    enabled: !!email,
+    enabled: !!userData.email,
     initialPageParam: null,
   });
 
   const feeds = feedData?.pages.flatMap((page) => page.feeds) || [];
 
   useEffect(() => {
-    if (!email) return;
+    if (!userData.email) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -117,7 +127,7 @@ const MyProfilePage = () => {
         observer.unobserve(loadMoreRef.current);
       }
     };
-  }, [fetchNextPage, hasNextPage, isFetchingNextPage, email]);
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage, userData.email]);
 
   if (isLoadingProfile) {
     return (
@@ -145,22 +155,22 @@ const MyProfilePage = () => {
       <div className="w-[40%] min-w-[500px] h-[100%] justify-center">
         <Sibar />
         <MainProfile
-          email={email}
-          nickname={nickname}
-          bio={bio || ''}
+          email={userData.email}
+          nickname={userData.nickname}
+          bio={userData.bio || ''}
           follower={followerCount}
           following={followingCount}
-          profileImage={profileImage}
+          profileImage={userData.profileImage}
           isCurrentUser={true}
         />
         <ScrollArea ref={scrollRef} className="w-full min-w-[500px] h-[calc(100vh-160px)] overflow-auto">
           {feeds.map((feed) => (
             <FeedItem
               key={feed.postId}
-              profileImage={profileImage}
+              profileImage={userData.profileImage}
               postId={feed.postId}
-              nickname={nickname}
-              userId={email}
+              nickname={userData.nickname}
+              userId={userData.email}
               content={feed.content}
               images={feed.images}
               time={feed.createdAt}

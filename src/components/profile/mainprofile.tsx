@@ -1,14 +1,14 @@
 'use client';
-
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { Profile, ProfileFallback, ProfileImage } from "../ui/profile";
 import { Button } from "../ui/button";
-import { profileEditStore, authStore } from "../../states/store";
+import { profileEditStore } from "../../states/store";
 import { MainProfileProps } from "../../types/types";
 import ProfileEdit from "./new-neo-profileEdit";
 import FollowButton from '../follow/followButton';
 import axios from 'axios';
+
 const MainProfile: React.FC<MainProfileProps> = ({
   email,
   nickname,
@@ -18,33 +18,40 @@ const MainProfile: React.FC<MainProfileProps> = ({
   profileImage,
 }) => {
   const { isEditOpen, openEdit } = profileEditStore();
-  const { email: loggedInUserEmail } = authStore((state) => ({
-    email: state.email,
-  }));
+
+  // 세션 스토리지에서 로그인된 사용자 이메일 가져오기
+  const [loggedInUserEmail, setLoggedInUserEmail] = useState<string | null>(null);
+
+  useEffect(() => {
+    const storedUserData = sessionStorage.getItem('userData');
+    if (storedUserData) {
+      const userData = JSON.parse(storedUserData);
+      setLoggedInUserEmail(userData.email);
+    }
+  }, []);
 
   const [isFollowing, setIsFollowing] = useState<boolean | null>(null); // 팔로우 상태
 
   const isCurrentUser = email === loggedInUserEmail;
 
   useEffect(() => {
-    if (!isCurrentUser) {
+    if (!isCurrentUser && loggedInUserEmail) {
       const checkFollowStatus = async () => {
         try {
           const response = await axios.post('/api/follow/status', {
             loggedInUserEmail,
             targetUserEmail: email,
           });
-  
+      
           setIsFollowing(response.data.isFollowing);
         } catch (error) {
           console.error('팔로우 상태를 확인하는 중 오류 발생:', error);
         }
       };
-  
+      
       checkFollowStatus();
     }
   }, [loggedInUserEmail, email, isCurrentUser]);
-  
 
   const handleEdit = () => {
     openEdit(); // 프로필 수정 열기

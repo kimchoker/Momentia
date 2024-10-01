@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
-import { authStore } from '../../states/store'; // 사용자의 정보를 가져오는 store
+
 
 type FollowButtonProps = {
   targetUserId: string;
@@ -12,7 +12,9 @@ type FollowButtonProps = {
 
 const FollowButton: React.FC<FollowButtonProps> = ({ targetUserId, isFollowing }) => {
   const queryClient = useQueryClient();
-  const { email: followerUserID } = authStore();
+  const storedUserData = sessionStorage.getItem('userData');
+  const userData = JSON.parse(storedUserData);
+  const followerUserID = userData.email;
   const [following, setFollowing] = useState(isFollowing);
 
   const followMutation = useMutation({

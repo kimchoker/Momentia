@@ -3,7 +3,6 @@ import { db, auth } from "../firebase/firebase";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, User } from "firebase/auth";
 import { UserData } from '../../types/types';
 import Cookies from "js-cookie";
-import { authStore } from "../../states/store";
 import axios from "axios";
 
 // 아이디 중복확인
@@ -67,33 +66,6 @@ const fetchUserInfo = async () => {
   }
 };
 
-// 프로필 정보 받아오기(사이드바)
-const fetchProfile = async () => {
-  const token = Cookies.get('token');
-  try {
-
-    const response = await axios.post('/api/profile', { idToken: token });
-
-    if (response.status === 200) {
-      const data = response.data;
-      const setUser = authStore.getState().setUser;
-      setUser({
-        uid: data.uid,
-        email: data.email,
-        nickname: data.nickname,
-        bio: data.bio,
-        follower: data.follower,
-        following: data.following,
-        profileImage: data.profileImage,
-      });
-    } else {
-      console.error('데이터 store에 설정 실패:', response.statusText);
-    }
-  } catch (error) {
-    console.error('데이터 서버에서 가져오기 실패:', error);
-  }
-};
-
 const fetchUserProfile = async (userId: string) => {
   try {
     const response = await axios.get(`/api/user/${userId}`);
@@ -103,4 +75,4 @@ const fetchUserProfile = async (userId: string) => {
   }
 };
 
-export { checkIDExists, signUp, login, fetchUserInfo, fetchProfile, fetchUserProfile };
+export { checkIDExists, signUp, login, fetchUserInfo, fetchUserProfile };

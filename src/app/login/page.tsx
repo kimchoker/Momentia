@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react";
 import { BsEnvelope, BsLock } from "react-icons/bs";
 import { validateEmail } from "../../lib/validation/validation";
 import { useRouter } from "next/navigation";
-import { authStore } from "../../states/store";
 import { fetchUserInfo, login } from "../../lib/api/userApi";
 
 const Login: React.FC = () => {
@@ -27,37 +26,41 @@ const Login: React.FC = () => {
   }, [inputEmail, validate, inputPW]);
 
   // 로그인 시 처리
-  const handleLogin = async (event: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>) => {
+  const handleLogin = async (
+    event: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>
+  ) => {
     event.preventDefault();
     if (!inputEmail) {
       alert("이메일을 입력해 주세요.");
     } else if (!inputPW) {
-      alert("비밀번호를 입력해 주세요.")
+      alert("비밀번호를 입력해 주세요.");
     } else {
       try {
         const user = await login(inputEmail, inputPW);
   
         if (user) {
-          // user 객체를 받아와서 토큰을 추출한 다음 store 로그인에 전달
+          // user 객체를 받아와서 토큰을 추출한 다음 세션 스토리지에 저장
           const token = await user.getIdToken();
           console.log("로그인 성공", token);
-          authStore.getState().login(token);
+          sessionStorage.setItem('token', token);
+  
           const userData = await fetchUserInfo();
           console.log(userData);
           if (userData) {
-            authStore.getState().setUser(userData); // 받아온 사용자 정보 저장
+            // 받아온 사용자 정보를 세션 스토리지에 저장
+            sessionStorage.setItem('userData', JSON.stringify(userData));
           }
-  
+          
           router.push('/main');
         } else {
-          alert("이메일 혹은 비밀번호가 일치하지 않습니다.")
+          alert("이메일 혹은 비밀번호가 일치하지 않습니다.");
         }
       } catch (error) {
         console.error("로그인 실패:", error.message);
       }
     }
-    
   };
+  
 
   const [isIDFocused, setIsIDFocused] = useState<boolean>(false);
   const [isPWFocused, setIsPWFocused] = useState<boolean>(false);

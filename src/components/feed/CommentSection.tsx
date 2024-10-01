@@ -3,9 +3,9 @@ import React, { useState } from 'react';
 import { ArrowUp } from 'lucide-react';
 import { useQueryClient, useQuery, useMutation } from '@tanstack/react-query';
 import { ClipLoader } from 'react-spinners';
-import { authStore } from '../../states/store';
 import { CommentComponent } from './CommentComponent';
 import axios from 'axios';
+import { useEffect } from 'react';
 
 // 댓글 가져오기 함수
 const fetchComments = async (postId) => {
@@ -28,8 +28,22 @@ const deleteCommentApi = async ({ commentId, postId }) => {
 
 const CommentSection = ({ postId }) => {
   const queryClient = useQueryClient();
-  const { email, isLoggedIn } = authStore();
   const [commentText, setCommentText] = useState("");
+  const [userData, setUserData] = useState(null);
+
+  useEffect(() => {
+    const storedUserData = sessionStorage.getItem('userData');
+    if (storedUserData) {
+      const parsedUserData = JSON.parse(storedUserData);
+      setUserData(parsedUserData);
+    } else {
+      alert('로그인이 필요합니다.');
+      // 필요하다면 로그인 페이지로 리다이렉트
+      // router.push('/login');
+    }
+  }, []);
+
+  
 
   // useQuery로 댓글 불러오기
   const { data: comments = [], isLoading } = useQuery({
@@ -56,12 +70,12 @@ const CommentSection = ({ postId }) => {
   // 댓글 저장 함수
   const handleCommentSave = () => {
     if (!commentText.trim()) return;
-    if (!isLoggedIn || !email) {
+    if (!userData.email) {
       alert('로그인이 필요합니다.');
       setCommentText("");
       return;
     }
-    const newComment = { postId, content: commentText, userId: email };
+    const newComment = { postId, content: commentText, userId: userData.email };
     createCommentMutation.mutate(newComment);
     setCommentText("");
   };
@@ -103,7 +117,7 @@ const CommentSection = ({ postId }) => {
             profileImage={comment.profileImage}
             commentId={comment.id}
             postId={postId}
-            currentUserId={email}
+            currentUserId={userData.email}
             userId={comment.userId}
             nickname={comment.nickname}
             comment={comment.content}

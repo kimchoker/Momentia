@@ -1,39 +1,35 @@
 'use client';
 
 import React, { useEffect, useState } from "react";
-import { profileEditStore, authStore } from "../../states/store";
+import { profileEditStore } from "../../states/store";
 import { CirclePlus } from "lucide-react";
 import axios from "axios";
+// `authStore` 임포트 제거
 
 interface ModalProps {
   isOpen: boolean;
+}
+
+interface UserData {
+  uid: string;
+  email: string;
+  nickname: string;
+  bio: string;
+  profileImage: string;
+  follower: string;
+  following: number;
 }
 
 const ProfileEdit: React.FC<ModalProps> = ({ isOpen }) => {
   const { closeEdit } = profileEditStore((state) => ({
     closeEdit: state.closeEdit,
   }));
-  const {
-    email,
-    nickname: initialNickname,
-    bio: initialBio,
-    profileImage: initialProfileImage,
-    setNickname,
-    setBio,
-    setProfileImage,
-  } = authStore((state) => ({
-    email: state.email,
-    nickname: state.nickname,
-    bio: state.bio,
-    profileImage: state.profileImage,
-    setNickname: state.setNickname,
-    setBio: state.setBio,
-    setProfileImage: state.setProfileImage,
-  }));
 
-  const [newNickname, setNewNickname] = useState(initialNickname);
-  const [newBio, setNewBio] = useState(initialBio);
-  const [newProfileImage, setNewProfileImage] = useState(initialProfileImage);
+  // 세션 스토리지에서 사용자 정보 초기화
+  const [email, setEmail] = useState('');
+  const [newNickname, setNewNickname] = useState('');
+  const [newBio, setNewBio] = useState('');
+  const [newProfileImage, setNewProfileImage] = useState('');
   const [visible, setVisible] = useState(false);
   const [animate, setAnimate] = useState(false);
 
@@ -48,26 +44,54 @@ const ProfileEdit: React.FC<ModalProps> = ({ isOpen }) => {
     }
   }, [isOpen]);
 
+  useEffect(() => {
+    // 세션 스토리지에서 사용자 데이터 가져오기
+    const storedUserData = sessionStorage.getItem('userData');
+    if (storedUserData) {
+      const userData: UserData = JSON.parse(storedUserData);
+      setEmail(userData.email || '');
+      setNewNickname(userData.nickname || '');
+      setNewBio(userData.bio || '');
+      setNewProfileImage(userData.profileImage || '');
+    } else {
+      // 사용자 데이터가 없을 경우 처리 (예: 로그인 페이지로 이동)
+      alert('로그인이 필요합니다.');
+      // 필요하다면 로그인 페이지로 리다이렉트
+      // window.location.href = '/login';
+    }
+  }, []);
+
   const handleSave = async () => {
     let hasChanges = false;
 
-    if (newNickname !== initialNickname) {
-      setNickname(newNickname);
+    // 세션 스토리지에서 사용자 데이터 가져오기
+    const storedUserData = sessionStorage.getItem('userData');
+    let userData: UserData;
+    if (storedUserData) {
+      userData = JSON.parse(storedUserData);
+    } else {
+      alert('로그인이 필요합니다.');
+      return;
+    }
+
+    // 변경 사항 확인 및 userData 업데이트
+    if (newNickname !== userData.nickname) {
+      userData.nickname = newNickname;
       hasChanges = true;
     }
-    if (newBio !== initialBio) {
-      setBio(newBio);
+    if (newBio !== userData.bio) {
+      userData.bio = newBio;
       hasChanges = true;
     }
-    if (newProfileImage !== initialProfileImage) {
-      setProfileImage(newProfileImage);
+    if (newProfileImage !== userData.profileImage) {
+      userData.profileImage = newProfileImage;
       hasChanges = true;
     }
 
     if (hasChanges) {
       try {
-        const idToken = await authStore.getState().token; // authStore에서 토큰 가져오기
-        const response = await axios.post("/api/profile", {
+        const idToken = sessionStorage.getItem('token'); // 세션 스토리지에서 토큰 가져오기
+        const response = await axios.post('/api/profile', {
           idToken,
           nickname: newNickname,
           bio: newBio,
@@ -75,15 +99,20 @@ const ProfileEdit: React.FC<ModalProps> = ({ isOpen }) => {
         });
 
         if (response.status === 200) {
-          console.log("프로필 업데이트 성공:", response.data);
+          console.log('프로필 업데이트 성공:', response.data);
+          // 업데이트된 사용자 정보를 세션 스토리지에 저장
+          sessionStorage.setItem('userData', JSON.stringify(userData));
         } else {
-          console.error("프로필 업데이트 실패:", response.statusText);
+          console.error('프로필 업데이트 실패:', response.statusText);
         }
 
         closeEdit(); // 변경사항이 있을 경우에만 모달 닫기
       } catch (error) {
-        console.error("프로필 업데이트 중 오류 발생:", error);
+        console.error('프로필 업데이트 중 오류 발생:', error);
       }
+    } else {
+      // 변경사항이 없을 경우 모달 닫기
+      closeEdit();
     }
   };
 

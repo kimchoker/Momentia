@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { uploadImage, savePost } from '../../lib/api/feedApi';
 import { useModalStore } from '../../states/store';
 import { Button } from '../ui/button';
-import { authStore } from '../../states/store';
 import { CircleX } from 'lucide-react';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { useDrag, useDrop, DndProvider } from 'react-dnd';
@@ -51,7 +50,21 @@ const WritingComponent = () => {
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const queryClient = useQueryClient();
   const { closeModal } = useModalStore();
-  const { uid, email, nickname } = authStore();
+
+
+  const [userData, setUserData] = useState(null);
+
+    useEffect(() => {
+      const storedUserData = sessionStorage.getItem('userData');
+      if (storedUserData) {
+        const parsedUserData = JSON.parse(storedUserData);
+        setUserData(parsedUserData);
+      } else {
+        alert('로그인이 필요합니다.');
+        // 필요하다면 로그인 페이지로 리다이렉트
+        // router.push('/login');
+      }
+    }, []);
 
   // 텍스트 입력 핸들러
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -113,8 +126,8 @@ const WritingComponent = () => {
       }
 
       const postData = {
-        userId: uid,
-        email: email,
+        userId: userData.uid,
+        email: userData.email,
         content,
         likeCount: 0,
         commentCount: 0,
