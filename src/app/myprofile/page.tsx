@@ -55,6 +55,8 @@ const MyProfilePage = () => {
   const [followingCount, setFollowingCount] = useState(0);
   const [isLoadingProfile, setIsLoadingProfile] = useState(true); // 프로필 로딩 상태
   const [userData, setUserData] = useState(null);
+  const [isUserDataLoading, setIsUserDataLoading] = useState(true); // 유저 데이터 로딩 상태 추가
+  const [totalFeedCount, setTotalFeedCount] = useState(0); // 전체 피드 수 상태 추가
 
   useEffect(() => {
     const storedUserData = sessionStorage.getItem('userData');
@@ -66,6 +68,7 @@ const MyProfilePage = () => {
       // 필요하다면 로그인 페이지로 리다이렉트
       // router.push('/login');
     }
+    setIsUserDataLoading(false); // 유저 데이터 로딩 완료
   }, []);
 
   const scrollRef = useRef<HTMLDivElement | null>(null);
@@ -73,14 +76,13 @@ const MyProfilePage = () => {
 
   // 팔로워 및 팔로잉 수를 가져오기 위한 useEffect
   useEffect(() => {
+    if (isUserDataLoading || !userData?.email) return;
+
     const fetchCounts = async () => {
       try {
-        if (userData.email) {
-          const { followerCount, followingCount } = await fetchFollowCounts(userData.email);
-          setFollowerCount(followerCount);
-          setFollowingCount(followingCount);
-          console.log('팔로우 불러오기 작업 실행됨')
-        }
+        const { followerCount, followingCount } = await fetchFollowCounts(userData.email);
+        setFollowerCount(followerCount);
+        setFollowingCount(followingCount);
       } catch (error) {
         console.error('팔로워 및 팔로잉 수를 가져오는 중 오류 발생:', error);
       } finally {
@@ -88,27 +90,33 @@ const MyProfilePage = () => {
       }
     };
 
-    if (userData.email) {
-      fetchCounts();
-    }
-  }, [userData.email]);
+    fetchCounts();
+  }, [isUserDataLoading, userData?.email]);
 
   // 유저 피드 데이터 불러오기
   const { data: feedData, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
-    queryKey: ['feeds', userData.email],
-    queryFn: ({ pageParam = null }) => fetchUserFeeds(userData.email as string, pageParam),
+    queryKey: ['feeds', userData?.email],
+    queryFn: ({ pageParam = null }) => fetchUserFeeds(userData?.email as string, pageParam),
     getNextPageParam: (lastPage) => {
       const lastFeed = lastPage.feeds[lastPage.feeds.length - 1];
       return lastFeed ? lastFeed.createdAt : undefined;
     },
-    enabled: !!userData.email,
+    enabled: !!userData?.email,
     initialPageParam: null,
   });
 
   const feeds = feedData?.pages.flatMap((page) => page.feeds) || [];
 
+  // 전체 피드 수 업데이트
   useEffect(() => {
-    if (!userData.email) return;
+    if (feedData?.pages?.length) {
+      const totalFeeds = feedData.pages[0]?.totalFeeds;
+      setTotalFeedCount(totalFeeds);
+    }
+  }, [feedData]);
+
+  useEffect(() => {
+    if (!userData?.email || feeds.length >= totalFeedCount) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -127,7 +135,7 @@ const MyProfilePage = () => {
         observer.unobserve(loadMoreRef.current);
       }
     };
-  }, [fetchNextPage, hasNextPage, isFetchingNextPage, userData.email]);
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage, userData?.email, feeds.length, totalFeedCount]);
 
   if (isLoadingProfile) {
     return (
@@ -148,7 +156,6 @@ const MyProfilePage = () => {
       </div>
     );
   }
-
 
   return (
     <div className="flex justify-center items-center h-screen font-nanum-barun-gothic p-0 mt-0 mb-0">

@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
 
     // 데이터가 없을 때 처리
     if (querySnapshot.empty) {
-      return NextResponse.json({ message: '피드의 마지막입니다.', feeds: [], nextCursor: null }, { status: 404 });
+      return NextResponse.json({ message: '피드의 마지막입니다.', feeds: [], nextCursor: null, totalFeeds });
     }
 
     // 유저 정보 가져오기

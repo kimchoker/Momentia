@@ -7,7 +7,6 @@ import { FaComment } from 'react-icons/fa';
 const FeedItem = ({ nickname, userId, content, images, postId, time, commentCount, likeCount, profileImage }) => {
   const createdAt = new Date(time);
   const formattedCreatedAt = `${createdAt.getFullYear()}년 ${createdAt.getMonth() + 1}월 ${createdAt.getDate()}일`;
-  console.log(nickname)
   const { openModal, setModalContent, setModalTitle } = useModalStore();
 
   const handleClick = () => {
@@ -38,10 +37,8 @@ const FeedItem = ({ nickname, userId, content, images, postId, time, commentCoun
         backgroundPosition: 'center',
       }}
     >
-      {/* Overlay for darker background on the image */}
       <div className="absolute inset-0 bg-black bg-opacity-40"></div>
 
-      {/* User profile and time */}
       <div className="absolute top-3 left-3 flex items-center space-x-2 z-10">
         <Avatar>
           <AvatarImage src={profileImage} />

@@ -133,14 +133,20 @@ const Sibar = () => {
           </Button>
         </div>
 
-        <Button className={`transition-all ease-in-out duration-500 text-[#414868] ${isOpen ? "mb-12 mt-8" : "mb-6 mt-8"} ${isOpen ? "translate-x-1" : "translate-x-0"}`} variant="link" asChild>
+        <Button
+          className={`transition-all ease-in-out duration-1000 text-[#414868] ${isOpen ? "mb-12 mt-8" : "mb-6 mt-8"} ${isOpen ? "translate-x-1" : "translate-x-0"}`}
+          variant="link"
+          asChild
+        >
           <Link href="/main" className="flex items-center gap-2">
-            <Image
-              src={isOpen ? "/images/Logo.png" : "/images/Logo2.png"} // isOpen에 따라 다른 이미지 로드
-              alt="Logo"
-              width={128} // 너비 설정
-              height={128} // 높이 설정
-            />
+            
+              <Image
+                src={isOpen ? "/images/Logo.png" : "/images/Logo2.png"}
+                alt="Logo"
+                width={128}
+                height={128}
+              />
+            
           </Link>
         </Button>
 

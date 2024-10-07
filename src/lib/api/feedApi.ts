@@ -26,7 +26,7 @@ const uploadImage = async (file: File): Promise<{ url: string, fileName: string 
   }
 };
 
-// 전체 피드 글 불러오기
+// 전체 피드 글 불러오기(과거 글, 무한스크롤 기능에 사용)
 const fetchFeeds = async ({ email, pageParam, type }) => {
 
   const response = await fetch('/api/feed', {
@@ -48,17 +48,50 @@ const fetchFeeds = async ({ email, pageParam, type }) => {
   return response.json();
 };
 
+// 전체 피드 갯수를 비교하기 위한 피드 갯수 요청용 api
+const fetchFeedCount = async () => {
+  const response = await fetch('/api/feed/count', {
+    method: 'GET',
+  });
+
+  if (!response.ok) {
+    throw new Error('피드 개수를 불러오는 데 실패했습니다.');
+  }
+
+  const data = await response.json();
+  return data.totalFeeds;
+};
+
+// 새 피드 가져오기 (polling 기능을 이용한 새 피드 불러오는 기능)
+const fetchNewFeeds = async ({ email, type, lastCreatedAt }) => {
+  const response = await fetch('/api/feed/new', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      email,
+      type,
+      lastCreatedAt,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error('새 피드를 불러오는 데 실패했습니다.');
+  }
+
+  return response.json();
+};
+
 
 
 // 특정 유저 피드 글 불러오기
 const fetchUserFeeds = async (userId: string, pageParam: string | null) => {
-  console.log(userId, pageParam)
   try {
     const response = await axios.post('/api/feed/user', {
       email: userId,
       pageParam,
     });
-    console.log(response.data);
     return response.data;
   } catch (error) {
     throw new Error('유저 피드를 불러오는 데 실패했습니다.');
@@ -161,7 +194,6 @@ const deleteCommentApi = async ({ commentId, postId }) => {
 
 // 좋아요 추가
 const likePost = async (postId: string, email: string) => {
-  console.log(postId, email);
   const response = await axios.post("/api/like", {
     postId,
     email, // 요청 바디에 email 포함
@@ -171,7 +203,6 @@ const likePost = async (postId: string, email: string) => {
 
 // 좋아요 취소
 const unlikePost = async (postId: string, email: string) => {
-  console.log(postId, email);
   const response = await axios.delete("/api/like", {
     data: {
       postId,
@@ -180,4 +211,4 @@ const unlikePost = async (postId: string, email: string) => {
   });
   return response.data;
 };
-export { uploadImage, savePost, updatePost, deletePost, deleteComment, likePost, unlikePost, fetchComments, createComment, deleteCommentApi, fetchUserFeeds, fetchFeeds };
+export { uploadImage, savePost, updatePost, deletePost, deleteComment, likePost, unlikePost, fetchComments, createComment, deleteCommentApi, fetchUserFeeds, fetchFeeds, fetchFeedCount, fetchNewFeeds };
