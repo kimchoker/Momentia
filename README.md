@@ -51,7 +51,7 @@ http://localhost:3000/
 
 
 ## 📌 주요기능
-##### 토글을 열면 시연영상을 확인하실 수 있습니다
+
 #### <details><summary>로그인 / 회원가입</summary> <br/> <p>로그인</p> <img src="" width="600" /> <br/> <br/> <p>회원가입</p> <img src="" width="600" /> <br/></details>
 - 폼 유효성 검증
 - 로그인 후 전역상태로 회원정보 관리
