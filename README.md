@@ -54,7 +54,7 @@ http://localhost:3000/
 
 #### <details><summary>로그인 / 회원가입</summary> <br/> <p>로그인</p> <img src="" width="600" /> <br/> <br/> <p>회원가입</p> <img src="" width="600" /> <br/></details>
 - 폼 유효성 검증
-- 로그인 후 전역상태로 회원정보 관리
+- 로그인 후 sessionStorage로 회원정보 관리
 
 #### <details><summary>전체 피드 조회 및 친구 피드</summary> <br/> <p>친구 피드 조회 기능</p> <img src="" width="600" /> <br/> <br/> <p>피드 - 무한스크롤</p> <img src="" width="600" /> <br/></details>
 - 전체 피드와 친구 피드를 탭으로 구현
@@ -81,7 +81,7 @@ http://localhost:3000/
 <br/>
 
 ## 🔥 성능 최적화
-- 
+- 이미지 업로드 시 확장자를 .webp로 변환하고 이미지 크기를 원본의 80%로 줄여 로딩 속도 향상
 -
 -
 <br/>  
