@@ -31,6 +31,7 @@ async function signUp(email: string, password: string, nickname: string) {
       nickname: nickname,
       profileImage: "",
       updatedAt: now,
+      fcmToken: ""
     };
 
     // Firestore에 사용자 데이터 저장 (문서 ID를 uid로)

@@ -1,7 +1,6 @@
 "use client";
 import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
 import { useRouter } from 'next/navigation';
-import { deleteComment } from '../../lib/api/feedApi';
 import React, { useState, useEffect } from 'react';
 import { X, ArrowUp } from 'lucide-react'; // 아이콘 추가
 import { fetchComments, createComment, deleteCommentApi } from '../../lib/api/feedApi';
@@ -10,23 +9,21 @@ import { useQueryClient, useQuery, useMutation } from '@tanstack/react-query';
 const CommentSection = ({ postId }) => {
   const queryClient = useQueryClient();
   const [commentText, setCommentText] = useState('');
-
   const [userData, setUserData] = useState(null);
 
-    useEffect(() => {
-      const storedUserData = sessionStorage.getItem('userData');
-      if (storedUserData) {
-        const parsedUserData = JSON.parse(storedUserData);
-        setUserData(parsedUserData);
-      } else {
-        alert('로그인이 필요합니다.');
-        // 필요하다면 로그인 페이지로 리다이렉트
-        // router.push('/login');
-      }
-    }, []);
+  useEffect(() => {
+    const storedUserData = sessionStorage.getItem('userData');
+    if (storedUserData) {
+      const parsedUserData = JSON.parse(storedUserData);
+      setUserData(parsedUserData);
+    } else {
+      alert('로그인이 필요합니다.');
+      // 로그인 리다이렉트 필요 시 여기에 router.push('/login') 추가 가능
+    }
+  }, []);
 
-  // useQuery로 댓글 불러오기
-  const { data: comments = [], isLoading } = useQuery({
+  // 댓글 불러오기
+  const { data: comments = [], isPending: isCommentsLoading } = useQuery({
     queryKey: ['comments', postId],
     queryFn: () => fetchComments(postId),
   });
@@ -50,7 +47,7 @@ const CommentSection = ({ postId }) => {
   // 댓글 저장 함수
   const handleCommentSave = () => {
     if (!commentText.trim()) return;
-    if (!userData.email) {
+    if (!userData?.email) {
       alert('로그인이 필요합니다.');
       setCommentText('');
       return;
@@ -61,19 +58,19 @@ const CommentSection = ({ postId }) => {
     setCommentText('');
   };
 
-  if (isLoading) {
+  if (isCommentsLoading) {
     return <p>댓글을 불러오는 중...</p>;
   }
 
   return (
     <div>
-      <div className="mt-4 flex items-center space-x-2 w-full"> {/* 댓글 입력 영역 너비 조정 */}
+      <div className="mt-4 flex items-center space-x-2 w-full">
         <input
           type="text"
           value={commentText}
           onChange={(e) => setCommentText(e.target.value)}
           placeholder="댓글을 입력하세요"
-          className="flex-grow p-2 m-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full" // 너비 조정
+          className="flex-grow p-2 m-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full"
         />
         <button
           onClick={handleCommentSave}
@@ -97,6 +94,7 @@ const CommentSection = ({ postId }) => {
               comment={comment.content}
               createdAt={comment.createdAt}
               onDelete={() => deleteCommentMutation.mutate({ commentId: comment.id, postId })}
+              isDeleting={deleteCommentMutation.isPending && deleteCommentMutation.variables?.commentId === comment.id}
             />
           ))
         ) : (
@@ -107,20 +105,10 @@ const CommentSection = ({ postId }) => {
   );
 };
 
-const CommentComponent = ({ postId, userId, nickname, currentUserId, comment, createdAt, profileImage, commentId, onDelete }) => {
+const CommentComponent = ({ postId, userId, nickname, currentUserId, comment, createdAt, profileImage, commentId, isDeleting, onDelete }) => {
   const router = useRouter();
 
-  // 댓글 삭제
-  const handleDeleteComment = async (commentId) => {
-    try {
-      await deleteComment(commentId, postId);  // API 호출
-      alert('댓글이 삭제되었습니다.');
-    } catch (error) {
-      console.error('Failed to delete comment:', error);
-      alert('댓글 삭제 중 오류가 발생했습니다.');
-    }
-  };
-
+  // 프로필 클릭 핸들러
   const handleProfileClick = () => {
     router.push(`/profile/${userId}`);
   };
@@ -131,7 +119,7 @@ const CommentComponent = ({ postId, userId, nickname, currentUserId, comment, cr
   return (
     <div className="flex flex-row items-start p-2">
       <Avatar onClick={handleProfileClick} className="cursor-pointer">
-        <AvatarImage src={profileImage} /> {/* 댓글 작성자 프로필 이미지 */}
+        <AvatarImage src={profileImage} alt={`${nickname}의 프로필`} /> {/* 댓글 작성자 프로필 이미지 */}
         <AvatarFallback />
       </Avatar>
       <div className="flex flex-col ml-3 flex-grow">
@@ -144,10 +132,11 @@ const CommentComponent = ({ postId, userId, nickname, currentUserId, comment, cr
       </div>
       {currentUserId === userId && (
         <button
-          onClick={() => handleDeleteComment(commentId)}
+          onClick={onDelete}
           className="ml-auto p-1 text-red-500 hover:text-red-700"
+          disabled={isDeleting} // 삭제 중이면 버튼 비활성화
         >
-          <X className="w-4 h-4" />
+          {isDeleting ? '삭제 중...' : <X className="w-4 h-4" />}
         </button>
       )}
     </div>

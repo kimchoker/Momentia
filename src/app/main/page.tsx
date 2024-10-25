@@ -4,7 +4,6 @@ import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchFeeds, fetchNewFeeds, fetchFeedCount } from '../../lib/api/feedApi';
 import { ScrollArea } from '../../components/ui/scroll-area';
 import FeedItem from '../../components/feed/feedItem';
-// `SkeletonFeedItem` 컴포넌트 임포트 제거
 import Sibar from '../../components/sidebar/new-neo-sidebar';
 import Spinner from '../../components/ui/spinner';
 

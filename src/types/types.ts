@@ -49,6 +49,7 @@ export interface UserData {
   nickname: string;
   profileImage: string;
   updatedAt: Timestamp;
+  fcmToken: string;
 }
 
 // layout.tsx 설정용

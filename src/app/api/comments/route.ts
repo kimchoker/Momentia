@@ -1,7 +1,73 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '../../../lib/firebase/firebase';
-import { collection, getDocs, orderBy, query, doc, deleteDoc, updateDoc, increment, addDoc, Timestamp, where } from 'firebase/firestore';
+import { collection, getDocs, orderBy, query, doc, deleteDoc, updateDoc, increment, addDoc, Timestamp, where, getDoc } from 'firebase/firestore';
 import { comment } from '../../../types/types';
+import admin from 'firebase-admin';
+
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert({
+      privateKey: process.env.PRIVATE_KEY.replace(/\\n/g, '\n'),
+      clientEmail: process.env.CLIENT_EMAIL,
+      projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
+    }),
+  });
+}
+
+
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json();
+    console.log('Request body:', body);
+
+    const { postId, userID, content } = body;
+
+    if (!postId || !userID || !content) {
+      return NextResponse.json({ message: '필수 요소 중 없는 값이 있습니다.' }, { status: 400 });
+    }
+
+    const commentsCollection = collection(db, 'Feed', postId, 'comment');
+    const newComment = {
+      postId,
+      userID, // 댓글 작성자 ID
+      content,
+      createdAt: Timestamp.now(),
+    };
+
+    const commentDoc = await addDoc(commentsCollection, newComment);
+
+    const postRef = doc(db, 'Feed', postId);
+    await updateDoc(postRef, { commentCount: increment(1) });
+
+    // 수정된 부분: getDoc 사용
+    const postSnapshot = await getDoc(postRef);
+    const postAuthorId = postSnapshot.data()?.userId;
+
+    if (postAuthorId) {
+      const userSnapshot = await getDocs(query(collection(db, 'user'), where('userId', '==', postAuthorId)));
+      if (!userSnapshot.empty) {
+        const authorData = userSnapshot.docs[0].data();
+        const fcmToken = authorData?.fcmToken;
+
+        if (fcmToken) {
+          const message = {
+            token: fcmToken,
+            notification: {
+              title: '새 댓글이 달렸습니다!',
+              body: `${userID}님이 댓글을 남겼습니다: "${content}"`,
+            },
+          };
+          await admin.messaging().send(message);
+        }
+      }
+    }
+
+    return NextResponse.json({ message: '댓글 저장이 완료되었습니다.', commentId: commentDoc.id }, { status: 200 });
+  } catch (error) {
+    console.error('댓글 저장 중 오류 발생:', error);
+    return NextResponse.json({ message: '댓글 저장 중 문제가 발생했습니다.' }, { status: 500 });
+  }
+}
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -56,42 +122,6 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     console.error('댓글을 가져오는 데 실패했습니다:', error);
     return NextResponse.json({ message: 'DB에서 가져오는 중 문제가 발생했습니다.' }, { status: 500 });
-  }
-}
-
-
-export async function POST(req: NextRequest) {
-  try {
-    const body = await req.json();
-    console.log('Request body:', body);  // 요청 본문 출력
-
-    const { postId, userId, content } = body;
-
-    // 필수 값이 없을 경우 400 응답
-    if (!postId || !userId || !content) {
-      return NextResponse.json({ message: '필수 요소 중 없는 값이 있습니다.' }, { status: 400 });
-    }
-
-    const commentsCollection = collection(db, 'Feed', postId, 'comment');
-
-    // 새로운 댓글 생성
-    const newComment = {
-      postId,
-      userId,
-      content,
-      createdAt: Timestamp.now(),
-    };
-
-    const commentDoc = await addDoc(commentsCollection, newComment);
-
-    // 댓글 수 증가
-    const postRef = doc(db, 'Feed', postId);
-    await updateDoc(postRef, { commentCount: increment(1) });
-
-    return NextResponse.json({ message: '댓글 저장이 완료되었습니다.', commentId: commentDoc.id }, { status: 200 });
-  } catch (error) {
-    console.error('댓글 저장 중 오류 발생:', error);  // 에러 로그
-    return NextResponse.json({ message: '댓글 저장 중 문제가 발생했습니다.' }, { status: 500 });
   }
 }
 

@@ -2,7 +2,7 @@ import { initializeApp } from "firebase/app";
 import { getAuth, Auth } from "firebase/auth";
 import { getFirestore, Firestore, collection, CollectionReference } from "firebase/firestore";
 import { getStorage } from 'firebase/storage';
-import { getMessaging, getToken, onMessage } from 'firebase/messaging';
+import { getMessaging } from "firebase/messaging"
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_API_KEY,
@@ -21,4 +21,5 @@ const storage = getStorage(app);
 const auth: Auth = getAuth(app);
 const db: Firestore = getFirestore(app);
 const USER_COLLECTION: CollectionReference = collection(db, "User");
-export { storage, auth, db, USER_COLLECTION };
+const messaging = getMessaging(app);
+export { storage, auth, db, USER_COLLECTION, messaging };
