@@ -160,8 +160,8 @@ const checkID = async (id :string) => {
             >
               {IDInfo}
             </p>
-            <label htmlFor="email" className="mb-2 font-bold text-sm">
-              비밀번호
+            <label htmlFor="password" className="mb-2 font-bold text-sm">
+              비밀번호 (8자 이상, 숫자 및 특수문자 포함)
             </label>
             <div
               className={`flex items-center rounded-md p-2 h-[35px] transition-colors duration-500 bg-transparent hover:bg-[#EEEDEB] border rounded p-2 h-9 
