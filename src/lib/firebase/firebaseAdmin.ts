@@ -18,7 +18,7 @@ export function getFirebaseAdmin() {
 
 // 필요한 곳에서 사용
 const admin = getFirebaseAdmin();
-const adminAuth = admin.auth();
-const adminDB = admin.firestore();
-const adminStorage = admin.storage().bucket();
-const messaging = admin.messaging();
+export const adminAuth = admin.auth();
+export const adminDB = admin.firestore();
+export const adminStorage = admin.storage().bucket();
+export const messaging = admin.messaging();
