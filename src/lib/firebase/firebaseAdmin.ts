@@ -1,28 +1,42 @@
-import * as firebaseAdminModule from 'firebase-admin';
+import * as admin from "firebase-admin";
+
+const firebaseAdminConfig = {
+  privateKey: (process.env.PRIVATE_KEY as string).replace(/\\n/g, "\n"),
+  clientEmail: process.env.CLIENT_EMAIL,
+  projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
+};
+
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert(firebaseAdminConfig),
+    storageBucket: `${process.env.NEXT_PUBLIC_PROJECT_ID}.appspot.com`,
+  });
+}
+
+const adminAuth = admin.auth();
+const adminDB = admin.firestore();
+const adminStorage = admin.storage().bucket();
+const messaging = admin.messaging(); // 서버에서 푸시 메시지를 전송할 때 사용
+
 
 export function getFirebaseAdmin() {
-  if (!firebaseAdminModule.apps.length) {
+  if (!admin.apps.length) {
     const firebaseAdminConfig = {
       privateKey: process.env.PRIVATE_KEY.replace(/\\n/g, '\n'),
       clientEmail: process.env.CLIENT_EMAIL,
       projectId: process.env.PROJECT_ID,
     };
 
-    firebaseAdminModule.initializeApp({
-      credential: firebaseAdminModule.credential.cert(firebaseAdminConfig),
+    admin.initializeApp({
+      credential: admin.credential.cert(firebaseAdminConfig),
       storageBucket: `${process.env.PROJECT_ID}.appspot.com`,
     });
   }
-  return firebaseAdminModule;
+  return admin;
 }
-
-// Firebase 서비스들을 지연 로딩으로 제공
-
-export const adminAuth = firebaseAdminModule.auth();
-
-export function getAdminAuth() {
+export function getAdminStorage() {
   const admin = getFirebaseAdmin();
-  return admin.auth();
+  return admin.storage().bucket();
 }
 
 export function getAdminDB() {
@@ -30,12 +44,4 @@ export function getAdminDB() {
   return admin.firestore();
 }
 
-export function getAdminStorage() {
-  const admin = getFirebaseAdmin();
-  return admin.storage().bucket();
-}
-
-export function getMessaging() {
-  const admin = getFirebaseAdmin();
-  return admin.messaging();
-}
+export { admin, adminAuth, adminDB, adminStorage, messaging };
