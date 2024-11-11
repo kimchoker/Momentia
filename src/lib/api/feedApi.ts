@@ -104,7 +104,7 @@ const fetchUserFeeds = async (userId: string, pageParam: string | null) => {
     });
     return response.data;
   } catch (error) {
-    throw new Error('유저 피드를 불러오는 데 실패했습니다.');
+    throw new Error('유저 피드를 불러오는 데 실패했습니다.', error);
   }
 };
 

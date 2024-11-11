@@ -68,7 +68,7 @@ const login = async (email: string, password: string): Promise<User> => {
     const { user } = userCredential;
     return user;
   } catch (error) {
-    throw new Error('로그인에 실패했습니다.');
+    throw new Error('로그인에 실패했습니다.', error);
   }
 };
 
@@ -99,7 +99,7 @@ const fetchUserProfile = async (userId: string) => {
     const response = await axios.get(`/api/user/${userId}`);
     return response.data;
   } catch (error) {
-    throw new Error('유저 프로필 정보를 가져오는 중 오류 발생');
+    throw new Error('유저 프로필 정보를 가져오는 중 오류 발생', error);
   }
 };
 

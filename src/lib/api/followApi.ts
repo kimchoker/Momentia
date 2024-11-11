@@ -7,6 +7,6 @@ export const fetchFollowCounts = async (email: string) => {
     });
     return response.data;
   } catch (error) {
-    throw new Error('팔로워 및 팔로잉 수를 가져오는 데 실패했습니다.');
+    throw new Error('팔로워 및 팔로잉 수를 가져오는 데 실패했습니다.', error);
   }
 };
