@@ -4,13 +4,15 @@ import React, { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 
-
 type FollowButtonProps = {
   targetUserId: string;
   isFollowing: boolean;
 };
 
-const FollowButton: React.FC<FollowButtonProps> = ({ targetUserId, isFollowing }) => {
+const FollowButton: React.FC<FollowButtonProps> = ({
+  targetUserId,
+  isFollowing,
+}) => {
   const queryClient = useQueryClient();
   const storedUserData = sessionStorage.getItem('userData');
   const userData = JSON.parse(storedUserData);
@@ -18,7 +20,11 @@ const FollowButton: React.FC<FollowButtonProps> = ({ targetUserId, isFollowing }
   const [following, setFollowing] = useState(isFollowing);
 
   const followMutation = useMutation({
-    mutationFn: async () => await axios.post('/api/follow', { followingUserID: targetUserId, followerUserID }),
+    mutationFn: async () =>
+      axios.post('/api/follow', {
+        followingUserID: targetUserId,
+        followerUserID,
+      }),
     onMutate: async () => {
       await queryClient.cancelQueries({ queryKey: ['user', targetUserId] });
       setFollowing(true);
@@ -33,7 +39,10 @@ const FollowButton: React.FC<FollowButtonProps> = ({ targetUserId, isFollowing }
   });
 
   const unfollowMutation = useMutation({
-    mutationFn: async () => await axios.delete('/api/follow', { data: { followingUserID: targetUserId, followerUserID } }),
+    mutationFn: async () =>
+      axios.delete('/api/follow', {
+        data: { followingUserID: targetUserId, followerUserID },
+      }),
     onMutate: async () => {
       await queryClient.cancelQueries({ queryKey: ['user', targetUserId] });
       setFollowing(false);
@@ -52,7 +61,10 @@ const FollowButton: React.FC<FollowButtonProps> = ({ targetUserId, isFollowing }
   };
 
   return (
-    <button onClick={handleFollowClick} className={`px-4 py-2 rounded ${following ? 'bg-red-500 text-white' : 'bg-blue-500 text-white'}`}>
+    <button
+      onClick={handleFollowClick}
+      className={`px-4 py-2 rounded ${following ? 'bg-red-500 text-white' : 'bg-blue-500 text-white'}`}
+    >
       {following ? '언팔로우' : '팔로우'}
     </button>
   );

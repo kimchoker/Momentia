@@ -9,7 +9,11 @@ axiosInstance.interceptors.response.use(
     const originalRequest = error.config;
 
     // 401 에러가 발생하고, 재시도하지 않은 경우
-    if (error.response && error.response.status === 401 && !originalRequest._retry) {
+    if (
+      error.response &&
+      error.response.status === 401 &&
+      !originalRequest._retry
+    ) {
       originalRequest._retry = true;
       const auth = getAuth();
       const user = auth.currentUser;
@@ -20,7 +24,7 @@ axiosInstance.interceptors.response.use(
         sessionStorage.setItem('token', token);
 
         // 요청 헤더에 새로운 토큰 설정
-        originalRequest.headers['Authorization'] = `Bearer ${token}`;
+        originalRequest.headers.Authorization = `Bearer ${token}`;
 
         // 요청 재시도
         return axiosInstance(originalRequest);
@@ -28,7 +32,7 @@ axiosInstance.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export default axiosInstance;

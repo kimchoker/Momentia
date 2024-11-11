@@ -1,5 +1,5 @@
-import { onDocumentCreated } from "firebase-functions/v2/firestore";
-import * as admin from "firebase-admin";
+import { onDocumentCreated } from 'firebase-functions/v2/firestore';
+import * as admin from 'firebase-admin';
 
 admin.initializeApp();
 
@@ -7,15 +7,26 @@ admin.initializeApp();
 export const sendNotificationOnComment = onDocumentCreated(
   'posts/{postId}/comments/{commentId}',
   async (event) => {
-    const commentData = event.data?.data() as { authorId: string; commentText: string };
-    const postId = event.params.postId;
+    const commentData = event.data?.data() as {
+      authorId: string;
+      commentText: string;
+    };
+    const { postId } = event.params;
 
     // 게시글 작성자의 토큰 가져오기
-    const postDoc = await admin.firestore().collection('posts').doc(postId).get();
+    const postDoc = await admin
+      .firestore()
+      .collection('posts')
+      .doc(postId)
+      .get();
     const postAuthorId = postDoc.data()?.authorId;
 
     if (postAuthorId) {
-      const userDoc = await admin.firestore().collection('users').doc(postAuthorId).get();
+      const userDoc = await admin
+        .firestore()
+        .collection('users')
+        .doc(postAuthorId)
+        .get();
       const userFcmToken = userDoc.data()?.fcmToken;
 
       // 알림 메시지 보내기
@@ -31,7 +42,7 @@ export const sendNotificationOnComment = onDocumentCreated(
         await admin.messaging().send(message);
       }
     }
-  }
+  },
 );
 
 // 좋아요 알림 보내기 함수
@@ -39,14 +50,22 @@ export const sendNotificationOnLike = onDocumentCreated(
   'posts/{postId}/likes/{likeId}',
   async (event) => {
     const likeData = event.data?.data() as { userId: string };
-    const postId = event.params.postId;
+    const { postId } = event.params;
 
     // 게시글 작성자의 토큰 가져오기
-    const postDoc = await admin.firestore().collection('posts').doc(postId).get();
+    const postDoc = await admin
+      .firestore()
+      .collection('posts')
+      .doc(postId)
+      .get();
     const postAuthorId = postDoc.data()?.authorId;
 
     if (postAuthorId) {
-      const userDoc = await admin.firestore().collection('users').doc(postAuthorId).get();
+      const userDoc = await admin
+        .firestore()
+        .collection('users')
+        .doc(postAuthorId)
+        .get();
       const userFcmToken = userDoc.data()?.fcmToken;
 
       // 알림 메시지 보내기
@@ -62,5 +81,5 @@ export const sendNotificationOnLike = onDocumentCreated(
         await admin.messaging().send(message);
       }
     }
-  }
+  },
 );

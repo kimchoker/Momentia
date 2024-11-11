@@ -3,19 +3,19 @@ import { NextRequest, NextResponse } from 'next/server';
 // 로그인 상태를 확인하는 미들웨어
 export function middleware(req: NextRequest) {
   const token = req.cookies.get('token'); // 쿠키에 저장된 로그인 토큰 가져오기
-  
+
   const url = req.nextUrl.clone();
 
   if (!token) {
-    // 로그인되지 않은 상태: 
+    // 로그인되지 않은 상태:
     if (url.pathname === '/') {
-      url.pathname = '/beforeLogin'; 
+      url.pathname = '/beforeLogin';
       return NextResponse.rewrite(url);
     }
   } else {
     // 로그인된 상태:
     if (url.pathname === '/') {
-      url.pathname = '/main'; 
+      url.pathname = '/main';
       return NextResponse.rewrite(url);
     }
   }

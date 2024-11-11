@@ -1,17 +1,18 @@
 'use client';
+
 import React, { useState, useEffect } from 'react';
+import { X, Edit, Trash } from 'lucide-react'; // 아이콘 추가
+import { FaHeart, FaComment } from 'react-icons/fa';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import ImageModal from './imageModal';
 import EditPostComponent from './feedEdit';
 import CommentSection from './CommentSection';
 import AvatarProfile from '../profile/AvatarProfile'; // AvatarProfile 임포트
 import { useModalStore } from '../../states/store';
-import { X, Edit, Trash } from 'lucide-react'; // 아이콘 추가
 import { deletePost, likePost, unlikePost } from '../../lib/api/feedApi';
-import { FaHeart, FaComment } from 'react-icons/fa';
 import { ScrollArea } from '../ui/scroll-area';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-const FeedDetail = ({
+function FeedDetail({
   nickname,
   userId,
   content,
@@ -21,7 +22,7 @@ const FeedDetail = ({
   likeCount,
   commentCount,
   profileImage,
-}) => {
+}) {
   const queryClient = useQueryClient();
   const { closeModal, setModalTitle } = useModalStore();
 
@@ -184,7 +185,11 @@ const FeedDetail = ({
         <div className="relative p-3 bg-white rounded-lg overflow-hidden w-full mx-auto">
           {/* 프로필과 작성 시간을 같은 줄에 배치 */}
           <div className="flex justify-between items-center mb-4">
-            <AvatarProfile nickname={nickname} userId={userId} profileImage={profileImage} />
+            <AvatarProfile
+              nickname={nickname}
+              userId={userId}
+              profileImage={profileImage}
+            />
             <p className="text-gray-500 text-sm">{formattedCreatedAt}</p>
           </div>
 
@@ -208,8 +213,13 @@ const FeedDetail = ({
           {/* 좋아요/댓글수와 수정/삭제 버튼을 같은 줄에 배치 */}
           <div className="flex items-center justify-between mt-4 text-gray-500">
             <div className="flex items-center justify-start">
-              <button onClick={handleLikeClick} className="focus:outline-none flex flex-row">
-                <FaHeart className={`m-2 ${hasLiked ? 'text-red-500' : 'text-gray-500'}`} />
+              <button
+                onClick={handleLikeClick}
+                className="focus:outline-none flex flex-row"
+              >
+                <FaHeart
+                  className={`m-2 ${hasLiked ? 'text-red-500' : 'text-gray-500'}`}
+                />
                 <span className="mt-1">{currentLikeCount}</span>
               </button>
               <div className="flex flex-row">
@@ -220,10 +230,16 @@ const FeedDetail = ({
 
             {isAuthor && (
               <div className="flex space-x-2">
-                <button onClick={handleEdit} className="p-1 text-gray-500 hover:text-black">
+                <button
+                  onClick={handleEdit}
+                  className="p-1 text-gray-500 hover:text-black"
+                >
                   <Edit className="w-5 h-5" />
                 </button>
-                <button onClick={handleDelete} className="p-1 text-gray-500 hover:text-red-500">
+                <button
+                  onClick={handleDelete}
+                  className="p-1 text-gray-500 hover:text-red-500"
+                >
                   <Trash className="w-5 h-5" />
                 </button>
               </div>
@@ -237,12 +253,15 @@ const FeedDetail = ({
 
           {/* 이미지 모달 */}
           {selectedImage && (
-            <ImageModal imageUrl={selectedImage} onClose={() => setSelectedImage(null)} />
+            <ImageModal
+              imageUrl={selectedImage}
+              onClose={() => setSelectedImage(null)}
+            />
           )}
         </div>
       </ScrollArea>
     </>
   );
-};
+}
 
 export default FeedDetail;

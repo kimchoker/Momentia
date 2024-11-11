@@ -1,17 +1,17 @@
 'use client';
-import React, { useState, useEffect } from "react";
-import { BsEnvelope, BsLock } from "react-icons/bs";
-import { validateEmail } from "../../lib/validation/validation";
-import { useRouter } from "next/navigation";
-import { fetchUserInfo, login } from "../../lib/api/userApi";
+
+import React, { useState, useEffect } from 'react';
+import { BsEnvelope, BsLock } from 'react-icons/bs';
+import { useRouter } from 'next/navigation';
+import { validateEmail } from '../../lib/validation/validation';
+import { fetchUserInfo, login } from '../../lib/api/userApi';
 
 const Login: React.FC = () => {
-
   const router = useRouter();
-  const [inputEmail, setInputEmail] = useState<string>("");
-  const [inputPW, setInputPW] = useState<string>("");
+  const [inputEmail, setInputEmail] = useState<string>('');
+  const [inputPW, setInputPW] = useState<string>('');
   const [validate, setValidate] = useState<boolean>(true);
-  const [errorMessage, setErrorMessage] = useState<string>(""); 
+  const [errorMessage, setErrorMessage] = useState<string>('');
 
   const onChangeEmail = (event: React.ChangeEvent<HTMLInputElement>) => {
     validateEmail(event.target.value, setInputEmail, setValidate);
@@ -19,7 +19,7 @@ const Login: React.FC = () => {
 
   const [buttonDisabled, setButtonDisabled] = useState<boolean>(true);
   useEffect(() => {
-    if (inputEmail !== "" && validate && inputPW !== "") {
+    if (inputEmail !== '' && validate && inputPW !== '') {
       setButtonDisabled(false);
     } else {
       setButtonDisabled(true);
@@ -28,42 +28,43 @@ const Login: React.FC = () => {
 
   // 로그인 시 처리
   const handleLogin = async (
-    event: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>
+    event:
+      | React.FormEvent<HTMLFormElement>
+      | React.MouseEvent<HTMLButtonElement>,
   ) => {
     event.preventDefault();
     if (!inputEmail || !inputPW) {
-      setErrorMessage("이메일을 입력해 주세요.");
+      setErrorMessage('이메일을 입력해 주세요.');
       return;
     }
-  
+
     try {
       const user = await login(inputEmail, inputPW);
-      console.log(user)
+      console.log(user);
       if (user) {
         // 새로운 토큰 발급 및 세션 스토리지에 저장
         const token = await user.getIdToken(true);
-        console.log("로그인 성공, 토큰:", token);
+        console.log('로그인 성공, 토큰:', token);
         sessionStorage.setItem('token', token);
-        
+
         // 토큰을 fetchUserInfo 함수에 전달
         const userData = await fetchUserInfo(token); // 사용자 정보 가져오기
         console.log(userData);
-        
+
         if (userData) {
           sessionStorage.setItem('userData', JSON.stringify(userData));
           router.push('/main');
         } else {
-          setErrorMessage("사용자 정보를 가져오는 중 오류가 발생했습니다.");
+          setErrorMessage('사용자 정보를 가져오는 중 오류가 발생했습니다.');
         }
       } else {
-        setErrorMessage("이메일 또는 비밀번호가 일치하지 않습니다.");
+        setErrorMessage('이메일 또는 비밀번호가 일치하지 않습니다.');
       }
     } catch (error: any) {
-      console.error("로그인 실패:", error);
-      setErrorMessage("로그인 중 오류가 발생했습니다. 다시 시도해 주세요.");
+      console.error('로그인 실패:', error);
+      setErrorMessage('로그인 중 오류가 발생했습니다. 다시 시도해 주세요.');
     }
   };
-  
 
   const [isIDFocused, setIsIDFocused] = useState<boolean>(false);
   const [isPWFocused, setIsPWFocused] = useState<boolean>(false);
@@ -77,9 +78,7 @@ const Login: React.FC = () => {
 
           {/* 오류 메시지 출력 */}
           {errorMessage && (
-            <div className="text-red-500 text-sm mb-4">
-              {errorMessage}
-            </div>
+            <div className="text-red-500 text-sm mb-4">{errorMessage}</div>
           )}
 
           {/* form 요소 추가 */}
@@ -94,11 +93,11 @@ const Login: React.FC = () => {
                             transition-colors duration-500 
                             bg-transparent 
                             hover:bg-[#EEEDEB]
-                            ${validate ? "" : "border-red-500"}
+                            ${validate ? '' : 'border-red-500'}
                             ${
                               isIDFocused
-                                ? "bg-[#EEEDEB] border-2 border-black"
-                                : "border-[#EEEDEB]"
+                                ? 'bg-[#EEEDEB] border-2 border-black'
+                                : 'border-[#EEEDEB]'
                             }
                           `}
               >
@@ -133,8 +132,8 @@ const Login: React.FC = () => {
                             hover:bg-[#EEEDEB]
                             ${
                               isPWFocused
-                                ? "bg-[#EEEDEB] border-2 border-[#000000]"
-                                : "border-[#EEEDEB]"
+                                ? 'bg-[#EEEDEB] border-2 border-[#000000]'
+                                : 'border-[#EEEDEB]'
                             }
                 `}
               >
@@ -184,7 +183,11 @@ const Login: React.FC = () => {
           </button>
 
           <button className="h-9 rounded p-2 border border-[#E3E1D9] bg-transparent flex flex-row justify-center items-center text-center">
-            <img src="../images/google.png" className="w-4 h-4 mb-1 mr-1" alt="google logo" />
+            <img
+              src="../images/google.png"
+              className="w-4 h-4 mb-1 mr-1"
+              alt="google logo"
+            />
             구글로 가입/로그인하기
           </button>
         </div>

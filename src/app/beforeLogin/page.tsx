@@ -1,10 +1,10 @@
 'use client';
+
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { Button } from '../../components/ui/button';
 import Image from 'next/image';
-import logo from "../../../public/images/Logo.png";
-
+import { Button } from '../../components/ui/button';
+import logo from '../../../public/images/Logo.png';
 
 const MainPage: React.FC = () => {
   const router = useRouter();
@@ -13,7 +13,13 @@ const MainPage: React.FC = () => {
     <div className="flex flex-col items-center justify-between min-h-screen bg-[#EEEDEB] py-40">
       {/* 로고 이미지 */}
       <div className="flex flex-col items-center">
-        <Image src={logo} alt="서비스 로고" width={200} height={200} className="mb-4" />
+        <Image
+          src={logo}
+          alt="서비스 로고"
+          width={200}
+          height={200}
+          className="mb-4"
+        />
       </div>
 
       {/* 서비스 소개 */}
@@ -22,7 +28,9 @@ const MainPage: React.FC = () => {
           하루에 한 번, 순간을 기록하다.
         </h2>
         <p className="text-base text-gray-700 leading-relaxed">
-          Momentia는 하루에 딱 한 번, 최대 4장의 사진으로 당신의 특별한 순간을 기록할 수 있는 마이크로 SNS입니다. 간결한 기록으로 더 의미 있는 하루를 만들어보세요.
+          Momentia는 하루에 딱 한 번, 최대 4장의 사진으로 당신의 특별한 순간을
+          기록할 수 있는 마이크로 SNS입니다. 간결한 기록으로 더 의미 있는 하루를
+          만들어보세요.
         </p>
       </div>
 

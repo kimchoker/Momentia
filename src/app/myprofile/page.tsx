@@ -1,4 +1,5 @@
 'use client';
+
 import React, { useRef, useEffect, useState } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { fetchFollowCounts } from '../../lib/api/followApi';
@@ -10,47 +11,49 @@ import Spinner from '../../components/ui/spinner';
 import MainProfile from '../../components/profile/mainprofile';
 
 // Skeleton 컴포넌트: 실제 UI와 동일한 구조로 스켈레톤 구현
-const SkeletonProfileInfo = () => (
-  <div className="p-5 flex items-center">
-    <div className="w-16 h-16 bg-gradient-custom bg-custom rounded-full animate-shimmer"></div>
-    <div className="ml-4 flex flex-col">
-      <div className="w-32 h-6 bg-gradient-custom bg-custom animate-shimmer rounded-md mb-2"></div>
-      <div className="w-48 h-4 bg-gradient-custom bg-custom animate-shimmer rounded-md"></div>
-    </div>
-  </div>
-);
-
-const SkeletonFeedItem = () => (
-  <div
-    className="relative w-full sm:w-[90%] md:w-[90%] h-[400px] bg-gray-200 rounded-2xl shadow-lg overflow-hidden ml-3 mt-3"
-  >
-    {/* Overlay for shimmer effect */}
-    <div className="absolute inset-0 bg-gray-300 animate-pulse"></div>
-
-    {/* User profile and time skeleton */}
-    <div className="absolute top-3 left-3 flex items-center space-x-2 z-10">
-      <div className="w-10 h-10 bg-gray-400 rounded-full animate-pulse"></div>
-      <div>
-        <div className="w-24 h-4 bg-gray-400 rounded-md animate-pulse mb-1"></div>
-        <div className="w-16 h-3 bg-gray-400 rounded-md animate-pulse"></div>
+function SkeletonProfileInfo() {
+  return (
+    <div className="p-5 flex items-center">
+      <div className="w-16 h-16 bg-gradient-custom bg-custom rounded-full animate-shimmer" />
+      <div className="ml-4 flex flex-col">
+        <div className="w-32 h-6 bg-gradient-custom bg-custom animate-shimmer rounded-md mb-2" />
+        <div className="w-48 h-4 bg-gradient-custom bg-custom animate-shimmer rounded-md" />
       </div>
     </div>
+  );
+}
 
-    {/* Comments and likes skeleton */}
-    <div className="absolute top-3 right-3 flex items-center space-x-2 z-10 text-gray-400">
-      <div className="w-4 h-4 bg-gray-400 rounded-full animate-pulse"></div>
-      <div className="w-6 h-4 bg-gray-400 rounded-md animate-pulse"></div>
+function SkeletonFeedItem() {
+  return (
+    <div className="relative w-full sm:w-[90%] md:w-[90%] h-[400px] bg-gray-200 rounded-2xl shadow-lg overflow-hidden ml-3 mt-3">
+      {/* Overlay for shimmer effect */}
+      <div className="absolute inset-0 bg-gray-300 animate-pulse" />
+
+      {/* User profile and time skeleton */}
+      <div className="absolute top-3 left-3 flex items-center space-x-2 z-10">
+        <div className="w-10 h-10 bg-gray-400 rounded-full animate-pulse" />
+        <div>
+          <div className="w-24 h-4 bg-gray-400 rounded-md animate-pulse mb-1" />
+          <div className="w-16 h-3 bg-gray-400 rounded-md animate-pulse" />
+        </div>
+      </div>
+
+      {/* Comments and likes skeleton */}
+      <div className="absolute top-3 right-3 flex items-center space-x-2 z-10 text-gray-400">
+        <div className="w-4 h-4 bg-gray-400 rounded-full animate-pulse" />
+        <div className="w-6 h-4 bg-gray-400 rounded-md animate-pulse" />
+      </div>
+
+      {/* Content skeleton */}
+      <div className="absolute bottom-10 left-3 text-white z-10">
+        <div className="w-[200px] h-6 bg-gray-400 rounded-md animate-pulse mb-2" />
+        <div className="w-[150px] h-6 bg-gray-400 rounded-md animate-pulse" />
+      </div>
     </div>
+  );
+}
 
-    {/* Content skeleton */}
-    <div className="absolute bottom-10 left-3 text-white z-10">
-      <div className="w-[200px] h-6 bg-gray-400 rounded-md animate-pulse mb-2"></div>
-      <div className="w-[150px] h-6 bg-gray-400 rounded-md animate-pulse"></div>
-    </div>
-  </div>
-);
-
-const MyProfilePage = () => {
+function MyProfilePage() {
   const [followerCount, setFollowerCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
   const [isLoadingProfile, setIsLoadingProfile] = useState(true); // 프로필 로딩 상태
@@ -80,7 +83,9 @@ const MyProfilePage = () => {
 
     const fetchCounts = async () => {
       try {
-        const { followerCount, followingCount } = await fetchFollowCounts(userData.email);
+        const { followerCount, followingCount } = await fetchFollowCounts(
+          userData.email,
+        );
         setFollowerCount(followerCount);
         setFollowingCount(followingCount);
       } catch (error) {
@@ -94,9 +99,15 @@ const MyProfilePage = () => {
   }, [isUserDataLoading, userData?.email]);
 
   // 유저 피드 데이터 불러오기
-  const { data: feedData, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
+  const {
+    data: feedData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
     queryKey: ['feeds', userData?.email],
-    queryFn: ({ pageParam = null }) => fetchUserFeeds(userData?.email as string, pageParam),
+    queryFn: ({ pageParam = null }) =>
+      fetchUserFeeds(userData?.email as string, pageParam),
     getNextPageParam: (lastPage) => {
       const lastFeed = lastPage.feeds[lastPage.feeds.length - 1];
       return lastFeed ? lastFeed.createdAt : undefined;
@@ -124,7 +135,7 @@ const MyProfilePage = () => {
           fetchNextPage();
         }
       },
-      { root: scrollRef.current, rootMargin: '0px', threshold: 0.1 }
+      { root: scrollRef.current, rootMargin: '0px', threshold: 0.1 },
     );
     if (loadMoreRef.current) {
       observer.observe(loadMoreRef.current);
@@ -135,7 +146,14 @@ const MyProfilePage = () => {
         observer.unobserve(loadMoreRef.current);
       }
     };
-  }, [fetchNextPage, hasNextPage, isFetchingNextPage, userData?.email, feeds.length, totalFeedCount]);
+  }, [
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    userData?.email,
+    feeds.length,
+    totalFeedCount,
+  ]);
 
   if (isLoadingProfile) {
     return (
@@ -145,7 +163,10 @@ const MyProfilePage = () => {
           <div className="p-5">
             <SkeletonProfileInfo />
           </div>
-          <ScrollArea ref={scrollRef} className="w-full min-w-[500px] h-[calc(100vh-160px)] overflow-auto">
+          <ScrollArea
+            ref={scrollRef}
+            className="w-full min-w-[500px] h-[calc(100vh-160px)] overflow-auto"
+          >
             {Array(3)
               .fill(0)
               .map(() => (
@@ -168,9 +189,12 @@ const MyProfilePage = () => {
           follower={followerCount}
           following={followingCount}
           profileImage={userData.profileImage}
-          isCurrentUser={true}
+          isCurrentUser
         />
-        <ScrollArea ref={scrollRef} className="w-full min-w-[500px] h-[calc(100vh-160px)] overflow-auto">
+        <ScrollArea
+          ref={scrollRef}
+          className="w-full min-w-[500px] h-[calc(100vh-160px)] overflow-auto"
+        >
           {feeds.map((feed) => (
             <FeedItem
               key={feed.postId}
@@ -195,6 +219,6 @@ const MyProfilePage = () => {
       </div>
     </div>
   );
-};
+}
 
 export default MyProfilePage;

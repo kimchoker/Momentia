@@ -1,10 +1,13 @@
 'use client';
+
 import React, { useState } from 'react';
 import FollowerList from './followerList';
 import FollowingList from './followingList';
 
-const FollowTabs = ({ email }) => {
-  const [activeTab, setActiveTab] = useState<'followers' | 'following'>('followers');
+function FollowTabs({ email }) {
+  const [activeTab, setActiveTab] = useState<'followers' | 'following'>(
+    'followers',
+  );
 
   return (
     <div className="w-full">
@@ -23,10 +26,14 @@ const FollowTabs = ({ email }) => {
         </button>
       </div>
       <div>
-        {activeTab === 'followers' ? <FollowerList email={email} /> : <FollowingList email={email} />}
+        {activeTab === 'followers' ? (
+          <FollowerList email={email} />
+        ) : (
+          <FollowingList email={email} />
+        )}
       </div>
     </div>
   );
-};
+}
 
 export default FollowTabs;

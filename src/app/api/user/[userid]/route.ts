@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../../../../lib/firebase/firebase'; // Firebase 초기화 코드 경로
 
-export async function GET(req: NextRequest, { params }: { params: { userid: string } }) {
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { userid: string } },
+) {
   const { userid } = params;
   const decodedUserId = decodeURIComponent(userid);
 
@@ -13,7 +16,10 @@ export async function GET(req: NextRequest, { params }: { params: { userid: stri
     const querySnapshot = await getDocs(q);
 
     if (querySnapshot.empty) {
-      return NextResponse.json({ message: '유저 정보를 찾을 수 없습니다.' }, { status: 404 });
+      return NextResponse.json(
+        { message: '유저 정보를 찾을 수 없습니다.' },
+        { status: 404 },
+      );
     }
 
     const userDoc = querySnapshot.docs[0];

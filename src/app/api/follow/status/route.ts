@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '../../../../lib/firebase/firebase';
 import { collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from '../../../../lib/firebase/firebase';
 
 // named export for POST method
 export async function POST(req: NextRequest) {
@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
     const followQuery = query(
       followCollection,
       where('FollowerUserId', '==', loggedInUserEmail),
-      where('FollowingUserId', '==', targetUserEmail)
+      where('FollowingUserId', '==', targetUserEmail),
     );
 
     const followSnapshot = await getDocs(followQuery);

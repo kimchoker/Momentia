@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { adminAuth } from '../../../lib/firebase/firebaseAdmin';
 import { getFirestore } from 'firebase-admin/firestore';
+import { adminAuth } from '../../../lib/firebase/firebaseAdmin';
 
 // Firestore 초기화
 const db = getFirestore();
@@ -12,12 +12,15 @@ export async function POST(req: NextRequest) {
 
     // idToken이 문자열인지 확인
     if (typeof idToken !== 'string') {
-      return NextResponse.json({ error: '토큰 형식이 올바르지 않습니다.' }, { status: 400 });
+      return NextResponse.json(
+        { error: '토큰 형식이 올바르지 않습니다.' },
+        { status: 400 },
+      );
     }
 
     // 토큰 검증 및 UID 추출
     const decodedToken = await adminAuth.verifyIdToken(idToken);
-    const uid = decodedToken.uid;
+    const { uid } = decodedToken;
 
     // Firestore에서 해당 유저의 문서 참조 가져오기
     const userDocRef = db.collection('user').doc(uid);
@@ -25,7 +28,10 @@ export async function POST(req: NextRequest) {
 
     // 문서가 존재하는지 확인
     if (!userDocSnap.exists) {
-      return NextResponse.json({ error: '유저 정보를 찾을 수 없습니다.' }, { status: 404 });
+      return NextResponse.json(
+        { error: '유저 정보를 찾을 수 없습니다.' },
+        { status: 404 },
+      );
     }
 
     // **프로필 수정** 요청 처리 (nickname, bio, profileImage가 있을 때)
@@ -36,7 +42,10 @@ export async function POST(req: NextRequest) {
         ...(profileImage && { profileImage }),
       });
 
-      return NextResponse.json({ message: '프로필이 성공적으로 업데이트되었습니다.' }, { status: 200 });
+      return NextResponse.json(
+        { message: '프로필이 성공적으로 업데이트되었습니다.' },
+        { status: 200 },
+      );
     }
 
     // **프로필 조회** 요청 처리 (nickname, bio, profileImage가 없을 때)
@@ -48,16 +57,18 @@ export async function POST(req: NextRequest) {
     const following = userData?.following;
     const fetchedProfileImage = userData?.profileImage;
 
-    return NextResponse.json({
-      uid,
-      email,
-      nickname: fetchedNickname,
-      bio: fetchedBio,
-      follower,
-      following,
-      profileImage: fetchedProfileImage,
-    }, { status: 200 });
-
+    return NextResponse.json(
+      {
+        uid,
+        email,
+        nickname: fetchedNickname,
+        bio: fetchedBio,
+        follower,
+        following,
+        profileImage: fetchedProfileImage,
+      },
+      { status: 200 },
+    );
   } catch (error) {
     console.error('에러 발생:', error);
     return NextResponse.json({ error: '서버 오류 발생' }, { status: 500 });

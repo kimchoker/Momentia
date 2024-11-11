@@ -1,12 +1,17 @@
-"use client";
-import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
+'use client';
+
 import { useRouter } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 import { X, ArrowUp } from 'lucide-react'; // 아이콘 추가
-import { fetchComments, createComment, deleteCommentApi } from '../../lib/api/feedApi';
 import { useQueryClient, useQuery, useMutation } from '@tanstack/react-query';
+import {
+  fetchComments,
+  createComment,
+  deleteCommentApi,
+} from '../../lib/api/feedApi';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 
-const CommentSection = ({ postId }) => {
+function CommentSection({ postId }) {
   const queryClient = useQueryClient();
   const [commentText, setCommentText] = useState('');
   const [userData, setUserData] = useState(null);
@@ -93,8 +98,13 @@ const CommentSection = ({ postId }) => {
               nickname={comment.nickname}
               comment={comment.content}
               createdAt={comment.createdAt}
-              onDelete={() => deleteCommentMutation.mutate({ commentId: comment.id, postId })}
-              isDeleting={deleteCommentMutation.isPending && deleteCommentMutation.variables?.commentId === comment.id}
+              onDelete={() =>
+                deleteCommentMutation.mutate({ commentId: comment.id, postId })
+              }
+              isDeleting={
+                deleteCommentMutation.isPending &&
+                deleteCommentMutation.variables?.commentId === comment.id
+              }
             />
           ))
         ) : (
@@ -103,9 +113,20 @@ const CommentSection = ({ postId }) => {
       </div>
     </div>
   );
-};
+}
 
-const CommentComponent = ({ postId, userId, nickname, currentUserId, comment, createdAt, profileImage, commentId, isDeleting, onDelete }) => {
+function CommentComponent({
+  postId,
+  userId,
+  nickname,
+  currentUserId,
+  comment,
+  createdAt,
+  profileImage,
+  commentId,
+  isDeleting,
+  onDelete,
+}) {
   const router = useRouter();
 
   // 프로필 클릭 핸들러
@@ -119,15 +140,16 @@ const CommentComponent = ({ postId, userId, nickname, currentUserId, comment, cr
   return (
     <div className="flex flex-row items-start p-2">
       <Avatar onClick={handleProfileClick} className="cursor-pointer">
-        <AvatarImage src={profileImage} alt={`${nickname}의 프로필`} /> {/* 댓글 작성자 프로필 이미지 */}
+        <AvatarImage src={profileImage} alt={`${nickname}의 프로필`} />{' '}
+        {/* 댓글 작성자 프로필 이미지 */}
         <AvatarFallback />
       </Avatar>
       <div className="flex flex-col ml-3 flex-grow">
-        <div className="flex justify-between items-center"> 
+        <div className="flex justify-between items-center">
           <p className="font-bold">{nickname}</p>
-          <p className="text-xs text-gray-400">{formattedCreatedAt}</p> 
+          <p className="text-xs text-gray-400">{formattedCreatedAt}</p>
         </div>
-        <p className="text-xs text-gray-500 mb-2">{userId}</p> 
+        <p className="text-xs text-gray-500 mb-2">{userId}</p>
         <p>{comment}</p> {/* 댓글 내용 표시 */}
       </div>
       {currentUserId === userId && (
@@ -141,6 +163,6 @@ const CommentComponent = ({ postId, userId, nickname, currentUserId, comment, cr
       )}
     </div>
   );
-};
+}
 
 export { CommentComponent, CommentSection };

@@ -1,9 +1,7 @@
 'use client';
+
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { Button } from '../components/ui/button';
-import Image from 'next/image';
-import logo from "../../public/images/Logo.png";
 
 const MainPage: React.FC = () => {
   const router = useRouter();
@@ -42,8 +40,7 @@ const MainPage: React.FC = () => {
     //     </Button>
     //   </div>
     // </div>
-    <>
-    </>
+    <></>
   );
 };
 

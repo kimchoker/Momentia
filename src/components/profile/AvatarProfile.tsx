@@ -1,12 +1,13 @@
-"use client"
-import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
-import { useRouter } from 'next/navigation';
-import { useModalStore } from '../../states/store';
-import { useStore } from 'zustand';
+'use client';
 
-const AvatarProfile = ({ nickname, userId, profileImage }) => {
+import { useRouter } from 'next/navigation';
+import { useStore } from 'zustand';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { useModalStore } from '../../states/store';
+
+function AvatarProfile({ nickname, userId, profileImage }) {
   const router = useRouter();
-  const { closeModal } = useStore(useModalStore); 
+  const { closeModal } = useStore(useModalStore);
 
   const handleProfileClick = () => {
     router.push(`/profile/${userId}`);
@@ -28,6 +29,6 @@ const AvatarProfile = ({ nickname, userId, profileImage }) => {
       </div>
     </div>
   );
-};
+}
 
 export default AvatarProfile;

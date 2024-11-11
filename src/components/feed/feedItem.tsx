@@ -1,10 +1,21 @@
-"use client"
-import { Avatar, AvatarFallback, AvatarImage } from '../../components/ui/avatar';
+'use client';
+
+import { FaComment } from 'react-icons/fa';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { useModalStore } from '../../states/store';
 import FeedDetail from './feedDetail';
-import { FaComment } from 'react-icons/fa';
 
-const FeedItem = ({ nickname, userId, content, images, postId, time, commentCount, likeCount, profileImage }) => {
+function FeedItem({
+  nickname,
+  userId,
+  content,
+  images,
+  postId,
+  time,
+  commentCount,
+  likeCount,
+  profileImage,
+}) {
   const createdAt = new Date(time);
   const formattedCreatedAt = `${createdAt.getFullYear()}년 ${createdAt.getMonth() + 1}월 ${createdAt.getDate()}일`;
   const { openModal, setModalContent, setModalTitle } = useModalStore();
@@ -21,9 +32,9 @@ const FeedItem = ({ nickname, userId, content, images, postId, time, commentCoun
         time={createdAt}
         commentCount={commentCount}
         likeCount={likeCount}
-      />
+      />,
     );
-    setModalTitle("글 상세 페이지")
+    setModalTitle('글 상세 페이지');
     openModal();
   };
 
@@ -37,7 +48,7 @@ const FeedItem = ({ nickname, userId, content, images, postId, time, commentCoun
         backgroundPosition: 'center',
       }}
     >
-      <div className="absolute inset-0 bg-black bg-opacity-40"></div>
+      <div className="absolute inset-0 bg-black bg-opacity-40" />
 
       <div className="absolute top-3 left-3 flex items-center space-x-2 z-10">
         <Avatar>
@@ -62,6 +73,6 @@ const FeedItem = ({ nickname, userId, content, images, postId, time, commentCoun
       </div>
     </div>
   );
-};
+}
 
 export default FeedItem;

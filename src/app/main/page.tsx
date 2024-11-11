@@ -1,13 +1,18 @@
 'use client';
+
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
-import { fetchFeeds, fetchNewFeeds, fetchFeedCount } from '../../lib/api/feedApi';
+import {
+  fetchFeeds,
+  fetchNewFeeds,
+  fetchFeedCount,
+} from '../../lib/api/feedApi';
 import { ScrollArea } from '../../components/ui/scroll-area';
 import FeedItem from '../../components/feed/feedItem';
 import Sibar from '../../components/sidebar/new-neo-sidebar';
 import Spinner from '../../components/ui/spinner';
 
-const Home = () => {
+function Home() {
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
   const queryClient = useQueryClient();
@@ -49,9 +54,10 @@ const Home = () => {
 
   const feeds = data?.pages.flatMap((page) => page.feeds) || [];
 
-  const latestFeedCreatedAt = useMemo(() => {
-    return feeds.length > 0 ? feeds[0].createdAt : null;
-  }, [feeds]);
+  const latestFeedCreatedAt = useMemo(
+    () => (feeds.length > 0 ? feeds[0].createdAt : null),
+    [feeds],
+  );
 
   // 폴링 메커니즘 구현
   useEffect(() => {
@@ -125,7 +131,7 @@ const Home = () => {
         root: scrollRef.current,
         rootMargin: '0px',
         threshold: 0.1,
-      }
+      },
     );
     if (loadMoreRef.current) {
       observer.observe(loadMoreRef.current);
@@ -136,7 +142,13 @@ const Home = () => {
         observer.unobserve(loadMoreRef.current);
       }
     };
-  }, [fetchNextPage, hasNextPage, isFetchingNextPage, feeds.length, totalFeeds]);
+  }, [
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    feeds.length,
+    totalFeeds,
+  ]);
 
   const handleTabChange = (tab: string) => {
     setSelectedTab(tab);
@@ -174,35 +186,35 @@ const Home = () => {
 
         <ScrollArea ref={scrollRef} className="w-full mt-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mr-5 ml-8">
-            {(!userData || isLoading)
+            {!userData || isLoading
               ? Array.from({ length: 6 }).map((_, index) => (
                   <div
                     key={index}
                     className="relative w-full sm:w-[90%] md:w-[90%] h-[400px] bg-gray-200 rounded-2xl shadow-lg overflow-hidden cursor-pointer transition-all duration-300 ease-in-out transform ml-3 mt-3 animate-pulse"
                   >
-                    <div className="absolute inset-0 bg-gray-300"></div>
+                    <div className="absolute inset-0 bg-gray-300" />
 
                     <div className="absolute top-3 left-3 flex items-center space-x-2 z-10">
                       {/* 프로필 이미지 스켈레톤 */}
-                      <div className="w-10 h-10 bg-gray-400 rounded-full"></div>
+                      <div className="w-10 h-10 bg-gray-400 rounded-full" />
                       <div className="flex flex-col space-y-1">
                         {/* 닉네임 스켈레톤 */}
-                        <div className="w-24 h-4 bg-gray-400 rounded"></div>
+                        <div className="w-24 h-4 bg-gray-400 rounded" />
                         {/* 시간 스켈레톤 */}
-                        <div className="w-16 h-3 bg-gray-400 rounded"></div>
+                        <div className="w-16 h-3 bg-gray-400 rounded" />
                       </div>
                     </div>
 
                     {/* 좋아요와 댓글 스켈레톤 */}
                     <div className="absolute top-3 right-3 flex items-center space-x-2 z-10">
-                      <div className="w-4 h-4 bg-gray-400 rounded"></div>
-                      <div className="w-6 h-3 bg-gray-400 rounded"></div>
+                      <div className="w-4 h-4 bg-gray-400 rounded" />
+                      <div className="w-6 h-3 bg-gray-400 rounded" />
                     </div>
 
                     {/* 글 내용 스켈레톤 */}
                     <div className="absolute bottom-10 left-3 z-10">
-                      <div className="w-64 h-6 bg-gray-400 rounded mb-2"></div>
-                      <div className="w-56 h-6 bg-gray-400 rounded"></div>
+                      <div className="w-64 h-6 bg-gray-400 rounded mb-2" />
+                      <div className="w-56 h-6 bg-gray-400 rounded" />
                     </div>
                   </div>
                 ))
@@ -232,6 +244,6 @@ const Home = () => {
       </div>
     </div>
   );
-};
+}
 
 export default Home;

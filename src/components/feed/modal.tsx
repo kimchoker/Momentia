@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from "react";
-import ReactDOM from "react-dom";
+import React, { useEffect, useState } from 'react';
+import ReactDOM from 'react-dom';
 
-const Modal = ({ isOpen, onClose, title, children }) => {
+function Modal({ isOpen, onClose, title, children }) {
   const [shouldRender, setShouldRender] = useState(isOpen); // 렌더링 여부 상태 관리
-  const [animationClass, setAnimationClass] = useState(""); // 애니메이션 클래스를 관리하는 상태
+  const [animationClass, setAnimationClass] = useState(''); // 애니메이션 클래스를 관리하는 상태
 
   // 모달이 열리고 닫힐 때 애니메이션 설정
   useEffect(() => {
     if (isOpen) {
       setShouldRender(true); // 모달을 렌더링
-      setTimeout(() => setAnimationClass("animate-modal-in"), 0); // 약간의 지연 후에 애니메이션 시작
+      setTimeout(() => setAnimationClass('animate-modal-in'), 0); // 약간의 지연 후에 애니메이션 시작
     } else {
-      setAnimationClass("animate-modal-out");
+      setAnimationClass('animate-modal-out');
       setTimeout(() => setShouldRender(false), 300); // 닫히는 애니메이션이 끝난 후 DOM에서 제거
     }
   }, [isOpen]);
@@ -24,7 +24,7 @@ const Modal = ({ isOpen, onClose, title, children }) => {
       <div
         className="fixed inset-0 bg-black opacity-50 transition-opacity duration-300"
         onClick={onClose}
-      ></div>
+      />
 
       {/* 모달 콘텐츠 */}
       <div
@@ -36,8 +36,8 @@ const Modal = ({ isOpen, onClose, title, children }) => {
         <div className="overflow-auto h-[80%]">{children}</div>
       </div>
     </div>,
-    document.body
+    document.body,
   );
-};
+}
 
 export default Modal;

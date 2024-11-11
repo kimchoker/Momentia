@@ -7,7 +7,10 @@ export async function GET(req: NextRequest) {
   const email = searchParams.get('email');
 
   if (!email) {
-    return NextResponse.json({ message: '이메일이 제공되지 않았습니다.' }, { status: 400 });
+    return NextResponse.json(
+      { message: '이메일이 제공되지 않았습니다.' },
+      { status: 400 },
+    );
   }
 
   try {

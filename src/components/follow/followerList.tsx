@@ -1,14 +1,17 @@
 'use client';
+
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import ProfileCard from './ProfileCard'; // 프로필 카드 컴포넌트 import
 
-const FollowerList = ({ email }) => {
+function FollowerList({ email }) {
   const [followers, setFollowers] = useState([]);
 
   useEffect(() => {
     const fetchFollowers = async () => {
-      const response = await axios.get(`/api/follow/list?email=${email}&type=followers`);
+      const response = await axios.get(
+        `/api/follow/list?email=${email}&type=followers`,
+      );
       setFollowers(response.data);
     };
     fetchFollowers();
@@ -31,6 +34,6 @@ const FollowerList = ({ email }) => {
       )}
     </div>
   );
-};
+}
 
 export default FollowerList;

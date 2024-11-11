@@ -7,7 +7,10 @@ export async function GET(req: NextRequest) {
   const type = searchParams.get('type'); // 'followers' 또는 'following'
 
   if (!email || !type) {
-    return NextResponse.json({ message: '이메일 또는 타입이 제공되지 않았습니다.' }, { status: 400 });
+    return NextResponse.json(
+      { message: '이메일 또는 타입이 제공되지 않았습니다.' },
+      { status: 400 },
+    );
   }
 
   try {
@@ -26,10 +29,13 @@ export async function GET(req: NextRequest) {
     }
 
     if (querySnapshot.empty) {
-      return NextResponse.json({ message: '리스트가 없습니다.' }, { status: 404 });
+      return NextResponse.json(
+        { message: '리스트가 없습니다.' },
+        { status: 404 },
+      );
     }
 
-    const list = querySnapshot.docs.map(doc => ({
+    const list = querySnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));

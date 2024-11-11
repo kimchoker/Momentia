@@ -1,16 +1,16 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { uploadImage, savePost } from '../../lib/api/feedApi';
-import { useModalStore } from '../../states/store';
-import { Button } from '../ui/button';
 import { CircleX } from 'lucide-react';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { useDrag, useDrop, DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import { Button } from '../ui/button';
+import { useModalStore } from '../../states/store';
+import { uploadImage, savePost } from '../../lib/api/feedApi';
 
 const ItemType = 'IMAGE'; // 드래그 가능한 아이템 타입
 
 // 이미지 썸네일 컴포넌트
-const DraggableImage = ({ url, index, moveImage, handleImageDelete }: any) => {
+function DraggableImage({ url, index, moveImage, handleImageDelete }: any) {
   const ref = useRef<HTMLDivElement>(null); // useRef로 ref 생성
 
   const [, drag] = useDrag({
@@ -31,8 +31,15 @@ const DraggableImage = ({ url, index, moveImage, handleImageDelete }: any) => {
   drag(drop(ref)); // drag와 drop을 결합
 
   return (
-    <div ref={ref} className="relative w-20 h-20 border border-gray-300 rounded-lg overflow-hidden m-1">
-      <img src={url} alt={`Preview ${index}`} className="w-full h-full object-cover" />
+    <div
+      ref={ref}
+      className="relative w-20 h-20 border border-gray-300 rounded-lg overflow-hidden m-1"
+    >
+      <img
+        src={url}
+        alt={`Preview ${index}`}
+        className="w-full h-full object-cover"
+      />
       <button
         type="button"
         onClick={() => handleImageDelete(index)}
@@ -42,29 +49,28 @@ const DraggableImage = ({ url, index, moveImage, handleImageDelete }: any) => {
       </button>
     </div>
   );
-};
+}
 
-const WritingComponent = () => {
+function WritingComponent() {
   const [content, setContent] = useState<string>('');
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const queryClient = useQueryClient();
   const { closeModal } = useModalStore();
 
-
   const [userData, setUserData] = useState(null);
 
-    useEffect(() => {
-      const storedUserData = sessionStorage.getItem('userData');
-      if (storedUserData) {
-        const parsedUserData = JSON.parse(storedUserData);
-        setUserData(parsedUserData);
-      } else {
-        alert('로그인이 필요합니다.');
-        // 필요하다면 로그인 페이지로 리다이렉트
-        // router.push('/login');
-      }
-    }, []);
+  useEffect(() => {
+    const storedUserData = sessionStorage.getItem('userData');
+    if (storedUserData) {
+      const parsedUserData = JSON.parse(storedUserData);
+      setUserData(parsedUserData);
+    } else {
+      alert('로그인이 필요합니다.');
+      // 필요하다면 로그인 페이지로 리다이렉트
+      // router.push('/login');
+    }
+  }, []);
 
   // 텍스트 입력 핸들러
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -73,7 +79,7 @@ const WritingComponent = () => {
 
   // 이미지 선택 핸들러 (최대 5장 제한)
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
+    const { files } = event.target;
     if (files) {
       const newImages = Array.from(files);
       const totalImages = selectedImages.length + newImages.length;
@@ -85,7 +91,9 @@ const WritingComponent = () => {
 
       setSelectedImages([...selectedImages, ...newImages]);
 
-      const newPreviewUrls = newImages.map(image => URL.createObjectURL(image));
+      const newPreviewUrls = newImages.map((image) =>
+        URL.createObjectURL(image),
+      );
       setPreviewUrls([...previewUrls, ...newPreviewUrls]);
     }
   };
@@ -105,13 +113,13 @@ const WritingComponent = () => {
       newSelectedImages.splice(hoverIndex, 0, draggedImage);
       setSelectedImages(newSelectedImages);
     },
-    [previewUrls, selectedImages]
+    [previewUrls, selectedImages],
   );
 
   // 이미지 삭제 핸들러
   const handleImageDelete = (index: number) => {
-    setPreviewUrls(prevUrls => prevUrls.filter((_, i) => i !== index));
-    setSelectedImages(prevImages => prevImages.filter((_, i) => i !== index));
+    setPreviewUrls((prevUrls) => prevUrls.filter((_, i) => i !== index));
+    setSelectedImages((prevImages) => prevImages.filter((_, i) => i !== index));
   };
 
   // 글 작성 후 최신 피드를 불러오기 위한 Mutation
@@ -131,7 +139,10 @@ const WritingComponent = () => {
         content,
         likeCount: 0,
         commentCount: 0,
-        images: uploaded.map(img => ({ url: img.url, fileName: img.fileName })),
+        images: uploaded.map((img) => ({
+          url: img.url,
+          fileName: img.fileName,
+        })),
       };
 
       // 글 저장
@@ -156,11 +167,12 @@ const WritingComponent = () => {
     postMutation.mutate();
   };
 
-  useEffect(() => {
-    return () => {
-      previewUrls.forEach(url => URL.revokeObjectURL(url));
-    };
-  }, [previewUrls]);
+  useEffect(
+    () => () => {
+      previewUrls.forEach((url) => URL.revokeObjectURL(url));
+    },
+    [previewUrls],
+  );
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -208,6 +220,6 @@ const WritingComponent = () => {
       </div>
     </DndProvider>
   );
-};
+}
 
 export default WritingComponent;

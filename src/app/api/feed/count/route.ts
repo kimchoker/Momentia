@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { db } from '../../../../lib/firebase/firebase';
 import { collection, getCountFromServer } from 'firebase/firestore';
+import { db } from '../../../../lib/firebase/firebase';
 
 export async function GET() {
   try {

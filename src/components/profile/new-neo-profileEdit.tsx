@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useEffect, useState } from "react";
-import { profileEditStore } from "../../states/store";
-import { CirclePlus } from "lucide-react";
-import axios from "axios";
+import React, { useEffect, useState } from 'react';
+import { CirclePlus } from 'lucide-react';
+import axios from 'axios';
+import { profileEditStore } from '../../states/store';
 // `authStore` 임포트 제거
 
 interface ModalProps {
@@ -133,13 +133,13 @@ const ProfileEdit: React.FC<ModalProps> = ({ isOpen }) => {
         <div className="fixed inset-0 z-50 flex items-end justify-center">
           <div
             className={`absolute inset-0 transition-opacity duration-300 ${
-              animate ? "opacity-50 bg-black" : "opacity-0 bg-black"
+              animate ? 'opacity-50 bg-black' : 'opacity-0 bg-black'
             }`}
             onClick={closeEdit}
           />
           <div
             className={`relative w-[500px] h-2/5 p-6 bg-white rounded-t-lg transform transition-transform duration-300 ease-in-out ${
-              animate ? "translate-y-0" : "translate-y-full"
+              animate ? 'translate-y-0' : 'translate-y-full'
             }`}
           >
             {/* 닫기 버튼 */}
@@ -168,7 +168,11 @@ const ProfileEdit: React.FC<ModalProps> = ({ isOpen }) => {
               <label
                 htmlFor="profileImageUpload"
                 className="absolute w-24 h-24 flex items-center justify-center text-sm text-white opacity-0 hover:opacity-100 cursor-pointer rounded-full bg-black bg-opacity-50 transition-opacity"
-                style={{ top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}
+                style={{
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                }}
               >
                 <CirclePlus />
               </label>

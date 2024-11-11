@@ -1,39 +1,42 @@
-"use client";
-import React from "react";
-import { Notification } from "../../types/types";
+'use client';
 
-
+import React from 'react';
+import { Notification } from '../../types/types';
 
 // 댓글 알림 컴포넌트
-const CommentNotification = ({ user, content, createdAt }: Notification) => {
+function CommentNotification({ user, content, createdAt }: Notification) {
   return (
     <div className="p-4 border-b">
-      <p><strong>{user}</strong>님이 당신의 글에 댓글을 남겼습니다: "{content}"</p>
+      <p>
+        <strong>{user}</strong>님이 당신의 글에 댓글을 남겼습니다: "{content}"
+      </p>
       <p className="text-gray-500 text-sm">{createdAt}</p>
     </div>
   );
-};
+}
 
 // 좋아요 알림 컴포넌트
-const LikeNotification = ({ user, createdAt }: Notification) => {
+function LikeNotification({ user, createdAt }: Notification) {
   return (
     <div className="p-4 border-b">
-      <p><strong>{user}</strong>님이 당신의 글을 좋아합니다.</p>
+      <p>
+        <strong>{user}</strong>님이 당신의 글을 좋아합니다.
+      </p>
       <p className="text-gray-500 text-sm">{createdAt}</p>
     </div>
   );
-};
+}
 
 // 메인 알림 컴포넌트
-const NotificationItem = (props: Notification) => {
+function NotificationItem(props: Notification) {
   switch (props.type) {
-    case "comment":
+    case 'comment':
       return <CommentNotification {...props} />;
-    case "like":
+    case 'like':
       return <LikeNotification {...props} />;
     default:
       return null;
   }
-};
+}
 
 export default NotificationItem;

@@ -1,34 +1,46 @@
-import { collection, doc, addDoc, serverTimestamp, updateDoc } from "firebase/firestore";
-import { db, storage } from "../firebase/firebase";
-import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
-import { PostData, UpdatePostData } from '../../types/types';
-import { getAuth } from "firebase/auth";
-import { convertToWebp } from "../imageResize/imageResizing";
+import {
+  collection,
+  doc,
+  addDoc,
+  serverTimestamp,
+  updateDoc,
+} from 'firebase/firestore';
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  deleteObject,
+} from 'firebase/storage';
+import { getAuth } from 'firebase/auth';
 import axios from 'axios';
+import { db, storage } from '../firebase/firebase';
+import { PostData, UpdatePostData } from '../../types/types';
+import { convertToWebp } from '../imageResize/imageResizing';
 
 // 이미지 업로드
-const uploadImage = async (file: File): Promise<{ url: string, fileName: string }> => {
+const uploadImage = async (
+  file: File,
+): Promise<{ url: string; fileName: string }> => {
   try {
     // 이미지를 WebP로 변환
     const webpBlob = await convertToWebp(file);
-    const uploadedFileName = `${Date.now()}_${file.name.replace(/\.[^/.]+$/, ".webp")}`;
-    
+    const uploadedFileName = `${Date.now()}_${file.name.replace(/\.[^/.]+$/, '.webp')}`;
+
     // Firebase에 업로드
     const storageRef = ref(storage, `images/${uploadedFileName}`);
     const snapshot = await uploadBytes(storageRef, webpBlob);
     const url = await getDownloadURL(snapshot.ref);
-    
+
     return { url, fileName: uploadedFileName };
   } catch (error) {
     console.error('Upload failed:', error);
-    alert("이미지 업로드에 실패했습니다.");
+    alert('이미지 업로드에 실패했습니다.');
     throw new Error('Image upload failed');
   }
 };
 
 // 전체 피드 글 불러오기(과거 글, 무한스크롤 기능에 사용)
 const fetchFeeds = async ({ email, pageParam, type }) => {
-
   const response = await fetch('/api/feed', {
     method: 'POST',
     headers: {
@@ -83,8 +95,6 @@ const fetchNewFeeds = async ({ email, type, lastCreatedAt }) => {
   return response.json();
 };
 
-
-
 // 특정 유저 피드 글 불러오기
 const fetchUserFeeds = async (userId: string, pageParam: string | null) => {
   try {
@@ -111,10 +121,14 @@ const savePost = async (postData: PostData) => {
   }
 };
 
-const updatePost = async (postId: string, updatedData: UpdatePostData, removedImages: { url: string; fileName: string }[]) => {
+const updatePost = async (
+  postId: string,
+  updatedData: UpdatePostData,
+  removedImages: { url: string; fileName: string }[],
+) => {
   try {
     if (!postId) {
-      throw new Error("postId가 유효하지 않습니다.");
+      throw new Error('postId가 유효하지 않습니다.');
     }
 
     const postRef = doc(db, 'Feed', postId);
@@ -144,17 +158,17 @@ const deletePost = async (postId: string) => {
     const idToken = await auth.currentUser?.getIdToken();
 
     if (!idToken) {
-      throw new Error("User not authenticated");
+      throw new Error('User not authenticated');
     }
 
-    const response = await axios.post("/api/deletepost", {
+    const response = await axios.post('/api/deletepost', {
       postId,
       idToken,
     });
 
     return response.data;
   } catch (error) {
-    console.error("글 삭제 중 오류가 발생했습니다:", error);
+    console.error('글 삭제 중 오류가 발생했습니다:', error);
     throw error;
   }
 };
@@ -163,9 +177,9 @@ const deleteComment = async (commentId: string, postId: string) => {
   try {
     const response = await axios.delete(`/api/comments`, {
       params: {
-        commentId: commentId, // 삭제할 댓글의 ID
-        postId: postId,       // 게시물의 ID
-      }
+        commentId, // 삭제할 댓글의 ID
+        postId, // 게시물의 ID
+      },
     });
 
     return response.data;
@@ -188,13 +202,12 @@ const createComment = async (newComment) => {
 };
 
 // 댓글 삭제 함수
-const deleteCommentApi = async ({ commentId, postId }) => {
-  return await axios.delete(`/api/comments?commentId=${commentId}&postId=${postId}`);
-};
+const deleteCommentApi = async ({ commentId, postId }) =>
+  axios.delete(`/api/comments?commentId=${commentId}&postId=${postId}`);
 
 // 좋아요 추가
 const likePost = async (postId: string, email: string) => {
-  const response = await axios.post("/api/like", {
+  const response = await axios.post('/api/like', {
     postId,
     email, // 요청 바디에 email 포함
   });
@@ -203,7 +216,7 @@ const likePost = async (postId: string, email: string) => {
 
 // 좋아요 취소
 const unlikePost = async (postId: string, email: string) => {
-  const response = await axios.delete("/api/like", {
+  const response = await axios.delete('/api/like', {
     data: {
       postId,
       email, // 요청 바디에 email 포함
@@ -211,4 +224,19 @@ const unlikePost = async (postId: string, email: string) => {
   });
   return response.data;
 };
-export { uploadImage, savePost, updatePost, deletePost, deleteComment, likePost, unlikePost, fetchComments, createComment, deleteCommentApi, fetchUserFeeds, fetchFeeds, fetchFeedCount, fetchNewFeeds };
+export {
+  uploadImage,
+  savePost,
+  updatePost,
+  deletePost,
+  deleteComment,
+  likePost,
+  unlikePost,
+  fetchComments,
+  createComment,
+  deleteCommentApi,
+  fetchUserFeeds,
+  fetchFeeds,
+  fetchFeedCount,
+  fetchNewFeeds,
+};

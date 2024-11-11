@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { db } from '../../../../lib/firebase/firebase';
 import {
   collection,
   getDocs,
@@ -11,6 +10,7 @@ import {
   doc as firestoreDoc,
   getDoc,
 } from 'firebase/firestore';
+import { db } from '../../../../lib/firebase/firebase';
 import { post } from '../../../../types/types';
 
 export async function POST(request: Request) {
@@ -25,12 +25,12 @@ export async function POST(request: Request) {
       const followCollection = collection(db, 'Follow');
       const followQuery = query(
         followCollection,
-        where('FollowerUserId', '==', email)
+        where('FollowerUserId', '==', email),
       );
 
       const followSnapshot = await getDocs(followQuery);
       const followingUserIds = followSnapshot.docs.map(
-        (doc) => doc.data().followingUserId
+        (doc) => doc.data().followingUserId,
       );
       followingUserIds.push(email);
 
@@ -42,13 +42,13 @@ export async function POST(request: Request) {
         feedCollection,
         where('email', 'in', followingUserIds),
         orderBy('createdAt', 'asc'),
-        startAfter(Timestamp.fromDate(new Date(lastCreatedAt)))
+        startAfter(Timestamp.fromDate(new Date(lastCreatedAt))),
       );
     } else {
       q = query(
         feedCollection,
         orderBy('createdAt', 'asc'),
-        startAfter(Timestamp.fromDate(new Date(lastCreatedAt)))
+        startAfter(Timestamp.fromDate(new Date(lastCreatedAt))),
       );
     }
 
@@ -61,7 +61,7 @@ export async function POST(request: Request) {
     const feeds = await Promise.all(
       querySnapshot.docs.map(async (feedDoc) => {
         const data = feedDoc.data() as post;
-        const userId = data.userId;
+        const { userId } = data;
 
         const userDocRef = firestoreDoc(db, 'user', userId);
         const userDocSnap = await getDoc(userDocRef);
@@ -87,7 +87,7 @@ export async function POST(request: Request) {
           commentCount: data.commentCount || 0,
           createdAt: (data.createdAt as Timestamp).toDate().toISOString(),
         };
-      })
+      }),
     );
 
     return NextResponse.json({ feeds });

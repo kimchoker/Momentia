@@ -1,8 +1,13 @@
-import { initializeApp } from "firebase/app";
-import { getAuth, Auth } from "firebase/auth";
-import { getFirestore, Firestore, collection, CollectionReference } from "firebase/firestore";
-import { getStorage } from "firebase/storage";
-import { getMessaging, isSupported } from "firebase/messaging";
+import { initializeApp } from 'firebase/app';
+import { getAuth, Auth } from 'firebase/auth';
+import {
+  getFirestore,
+  Firestore,
+  collection,
+  CollectionReference,
+} from 'firebase/firestore';
+import { getStorage } from 'firebase/storage';
+import { getMessaging, isSupported } from 'firebase/messaging';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_API_KEY,
@@ -19,12 +24,12 @@ const app = initializeApp(firebaseConfig);
 const storage = getStorage(app);
 const auth: Auth = getAuth(app);
 const db: Firestore = getFirestore(app);
-const USER_COLLECTION: CollectionReference = collection(db, "User");
+const USER_COLLECTION: CollectionReference = collection(db, 'User');
 
 let messaging;
 (async () => {
   // `messaging`은 클라이언트에서만 사용할 수 있도록 조건부로 초기화
-  if (typeof window !== "undefined" && (await isSupported())) {
+  if (typeof window !== 'undefined' && (await isSupported())) {
     messaging = getMessaging(app);
   }
 })();

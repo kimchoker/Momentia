@@ -1,13 +1,14 @@
 'use client';
+
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { Profile, ProfileFallback, ProfileImage } from "../ui/profile";
-import { Button } from "../ui/button";
-import { profileEditStore } from "../../states/store";
-import { MainProfileProps } from "../../types/types";
-import ProfileEdit from "./new-neo-profileEdit";
-import FollowButton from '../follow/followButton';
 import axios from 'axios';
+import { Profile, ProfileFallback, ProfileImage } from '../ui/profile';
+import { Button } from '../ui/button';
+import { profileEditStore } from '../../states/store';
+import { MainProfileProps } from '../../types/types';
+import ProfileEdit from './new-neo-profileEdit';
+import FollowButton from '../follow/followButton';
 
 const MainProfile: React.FC<MainProfileProps> = ({
   email,
@@ -20,7 +21,9 @@ const MainProfile: React.FC<MainProfileProps> = ({
   const { isEditOpen, openEdit } = profileEditStore();
 
   // 세션 스토리지에서 로그인된 사용자 이메일 가져오기
-  const [loggedInUserEmail, setLoggedInUserEmail] = useState<string | null>(null);
+  const [loggedInUserEmail, setLoggedInUserEmail] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
     const storedUserData = sessionStorage.getItem('userData');
@@ -42,13 +45,13 @@ const MainProfile: React.FC<MainProfileProps> = ({
             loggedInUserEmail,
             targetUserEmail: email,
           });
-      
+
           setIsFollowing(response.data.isFollowing);
         } catch (error) {
           console.error('팔로우 상태를 확인하는 중 오류 발생:', error);
         }
       };
-      
+
       checkFollowStatus();
     }
   }, [loggedInUserEmail, email, isCurrentUser]);
@@ -62,9 +65,7 @@ const MainProfile: React.FC<MainProfileProps> = ({
       <div className="flex flex-row">
         {/* 프로필 이미지 */}
         <Profile>
-          <ProfileImage
-            src={profileImage}
-          />
+          <ProfileImage src={profileImage} />
           <ProfileFallback />
         </Profile>
         {/* 닉네임/아이디 */}
@@ -75,11 +76,14 @@ const MainProfile: React.FC<MainProfileProps> = ({
           <p className="text-s">{email}</p>
           {/* 상태 메시지 */}
           <div className="mt-3 mb-5">
-            <p className="text-s">{bio || ""}</p>
+            <p className="text-s">{bio || ''}</p>
           </div>
           {/* 팔로우/팔로잉 정보 */}
           <div className="flex flex-row mb-2 text-m font-bold">
-            <Link href={`/follow/${email}`} className="mr-[60px] hover:underline">
+            <Link
+              href={`/follow/${email}`}
+              className="mr-[60px] hover:underline"
+            >
               팔로잉 {following || 0}
             </Link>
             <Link href={`/follow/${email}`} className="hover:underline">

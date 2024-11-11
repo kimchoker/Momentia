@@ -1,11 +1,10 @@
-import { Timestamp } from "firebase/firestore";
+import { Timestamp } from 'firebase/firestore';
 import { ReactNode } from 'react';
 
 // zustand
 export interface User {
   uid: string;
   email: string;
-  
 }
 
 // 유저 인증상태
@@ -16,10 +15,10 @@ export interface AuthState {
   email: string | null;
   nickname: string | null;
   bio: string | null;
-  follower: number | null 
-  following: number | null 
+  follower: number | null;
+  following: number | null;
   profileImage: string | null;
-  login: (token :string) => void;
+  login: (token: string) => void;
   logout: () => void;
   setUser: (userData: {
     uid: string;
@@ -74,13 +73,12 @@ export interface DrawerState {
   closeEdit: () => void;
 }
 
-
 // 글쓰기 관련 타입
 export interface PostData {
   userId: string; // uid
   email: string; // 이메일
   content: string; // 글 내용
-  images: { url: string; fileName: string }[]; // 첨부 이미지 
+  images: { url: string; fileName: string }[]; // 첨부 이미지
   likeCount: number;
   commentCount: number;
 }
@@ -91,7 +89,7 @@ export interface post {
   email: string; // 이메일
   userId: string; // uid
   content: string; // 글 내용
-  profileImage :string;
+  profileImage: string;
   images: {
     fileName: string;
     url: string;
@@ -113,8 +111,8 @@ export interface UserState {
 }
 
 export interface imageArray {
-	url: string
-	fileName: string
+  url: string;
+  fileName: string;
 }
 
 export interface UpdatePostData {
@@ -133,7 +131,7 @@ export interface comment {
 
 export interface Notification {
   id: string;
-  type: "like" | "comment";
+  type: 'like' | 'comment';
   content: string;
   user: string;
   postId?: string;
@@ -143,11 +141,11 @@ export interface Notification {
 
 // 프로필 관련
 export interface MainProfileProps {
-  email: string;             
-  nickname: string;        
-  bio?: string;               
-  follower?: number;       
-  following?: number;         
-  profileImage?: string;      
-  isCurrentUser: boolean;   
-};
+  email: string;
+  nickname: string;
+  bio?: string;
+  follower?: number;
+  following?: number;
+  profileImage?: string;
+  isCurrentUser: boolean;
+}

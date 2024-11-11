@@ -1,19 +1,20 @@
-"use client";
-import React, { useState, useEffect } from "react";
-import NotificationItem from "../../components/notification/NotificationComponent";
-import axios from "axios";
-import { Notification } from "../../types/types";
+'use client';
 
-const NotificationsPage = () => {
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import NotificationItem from '../../components/notification/NotificationComponent';
+import { Notification } from '../../types/types';
+
+function NotificationsPage() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
   // 알림 목록을 서버에서 가져오는 함수
   const fetchNotifications = async () => {
     try {
-      const response = await axios.get("/api/notifications");
+      const response = await axios.get('/api/notifications');
       setNotifications(response.data);
     } catch (error) {
-      console.error("알림을 불러오는 중 오류가 발생했습니다.", error);
+      console.error('알림을 불러오는 중 오류가 발생했습니다.', error);
     }
   };
 
@@ -33,6 +34,6 @@ const NotificationsPage = () => {
       ))}
     </div>
   );
-};
+}
 
 export default NotificationsPage;

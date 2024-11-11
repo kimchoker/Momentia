@@ -1,9 +1,9 @@
-"use client"
+'use client';
 
-import * as React from "react"
-import * as AvatarPrimitive from "@radix-ui/react-avatar"
+import * as React from 'react';
+import * as AvatarPrimitive from '@radix-ui/react-avatar';
 
-import { cn } from "../../utils/shadcn/utils"
+import { cn } from '../../utils/shadcn/utils';
 
 const Profile = React.forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Root>,
@@ -12,13 +12,13 @@ const Profile = React.forwardRef<
   <AvatarPrimitive.Root
     ref={ref}
     className={cn(
-      "relative flex h-[100px] w-[100px] shrink-0 overflow-hidden rounded-full",
-      className
+      'relative flex h-[100px] w-[100px] shrink-0 overflow-hidden rounded-full',
+      className,
     )}
     {...props}
   />
-))
-Profile.displayName = AvatarPrimitive.Root.displayName
+));
+Profile.displayName = AvatarPrimitive.Root.displayName;
 
 const ProfileImage = React.forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Image>,
@@ -26,11 +26,11 @@ const ProfileImage = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <AvatarPrimitive.Image
     ref={ref}
-    className={cn("aspect-square h-full w-full", className)}
+    className={cn('aspect-square h-full w-full', className)}
     {...props}
   />
-))
-ProfileImage.displayName = AvatarPrimitive.Image.displayName
+));
+ProfileImage.displayName = AvatarPrimitive.Image.displayName;
 
 const ProfileFallback = React.forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Fallback>,
@@ -39,12 +39,12 @@ const ProfileFallback = React.forwardRef<
   <AvatarPrimitive.Fallback
     ref={ref}
     className={cn(
-      "flex h-full w-full items-center justify-center rounded-full bg-muted",
-      className
+      'flex h-full w-full items-center justify-center rounded-full bg-muted',
+      className,
     )}
     {...props}
   />
-))
-ProfileFallback.displayName = AvatarPrimitive.Fallback.displayName
+));
+ProfileFallback.displayName = AvatarPrimitive.Fallback.displayName;
 
-export { Profile, ProfileImage, ProfileFallback }
+export { Profile, ProfileImage, ProfileFallback };

@@ -1,12 +1,12 @@
-export const convertToWebp = (file: File): Promise<Blob> => {
-  return new Promise((resolve, reject) => {
+export const convertToWebp = (file: File): Promise<Blob> =>
+  new Promise((resolve, reject) => {
     const reader = new FileReader();
-    
+
     reader.readAsDataURL(file);
     reader.onload = () => {
       const img = new Image();
       img.src = reader.result as string;
-      
+
       img.onload = () => {
         const canvas = document.createElement('canvas');
         canvas.width = img.width;
@@ -23,7 +23,7 @@ export const convertToWebp = (file: File): Promise<Blob> => {
               }
             },
             'image/webp',
-            0.8 // 품질 설정 (0~1, 1이 최고 품질)
+            0.8, // 품질 설정 (0~1, 1이 최고 품질)
           );
         } else {
           reject(new Error('Canvas 컨텍스트를 가져올 수 없습니다.'));
@@ -35,4 +35,3 @@ export const convertToWebp = (file: File): Promise<Blob> => {
       reject(new Error('파일을 읽는 중 오류가 발생했습니다.'));
     };
   });
-};

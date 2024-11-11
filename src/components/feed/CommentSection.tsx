@@ -1,9 +1,14 @@
 'use client';
+
 import React, { useState, useEffect } from 'react';
 import { ArrowUp } from 'lucide-react';
 import { useQueryClient, useQuery, useMutation } from '@tanstack/react-query';
-import { fetchComments, createComment, deleteCommentApi } from '../../lib/api/feedApi';
 import { ClipLoader } from 'react-spinners';
+import {
+  fetchComments,
+  createComment,
+  deleteCommentApi,
+} from '../../lib/api/feedApi';
 import { CommentComponent } from './CommentComponent';
 
 interface CommentSectionProps {
@@ -102,8 +107,13 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
             nickname={comment.nickname}
             comment={comment.content}
             createdAt={comment.createdAt}
-            onDelete={() => deleteCommentMutation.mutate({ commentId: comment.id, postId })}
-            isDeleting={deleteCommentMutation.isPending && deleteCommentMutation.variables?.commentId === comment.id}
+            onDelete={() =>
+              deleteCommentMutation.mutate({ commentId: comment.id, postId })
+            }
+            isDeleting={
+              deleteCommentMutation.isPending &&
+              deleteCommentMutation.variables?.commentId === comment.id
+            }
           />
         ))}
       </div>
