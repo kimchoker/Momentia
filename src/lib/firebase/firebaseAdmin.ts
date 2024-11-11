@@ -9,7 +9,7 @@ const firebaseAdminConfig = {
 if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.cert(firebaseAdminConfig),
-    storageBucket: 'gs://snsproject-85107.appspot.com',
+    storageBucket: 'snsproject-85107.appspot.com',
   });
 }
 
