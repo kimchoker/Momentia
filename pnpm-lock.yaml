@@ -138,9 +138,24 @@ importers:
       autoprefixer:
         specifier: ^10.4.20
         version: 10.4.20(postcss@8.4.41)
+      eslint-config-airbnb:
+        specifier: ^19.0.4
+        version: 19.0.4(eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.13.0(eslint@8.57.0)(typescript@5.5.4))(eslint@8.57.0))(eslint-plugin-jsx-a11y@6.10.2(eslint@8.57.0))(eslint-plugin-react-hooks@5.0.0(eslint@8.57.0))(eslint-plugin-react@7.37.2(eslint@8.57.0))(eslint@8.57.0)
       eslint-config-next:
         specifier: ^15.0.3
         version: 15.0.3(eslint@8.57.0)(typescript@5.5.4)
+      eslint-plugin-import:
+        specifier: ^2.31.0
+        version: 2.31.0(@typescript-eslint/parser@8.13.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.0)
+      eslint-plugin-jsx-a11y:
+        specifier: ^6.10.2
+        version: 6.10.2(eslint@8.57.0)
+      eslint-plugin-react:
+        specifier: ^7.37.2
+        version: 7.37.2(eslint@8.57.0)
+      eslint-plugin-react-hooks:
+        specifier: ^5.0.0
+        version: 5.0.0(eslint@8.57.0)
       eslint-plugin-storybook:
         specifier: ^0.8.0
         version: 0.8.0(eslint@8.57.0)(typescript@5.5.4)
@@ -1984,6 +1999,9 @@ packages:
   concat-map@0.0.1:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
 
+  confusing-browser-globals@1.0.11:
+    resolution: {integrity: sha512-JsPKdmh8ZkmnHxDk55FZ1TqVLvEQTvoByJZRN9jzI0UjxK/QgAmsphz7PGtqgPieQZ/CQcHWXCR7ATDNhGe+YA==}
+
   content-disposition@0.5.4:
     resolution: {integrity: sha512-FveZTNuGw04cxlAiWbzi6zTAL/lhehaWbTtgluJh4/E95DqMwTmha3KZN1aAWA8cFIhHzMZUvLevkw5Rqk+tSQ==}
     engines: {node: '>= 0.6'}
@@ -2190,6 +2208,23 @@ packages:
   escape-string-regexp@4.0.0:
     resolution: {integrity: sha512-TtpcNJ3XAzx3Gq8sWRzJaVajRs0uVxA2YAkdb1jm2YkPz4G6egUFAyA3n5vtEIZefPk5Wa4UXbKuS5fKkJWdgA==}
     engines: {node: '>=10'}
+
+  eslint-config-airbnb-base@15.0.0:
+    resolution: {integrity: sha512-xaX3z4ZZIcFLvh2oUNvcX5oEofXda7giYmuplVxoOg5A7EXJMrUyqRgR+mhDhPK8LZ4PttFOBvCYDbX3sUoUig==}
+    engines: {node: ^10.12.0 || >=12.0.0}
+    peerDependencies:
+      eslint: ^7.32.0 || ^8.2.0
+      eslint-plugin-import: ^2.25.2
+
+  eslint-config-airbnb@19.0.4:
+    resolution: {integrity: sha512-T75QYQVQX57jiNgpF9r1KegMICE94VYwoFQyMGhrvc+lB8YF2E/M/PYDaQe1AJcWaEgqLE+ErXV1Og/+6Vyzew==}
+    engines: {node: ^10.12.0 || ^12.22.0 || ^14.17.0 || >=16.0.0}
+    peerDependencies:
+      eslint: ^7.32.0 || ^8.2.0
+      eslint-plugin-import: ^2.25.3
+      eslint-plugin-jsx-a11y: ^6.5.1
+      eslint-plugin-react: ^7.28.0
+      eslint-plugin-react-hooks: ^4.3.0
 
   eslint-config-next@15.0.3:
     resolution: {integrity: sha512-IGP2DdQQrgjcr4mwFPve4DrCqo7CVVez1WoYY47XwKSrYO4hC0Dlb+iJA60i0YfICOzgNADIb8r28BpQ5Zs0wg==}
@@ -6191,6 +6226,8 @@ snapshots:
 
   concat-map@0.0.1: {}
 
+  confusing-browser-globals@1.0.11: {}
+
   content-disposition@0.5.4:
     dependencies:
       safe-buffer: 5.2.1
@@ -6434,6 +6471,26 @@ snapshots:
   escape-string-regexp@1.0.5: {}
 
   escape-string-regexp@4.0.0: {}
+
+  eslint-config-airbnb-base@15.0.0(eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.13.0(eslint@8.57.0)(typescript@5.5.4))(eslint@8.57.0))(eslint@8.57.0):
+    dependencies:
+      confusing-browser-globals: 1.0.11
+      eslint: 8.57.0
+      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@8.13.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.0)
+      object.assign: 4.1.5
+      object.entries: 1.1.8
+      semver: 6.3.1
+
+  eslint-config-airbnb@19.0.4(eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.13.0(eslint@8.57.0)(typescript@5.5.4))(eslint@8.57.0))(eslint-plugin-jsx-a11y@6.10.2(eslint@8.57.0))(eslint-plugin-react-hooks@5.0.0(eslint@8.57.0))(eslint-plugin-react@7.37.2(eslint@8.57.0))(eslint@8.57.0):
+    dependencies:
+      eslint: 8.57.0
+      eslint-config-airbnb-base: 15.0.0(eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.13.0(eslint@8.57.0)(typescript@5.5.4))(eslint@8.57.0))(eslint@8.57.0)
+      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@8.13.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-typescript@3.6.3)(eslint@8.57.0)
+      eslint-plugin-jsx-a11y: 6.10.2(eslint@8.57.0)
+      eslint-plugin-react: 7.37.2(eslint@8.57.0)
+      eslint-plugin-react-hooks: 5.0.0(eslint@8.57.0)
+      object.assign: 4.1.5
+      object.entries: 1.1.8
 
   eslint-config-next@15.0.3(eslint@8.57.0)(typescript@5.5.4):
     dependencies:
@@ -7972,7 +8029,7 @@ snapshots:
 
   resolve@2.0.0-next.5:
     dependencies:
-      is-core-module: 2.15.0
+      is-core-module: 2.15.1
       path-parse: 1.0.7
       supports-preserve-symlinks-flag: 1.0.0
 
