@@ -9,7 +9,7 @@ const firebaseAdminConfig = {
 if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.cert(firebaseAdminConfig),
-    storageBucket: process.env.NEXT_PUBLIC_STORAGE_BUCKET,
+    storageBucket: `${process.env.NEXT_PUBLIC_PROJECT_ID}.appspot.com`,
   });
 }
 
