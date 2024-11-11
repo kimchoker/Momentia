@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import admin from 'firebase-admin';
-import { adminDB } from '../../../lib/firebase/firebaseAdmin';
+import { getFirebaseAdmin } from '../../../lib/firebase/firebaseAdmin';
 
-// POST 요청 핸들러
 export async function POST(req: NextRequest) {
   try {
     const { postId, email } = await req.json();
@@ -10,6 +8,9 @@ export async function POST(req: NextRequest) {
     if (!postId || !email) {
       return NextResponse.json({ message: 'Invalid request' }, { status: 400 });
     }
+
+    const admin = getFirebaseAdmin(); // 함수 내부에서 Firebase Admin SDK 초기화
+    const adminDB = admin.firestore();
 
     const likesRef = adminDB.collection('Like').doc(`${postId}_${email}`);
     const postRef = adminDB.collection('Feed').doc(postId);
@@ -37,7 +38,6 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// DELETE 요청 핸들러
 export async function DELETE(req: NextRequest) {
   try {
     const { postId, email } = await req.json();
@@ -45,6 +45,9 @@ export async function DELETE(req: NextRequest) {
     if (!postId || !email) {
       return NextResponse.json({ message: 'Invalid request' }, { status: 400 });
     }
+
+    const admin = getFirebaseAdmin(); // 함수 내부에서 Firebase Admin SDK 초기화
+    const adminDB = admin.firestore();
 
     const likesRef = adminDB.collection('Like').doc(`${postId}_${email}`);
     const postRef = adminDB.collection('Feed').doc(postId);

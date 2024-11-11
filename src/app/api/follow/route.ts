@@ -1,17 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { adminDB } from '../../../lib/firebase/firebaseAdmin'; // Firebase Admin 초기화 코드
+import { getAdminDB } from '../../../lib/firebase/firebaseAdmin';
 
 // 팔로우 추가 (POST)
 export async function POST(req: NextRequest) {
   try {
     const { followingUserID, followerUserID } = await req.json();
 
-    // 요청에 필요한 값이 없을 경우
     if (!followingUserID || !followerUserID) {
       return NextResponse.json({ message: 'Invalid request' }, { status: 400 });
     }
 
-    // 이미 팔로우했는지 확인 (중복 팔로우 방지)
+    const adminDB = getAdminDB(); // 함수 내부에서 Firebase Admin SDK 초기화
+
+    // 이미 팔로우했는지 확인
     const followRef = adminDB
       .collection('follows')
       .where('followingUserID', '==', followingUserID)
@@ -23,10 +24,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { message: 'Already following' },
         { status: 409 },
-      ); // 이미 팔로우된 경우
+      );
     }
 
-    // 팔로우 데이터 Firestore에 추가
+    // 팔로우 데이터 추가
     await adminDB.collection('follows').add({
       followingUserID,
       followerUserID,
@@ -47,10 +48,11 @@ export async function DELETE(req: NextRequest) {
   try {
     const { followingUserID, followerUserID } = await req.json();
 
-    // 요청에 필요한 값이 없을 경우
     if (!followingUserID || !followerUserID) {
       return NextResponse.json({ message: 'Invalid request' }, { status: 400 });
     }
+
+    const adminDB = getAdminDB(); // 함수 내부에서 Firebase Admin SDK 초기화
 
     // 팔로우 데이터 삭제
     const followRef = adminDB
@@ -64,13 +66,12 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json(
         { message: 'Follow not found' },
         { status: 404 },
-      ); // 팔로우 관계가 없을 때
+      );
     }
 
     // 문서 삭제
-    snapshot.forEach(async (doc) => {
-      await doc.ref.delete();
-    });
+    const deletePromises = snapshot.docs.map((doc) => doc.ref.delete());
+    await Promise.all(deletePromises);
 
     return NextResponse.json({ message: '언팔로우 성공' }, { status: 200 });
   } catch (error) {
