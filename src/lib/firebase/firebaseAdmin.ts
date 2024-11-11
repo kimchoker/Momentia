@@ -17,6 +17,9 @@ export function getFirebaseAdmin() {
 }
 
 // Firebase 서비스들을 지연 로딩으로 제공
+
+export const adminAuth = firebaseAdminModule.auth();
+
 export function getAdminAuth() {
   const admin = getFirebaseAdmin();
   return admin.auth();
