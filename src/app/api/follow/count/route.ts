@@ -1,6 +1,6 @@
 // api/follow/count.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { getAdminDB } from '../../../../lib/firebase/firebaseAdmin';
+import { adminDB } from '../../../../lib/firebase/firebaseAdmin';
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -14,8 +14,6 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const adminDB = getAdminDB(); // 함수 내부에서 Firebase Admin SDK 초기화
-
     // 팔로워 수 가져오기
     const followersSnapshot = await adminDB
       .collection('Follow')

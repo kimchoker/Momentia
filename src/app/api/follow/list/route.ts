@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAdminDB } from '../../../../lib/firebase/firebaseAdmin';
+import { adminDB } from '../../../../lib/firebase/firebaseAdmin';
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -14,8 +14,6 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const adminDB = getAdminDB(); // 함수 내부에서 Firebase Admin SDK 초기화
-
     let querySnapshot;
 
     if (type === 'followers') {
@@ -28,11 +26,6 @@ export async function GET(req: NextRequest) {
         .collection('Follow')
         .where('followerUserId', '==', email)
         .get();
-    } else {
-      return NextResponse.json(
-        { message: '유효하지 않은 타입입니다.' },
-        { status: 400 },
-      );
     }
 
     if (querySnapshot.empty) {
