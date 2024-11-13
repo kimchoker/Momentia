@@ -1,10 +1,9 @@
 'use client';
 
 import React from 'react';
-import { useRouter } from 'next/navigation';
 
 const MainPage: React.FC = () => {
-  const router = useRouter();
+  // const router = useRouter();
 
   return (
     // <div className="flex flex-col items-center justify-between min-h-screen bg-[#EEEDEB] py-40">

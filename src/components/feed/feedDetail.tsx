@@ -140,7 +140,7 @@ function FeedDetail({
       alert('글이 성공적으로 삭제되었습니다.');
       closeModal();
     } catch (error) {
-      alert('글 삭제 중 오류가 발생했습니다.');
+      alert(`글 삭제 중 오류가 발생했습니다: ${error}`);
     }
   };
 

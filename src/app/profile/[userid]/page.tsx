@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect, useState } from 'react';
-import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
 import MainProfile from '../../../components/profile/mainprofile';
 import FeedItem from '../../../components/feed/feedItem';
@@ -56,7 +56,6 @@ function UserProfilePage() {
   const decodedUserid = decodeURIComponent(userid as string);
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
-  const queryClient = useQueryClient();
   const [totalFeeds, setTotalFeeds] = useState<number | null>(null);
 
   // 피드 가져오기
@@ -65,7 +64,6 @@ function UserProfilePage() {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-    refetch,
   } = useInfiniteQuery({
     queryKey: ['feeds', decodedUserid],
     queryFn: ({ pageParam = null }) => fetchUserFeeds(decodedUserid, pageParam),

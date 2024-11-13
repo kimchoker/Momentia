@@ -27,6 +27,9 @@ export async function GET(
 
     return NextResponse.json(userData, { status: 200 });
   } catch (error) {
-    return NextResponse.json({ message: '서버 오류 발생' }, { status: 500 });
+    return NextResponse.json(
+      { message: `서버 오류 발생: ${error}` },
+      { status: 500 },
+    );
   }
 }

@@ -116,6 +116,7 @@ function CommentSection({ postId }) {
 }
 
 function CommentComponent({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   postId,
   userId,
   nickname,
@@ -123,6 +124,7 @@ function CommentComponent({
   comment,
   createdAt,
   profileImage,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   commentId,
   isDeleting,
   onDelete,
