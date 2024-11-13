@@ -29,8 +29,6 @@ if (!admin.apps.length) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    console.log('Request body:', body);
-
     const { postId, userID, content } = body;
 
     if (!postId || !userID || !content) {
@@ -40,41 +38,40 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // 댓글 추가
     const commentsCollection = collection(db, 'Feed', postId, 'comment');
     const newComment = {
       postId,
-      userID, // 댓글 작성자 ID
+      userID,
       content,
       createdAt: Timestamp.now(),
     };
-
     const commentDoc = await addDoc(commentsCollection, newComment);
 
+    // 게시글의 댓글 수 증가
     const postRef = doc(db, 'Feed', postId);
     await updateDoc(postRef, { commentCount: increment(1) });
 
-    // 수정된 부분: getDoc 사용
+    // 게시물 작성자의 FCM 토큰 가져오기 (문서 ID가 postAuthorId와 같음)
     const postSnapshot = await getDoc(postRef);
     const postAuthorId = postSnapshot.data()?.userId;
 
     if (postAuthorId) {
-      const userSnapshot = await getDocs(
-        query(collection(db, 'user'), where('userId', '==', postAuthorId)),
-      );
-      if (!userSnapshot.empty) {
-        const authorData = userSnapshot.docs[0].data();
-        const fcmToken = authorData?.fcmToken;
+      // postAuthorId를 문서 ID로 사용하여 fcmToken 가져오기
+      const userDoc = await getDoc(doc(db, 'user', postAuthorId));
+      const fcmToken = userDoc.data()?.fcmToken;
 
-        if (fcmToken) {
-          const message = {
-            token: fcmToken,
-            notification: {
-              title: '새 댓글이 달렸습니다!',
-              body: `${userID}님이 댓글을 남겼습니다: "${content}"`,
-            },
-          };
-          await admin.messaging().send(message);
-        }
+      if (fcmToken) {
+        const message = {
+          token: fcmToken,
+          notification: {
+            title: '새 댓글이 달렸습니다!',
+            body: `${userID}님이 댓글을 남겼습니다: "${content}"`,
+          },
+        };
+
+        // FCM 메시지 전송
+        await admin.messaging().send(message);
       }
     }
 

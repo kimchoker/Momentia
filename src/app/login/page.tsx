@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { BsEnvelope, BsLock } from 'react-icons/bs';
 import { useRouter } from 'next/navigation';
 import { validateEmail } from '../../lib/validation/validation';
-import { fetchUserInfo, login } from '../../lib/api/userApi';
+import { login, fetchUserInfo } from '../../lib/api/userApi';
 
 const Login: React.FC = () => {
   const router = useRouter();
@@ -44,7 +44,7 @@ const Login: React.FC = () => {
       if (user) {
         // 새로운 토큰 발급 및 세션 스토리지에 저장
         const token = await user.getIdToken(true);
-        console.log('로그인 성공, 토큰:', token);
+        console.log('로그인 성공');
         sessionStorage.setItem('token', token);
 
         // 토큰을 fetchUserInfo 함수에 전달

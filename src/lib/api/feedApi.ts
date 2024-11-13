@@ -197,20 +197,39 @@ const fetchComments = async (postId) => {
 
 // 댓글 작성 함수
 const createComment = async (newComment) => {
+  // 댓글 작성 요청
   const response = await axios.post('/api/comments', newComment);
+  const { postId, userId, content } = response.data;
+
+  // 댓글 알림 전송
+  await axios.post('/api/sendNotification', {
+    postId,
+    actionUserId: userId,
+    actionContent: content,
+    type: 'comment',
+  });
+
   return response.data;
 };
-
 // 댓글 삭제 함수
 const deleteCommentApi = async ({ commentId, postId }) =>
   axios.delete(`/api/comments?commentId=${commentId}&postId=${postId}`);
 
-// 좋아요 추가
+// 좋아요 추가 함수
 const likePost = async (postId: string, email: string) => {
+  // 좋아요 요청
   const response = await axios.post('/api/like', {
     postId,
     email, // 요청 바디에 email 포함
   });
+
+  // 좋아요 알림 전송
+  await axios.post('/api/sendNotification', {
+    postId,
+    actionUserId: email,
+    type: 'like',
+  });
+
   return response.data;
 };
 
