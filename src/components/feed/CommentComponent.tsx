@@ -30,7 +30,10 @@ function CommentSection({ postId }) {
   // 댓글 불러오기
   const { data: comments = [], isPending: isCommentsLoading } = useQuery({
     queryKey: ['comments', postId],
-    queryFn: () => fetchComments(postId),
+    queryFn: async () => {
+      const fetchedComments = await fetchComments(postId);
+      return Array.isArray(fetchedComments) ? fetchedComments : [];
+    },
   });
 
   // 댓글 작성 Mutation
@@ -116,7 +119,6 @@ function CommentSection({ postId }) {
 }
 
 function CommentComponent({
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   postId,
   userId,
   nickname,
@@ -124,7 +126,6 @@ function CommentComponent({
   comment,
   createdAt,
   profileImage,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   commentId,
   isDeleting,
   onDelete,
