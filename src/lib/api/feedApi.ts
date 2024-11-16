@@ -223,12 +223,12 @@ const likePost = async (postId: string, email: string) => {
     email, // 요청 바디에 email 포함
   });
 
-  // 좋아요 알림 전송
-  await axios.post('/api/sendNotification', {
-    postId,
-    actionUserId: email,
-    type: 'like',
-  });
+  // // 좋아요 알림 전송
+  // await axios.post('/api/sendNotification', {
+  //   postId,
+  //   actionUserId: email,
+  //   type: 'like',
+  // });
 
   return response.data;
 };

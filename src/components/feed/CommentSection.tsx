@@ -1,18 +1,16 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
-import { useRouter } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
-import { X, ArrowUp } from 'lucide-react';
+import { ArrowUp } from 'lucide-react';
 import { useQueryClient, useQuery, useMutation } from '@tanstack/react-query';
 import {
   fetchComments,
   createComment,
   deleteCommentApi,
 } from '../../lib/api/feedApi';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import CommentComponent from '../feed/CommentComponent';
 
-function CommentSection({ postId }) {
+const CommentSection = ({ postId }) => {
   const queryClient = useQueryClient();
   const [commentText, setCommentText] = useState('');
   const [userData, setUserData] = useState(null);
@@ -55,9 +53,9 @@ function CommentSection({ postId }) {
   // 댓글 저장 함수
   const handleCommentSave = () => {
     if (!commentText.trim()) return;
+
     if (!userData?.email) {
       alert('로그인이 필요합니다.');
-      setCommentText('');
       return;
     }
 
@@ -96,7 +94,7 @@ function CommentSection({ postId }) {
               profileImage={comment.profileImage}
               commentId={comment.id}
               postId={postId}
-              currentUserId={userData.email}
+              currentUserId={userData?.email || ''} // userData가 null일 때 대비
               userId={comment.userId}
               nickname={comment.nickname}
               comment={comment.content}
@@ -116,55 +114,6 @@ function CommentSection({ postId }) {
       </div>
     </div>
   );
-}
+};
 
-function CommentComponent({
-  postId,
-  userId,
-  nickname,
-  currentUserId,
-  comment,
-  createdAt,
-  profileImage,
-  commentId,
-  isDeleting,
-  onDelete,
-}) {
-  const router = useRouter();
-
-  // 프로필 클릭 핸들러
-  const handleProfileClick = () => {
-    router.push(`/profile/${userId}`);
-  };
-
-  const createdAtorg = new Date(createdAt);
-  const formattedCreatedAt = `${createdAtorg.getFullYear() % 100}년 ${createdAtorg.getMonth() + 1}월 ${createdAtorg.getDate()}일 ${createdAtorg.getHours()}시 ${createdAtorg.getMinutes()}분`;
-
-  return (
-    <div className="flex flex-row items-start p-2">
-      <Avatar onClick={handleProfileClick} className="cursor-pointer">
-        <AvatarImage src={profileImage} alt={`${nickname}의 프로필`} />
-        <AvatarFallback />
-      </Avatar>
-      <div className="flex flex-col ml-3 flex-grow">
-        <div className="flex justify-between items-center">
-          <p className="font-bold">{nickname}</p>
-          <p className="text-xs text-gray-400">{formattedCreatedAt}</p>
-        </div>
-        <p className="text-xs text-gray-500 mb-2">{userId}</p>
-        <p>{comment}</p>
-      </div>
-      {currentUserId === userId && (
-        <button
-          onClick={onDelete}
-          className="ml-auto p-1 text-red-500 hover:text-red-700"
-          disabled={isDeleting}
-        >
-          {isDeleting ? '삭제 중...' : <X className="w-4 h-4" />}
-        </button>
-      )}
-    </div>
-  );
-}
-
-export { CommentComponent, CommentSection };
+export default CommentSection;

@@ -6,7 +6,7 @@ import { FaHeart, FaComment } from 'react-icons/fa';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import ImageModal from './imageModal';
 import EditPostComponent from './feedEdit';
-import { CommentSection } from './CommentSection';
+import CommentSection from './CommentSection';
 import AvatarProfile from '../profile/AvatarProfile'; // AvatarProfile 임포트
 import { useModalStore } from '../../states/store';
 import { deletePost, likePost, unlikePost } from '../../lib/api/feedApi';

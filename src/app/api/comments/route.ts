@@ -29,9 +29,9 @@ if (!admin.apps.length) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { postId, userID, content } = body;
+    const { postId, userId, content } = body;
 
-    if (!postId || !userID || !content) {
+    if (!postId || !userId || !content) {
       return NextResponse.json(
         { message: '필수 요소 중 없는 값이 있습니다.' },
         { status: 400 },
@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
     const commentsCollection = collection(db, 'Feed', postId, 'comment');
     const newComment = {
       postId,
-      userID,
+      userId,
       content,
       createdAt: Timestamp.now(),
     };
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
           token: fcmToken,
           notification: {
             title: '새 댓글이 달렸습니다!',
-            body: `${userID}님이 댓글을 남겼습니다: "${content}"`,
+            body: `${userId}님이 댓글을 남겼습니다: "${content}"`,
           },
         };
 

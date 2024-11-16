@@ -52,15 +52,23 @@ export async function POST(request: Request) {
     };
 
     // FCM 알림 전송
-    await messaging.send(message);
-    return NextResponse.json(
-      { message: '알림이 전송되었습니다.' },
-      { status: 200 },
-    );
+    try {
+      await messaging.send(message);
+      return NextResponse.json(
+        { message: '알림이 전송되었습니다.' },
+        { status: 200 },
+      );
+    } catch (sendError) {
+      console.error('FCM 메시지 전송 실패:', sendError);
+      return NextResponse.json(
+        { error: 'FCM 메시지 전송 실패', details: sendError.message },
+        { status: 500 },
+      );
+    }
   } catch (error) {
     console.error('알림 전송 실패:', error);
     return NextResponse.json(
-      { error: '알림 전송 중 오류 발생' },
+      { error: '알림 전송 중 오류 발생', details: error.message },
       { status: 500 },
     );
   }
