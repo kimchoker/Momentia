@@ -52,21 +52,18 @@ const CommentSection = ({ postId }) => {
 
   // 댓글 저장 함수
   const handleCommentSave = () => {
-    if (!commentText.trim()) return;
-
+    if (!commentText.trim()) {
+      console.error('댓글 내용이 비어 있습니다.');
+      return;
+    }
     if (!userData?.email) {
       alert('로그인이 필요합니다.');
       return;
     }
-
     const newComment = { postId, content: commentText, userId: userData.email };
     createCommentMutation.mutate(newComment);
     setCommentText('');
   };
-
-  if (isCommentsLoading) {
-    return <p>댓글을 불러오는 중...</p>;
-  }
 
   return (
     <div>
@@ -80,7 +77,7 @@ const CommentSection = ({ postId }) => {
         />
         <button
           onClick={handleCommentSave}
-          className="px-1 py-1 w-6 h-6 bg-black text-white rounded-full transition-all hover:bg-[#d6d6d6] m-2"
+          className="w-6 h-6 bg-black text-white rounded-full transition-all hover:bg-[#d6d6d6] m-2"
         >
           <ArrowUp />
         </button>

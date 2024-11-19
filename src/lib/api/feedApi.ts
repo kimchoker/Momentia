@@ -197,9 +197,12 @@ const fetchComments = async (postId) => {
 
 // 댓글 작성 함수
 const createComment = async (newComment) => {
-  // 댓글 작성 요청
   const response = await axios.post('/api/comments', newComment);
-  const { postId, userId, content } = response.data;
+  const { postId, userId, content } = newComment;
+
+  if (!postId || !userId || !content) {
+    throw new Error('댓글 작성 후 데이터가 올바르지 않습니다.');
+  }
 
   // 댓글 알림 전송
   await axios.post('/api/sendNotification', {
