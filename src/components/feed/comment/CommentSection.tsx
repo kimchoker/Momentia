@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -7,8 +8,8 @@ import {
   fetchComments,
   createComment,
   deleteCommentApi,
-} from '../../lib/api/feedApi';
-import CommentComponent from '../feed/CommentComponent';
+} from '../../../lib/api/feedApi';
+import CommentComponent from './CommentComponent';
 
 const CommentSection = ({ postId }) => {
   const queryClient = useQueryClient();

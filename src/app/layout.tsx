@@ -4,7 +4,8 @@ import './globals.css';
 import Head from 'next/head';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useEffect } from 'react';
-import { getMessaging, onMessage } from 'firebase/messaging';
+import { messaging } from '../lib/firebase/firebase'; // 클라이언트 메시징 가져오기
+import { onMessage } from 'firebase/messaging';
 
 // QueryClient 인스턴스 생성
 const queryClient = new QueryClient();
@@ -15,7 +16,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   useEffect(() => {
-    // 서비스 워커 등록 (중복 방지)
+    // 서비스 워커 등록
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker
         .getRegistration('/firebase-messaging-sw.js')
@@ -45,28 +46,29 @@ export default function RootLayout({
     });
 
     // 포그라운드 메시지 처리
-    const messaging = getMessaging();
+    if (messaging) {
+      const handleMessage = (payload: any) => {
+        console.log('포그라운드 메시지 수신:', payload);
 
-    const handleMessage = (payload: any) => {
-      console.log('포그라운드 메시지 수신:', payload);
+        const notificationTitle =
+          payload.notification?.title || '알림 제목 없음';
+        const notificationOptions = {
+          body: payload.notification?.body || '알림 내용 없음',
+          icon: '/icon.png', // 알림 아이콘 경로
+        };
 
-      const notificationTitle = payload.notification?.title || '알림 제목 없음';
-      const notificationOptions = {
-        body: payload.notification?.body || '알림 내용 없음',
-        icon: '/icon.png', // 알림 아이콘 경로
+        // 브라우저 알림 표시
+        new Notification(notificationTitle, notificationOptions);
       };
 
-      // 브라우저 알림 표시
-      new Notification(notificationTitle, notificationOptions);
-    };
+      // onMessage 핸들러 등록
+      const unsubscribe = onMessage(messaging, handleMessage);
 
-    // onMessage 핸들러 등록
-    const unsubscribe = onMessage(messaging, handleMessage);
-
-    // 클린업 함수로 핸들러 제거
-    return () => {
-      unsubscribe();
-    };
+      // 클린업 함수로 핸들러 제거
+      return () => {
+        unsubscribe();
+      };
+    }
   }, []);
 
   return (
