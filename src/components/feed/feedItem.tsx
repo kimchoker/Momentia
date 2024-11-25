@@ -15,6 +15,7 @@ function FeedItem({
   commentCount,
   likeCount,
   profileImage,
+  user,
 }) {
   const createdAt = new Date(time);
   const formattedCreatedAt = `${createdAt.getFullYear()}년 ${createdAt.getMonth() + 1}월 ${createdAt.getDate()}일`;
@@ -32,6 +33,7 @@ function FeedItem({
         time={createdAt}
         commentCount={commentCount}
         likeCount={likeCount}
+        user={user}
       />,
     );
     setModalTitle('글 상세 페이지');

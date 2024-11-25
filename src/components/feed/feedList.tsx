@@ -66,6 +66,7 @@ const FeedList = ({ selectedTab, userData }) => {
               time={feed.createdAt}
               commentCount={feed.commentCount}
               likeCount={feed.likeCount}
+              user={userData}
             />
           ))
         )}
